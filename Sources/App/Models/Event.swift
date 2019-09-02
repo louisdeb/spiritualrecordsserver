@@ -13,6 +13,11 @@ final class Event: Codable {
   
   var date: Date
   var artists: [Artist]
+  
+  init(date: Date, artists: [Artist]) {
+    self.date = date
+    self.artists = artists
+  }
 }
 
 extension Event: Migration {

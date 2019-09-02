@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Home</title>
+  </head>
+  
+  <body>
+    <h1>Event Management</h1>
+
+    <h2>Create A New Event</h2>
+    
+    <form method="post" action="/api/event">
+      <div class="input-group">
+        <label for="date">Select Date</label>
+        <input name="date" type="date" class="form-control"/>
+      
+        <label for="artists">Select Artists</label>
+        <select id="artists" name="artists" class="form-control" multiple="multiple">
+          #for(artist in artists) {
+            <option value="#(artist.name)">#(artist.name)</option>
+          }
+        </select>
+      </div>
+      
+      <span class="input-group-btn">
+      <input class="btn btn-primary" type="submit" value="create"/>
+      </span>
+    </form>
+    
+  </body>
+</html>
