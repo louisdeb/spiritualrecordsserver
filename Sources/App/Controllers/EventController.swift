@@ -18,6 +18,10 @@ struct EventController: RouteCollection {
   func create(_ req: Request) throws -> Future<Event> {
     let body = req.http.body.description
     
+    if (body.contains("date=&")) {
+      throw CreateError.runtimeError("no date provided")
+    }
+    
     let startIndex = body.index(body.startIndex, offsetBy: String("date=").count)
     let endIndex = body.index(body.startIndex, offsetBy: String("date=yyyy-mm-dd").count - 1)
     let dateString = String(body[startIndex...endIndex])
@@ -44,4 +48,8 @@ struct EventController: RouteCollection {
   func get(_ req: Request) throws -> Future<[Event]> {
     return Event.query(on: req).all()
   }
+}
+
+enum CreateError: Error {
+  case runtimeError(String)
 }
