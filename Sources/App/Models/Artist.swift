@@ -12,6 +12,12 @@ final class Artist: Codable {
   var id: UUID?
   
   var name: String
+  var image: String
+  var description: String
+  var website: String
+  var spotify: String
+  var instagram: String
+  var facebook: String
 }
 
 extension Artist: Migration {

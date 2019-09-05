@@ -1,24 +1,37 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Home</title>
-  </head>
+#set("content") {
+  <h1>Artist Management</h1>
 
-  <body>
-    <h1>Artist Management</h1>
+  <h2>Create A New Artist</h2>
+  <form id="artist-form" method="POST" action="/api/artist">
+    <input type="text" name="name" placeholder="Artist Name"/>
+    <input type="text" name="description" placeholder="Description"/>
+    <input type="text" name="image" placeholder="Image URL"/>
+    <input type="text" name="website" placeholder="Website URL"/>
+    <input type="text" name="spotify" placeholder="Spotify URL"/>
+    <input type="text" name="instagram" placeholder="Instagram URL"/>
+    <input type="text" name="facebook" placeholder="Facebook URL"/>
+    <span class="input-group-btn">
+      <input class="btn btn-primary" type="submit" value="Create"/>
+    </span>
+  </form>
 
-    <h2>Create A New Artist</h2>
-    <form method="POST" action="/api/artist">
-      <input type="text" name="name" placeholder="Artist Name"/>
-      <span class="input-group-btn">
-        <input class="btn btn-primary" type="submit" value="Create"/>
-      </span>
-    </form>
-    
-    <h2>Artists</h2>
+  <h2>Artists</h2>
+  <div class="artists">
     #for(artist in artists) {
-      <p>#(artist.name)</p>
+      <div class="artist">
+        <img src="#(artist.image)"/>
+        <h3>#(artist.name)</h3>
+        <p class="description">#(artist.description)</p>
+        <ul>
+          <li><a href="#(artist.website)">#(artist.website)</a></li>
+          <li><a href="#(artist.spotify)">Spotify</a></li>
+          <li><a href="#(artist.instagram)">Instagram</a></li>
+          <li><a href="#(artist.facebook)">Facebook</a></li>
+        </ul>
+        <a class="edit-profile" href="/api/artist/#(artist.id)/update">Edit Profile</a>
+      </div>
+      <hr/>
     }
-
-  </body>
-</html>
+  </div>
+}
+#embed("base")

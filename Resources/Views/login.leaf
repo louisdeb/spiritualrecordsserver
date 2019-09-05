@@ -1,0 +1,5 @@
+#set("content") {
+  <form method="post" action="/app/user">
+  </form>
+}
+#embed("base")

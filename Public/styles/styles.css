@@ -1,0 +1,38 @@
+body {
+  font-family: "Helvetica";
+  margin-left: 3em;
+  margin-top: 3em;
+}
+
+.artists {
+  width: 1000px;
+}
+
+.artist {
+  width: 1000px;
+  height: 300px;
+}
+
+.artist img {
+  float: left;
+  height: 300px;
+  width: 300px;
+  margin-right: 30px;
+}
+
+.artist .description {
+  height: 135px;
+  overflow-y: scroll;
+}
+
+.artist ul {
+  list-style-type: none;
+}
+
+.artist li {
+  line-height: 20px;
+}
+
+.artist .edit-profile {
+  float: right;
+}

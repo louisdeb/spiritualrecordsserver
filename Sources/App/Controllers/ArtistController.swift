@@ -20,6 +20,6 @@ struct ArtistController: RouteCollection {
   }
   
   func get(_ req: Request) throws -> Future<[Artist]> {
-    return Artist.query(on: req).all()
+    return Artist.query(on: req).sort(\Artist.name, .descending).all()
   }
 }
