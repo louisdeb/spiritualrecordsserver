@@ -28,7 +28,7 @@
           <li><a href="#(artist.instagram)">Instagram</a></li>
           <li><a href="#(artist.facebook)">Facebook</a></li>
         </ul>
-        <a class="edit-profile" href="/api/artist/#(artist.id)/update">Edit Profile</a>
+        <a class="edit-profile" href="/app/artists/#(artist.id)/edit">Edit Profile</a>
       </div>
       <hr/>
     }

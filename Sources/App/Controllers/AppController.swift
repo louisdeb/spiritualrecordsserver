@@ -13,8 +13,13 @@ struct AppController: RouteCollection {
     let route = router.grouped("app")
     route.get(use: index)
     route.get("login", use: login)
-    route.get("artistManagement", use: artistManagement)
-    route.get("eventManagement", use: eventManagement)
+    
+    let artistRoute = route.grouped("artists")
+    artistRoute.get(use: artistManagement)
+    artistRoute.get(Artist.parameter, "edit", use: artistEdit)
+    
+    let eventRoute = route.grouped("events")
+    eventRoute.get(use: eventManagement)
   }
   
   func index(_ req: Request) throws -> Future<View> {
@@ -28,6 +33,14 @@ struct AppController: RouteCollection {
   func artistManagement(_ req: Request) throws -> Future<View> {
     let data = ["artists": Artist.query(on: req).all()]
     return try req.view().render("artistManagement", data)
+  }
+  
+  func artistEdit(_ req: Request) throws -> Future<View> {
+    let artist = try req.parameters.next(Artist.self)
+    return artist.flatMap { (artistFuture) -> EventLoopFuture<View> in
+      let data = ["artist": artistFuture]
+      return try req.view().render("artistEdit", data)
+    }
   }
   
   func eventManagement(_ req: Request) throws -> Future<View> {

@@ -16,10 +16,27 @@ struct ArtistController: RouteCollection {
   }
   
   func create(_ req: Request, artist: Artist) throws -> Future<Artist> {
+    if artist.id != nil {
+      return try update(req, updatedArtist: artist)
+    }
     return artist.save(on: req)
   }
   
   func get(_ req: Request) throws -> Future<[Artist]> {
     return Artist.query(on: req).sort(\Artist.name, .descending).all()
+  }
+  
+  func update(_ req: Request, updatedArtist: Artist) throws -> Future<Artist> {
+    let artistFuture = Artist.find(updatedArtist.id!, on: req)
+    return artistFuture.flatMap { (artist) -> EventLoopFuture<Artist> in
+      artist!.name = updatedArtist.name
+      artist!.description = updatedArtist.description
+      artist!.image = updatedArtist.image
+      artist!.website = updatedArtist.website
+      artist!.spotify = updatedArtist.spotify
+      artist!.instagram = updatedArtist.instagram
+      artist!.facebook = updatedArtist.facebook
+      return artist!.save(on: req)
+    }
   }
 }
