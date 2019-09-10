@@ -2,7 +2,7 @@
   <h1>Editing #(artist.name)</h1>
 
   <form id="artist-form" method="POST" action="/api/artist">
-    <input type="text" name="id" value="#(artist.id)" readonly/>
+    <input type="text" name="id" value="#(artist.id)" style="display:none" readonly/>
     <input type="text" name="name" placeholder="Artist Name" value="#(artist.name)"/>
     <input type="text" name="description" placeholder="Description" value="#(artist.description)"/>
     <input type="text" name="image" placeholder="Image URL" value="#(artist.image)"/>

@@ -32,3 +32,5 @@ extension Event: Migration {
 extension Event: SQLiteUUIDModel {}
 extension Event: Content {}
 extension Event: Parameter {}
+
+// Could add a default event for open mics

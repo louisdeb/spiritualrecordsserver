@@ -15,20 +15,23 @@ struct ArtistController: RouteCollection {
     route.get(use: get)
   }
   
-  func create(_ req: Request, artist: Artist) throws -> Future<Artist> {
+  func create(_ req: Request, artist: Artist) throws -> Future<View> {
     if artist.id != nil {
       return try update(req, updatedArtist: artist)
     }
-    return artist.save(on: req)
+    return artist.save(on: req).flatMap { artist -> EventLoopFuture<View> in
+      let data = ["artists": Artist.query(on: req).sort(\Artist.name, .descending).all()]
+      return try req.view().render("artistManagement", data)
+    }
   }
   
   func get(_ req: Request) throws -> Future<[Artist]> {
     return Artist.query(on: req).sort(\Artist.name, .descending).all()
   }
   
-  func update(_ req: Request, updatedArtist: Artist) throws -> Future<Artist> {
+  func update(_ req: Request, updatedArtist: Artist) throws -> Future<View> {
     let artistFuture = Artist.find(updatedArtist.id!, on: req)
-    return artistFuture.flatMap { (artist) -> EventLoopFuture<Artist> in
+    return artistFuture.flatMap { (artist) -> EventLoopFuture<View> in
       artist!.name = updatedArtist.name
       artist!.description = updatedArtist.description
       artist!.image = updatedArtist.image
@@ -36,7 +39,10 @@ struct ArtistController: RouteCollection {
       artist!.spotify = updatedArtist.spotify
       artist!.instagram = updatedArtist.instagram
       artist!.facebook = updatedArtist.facebook
-      return artist!.save(on: req)
+      return artist!.save(on: req).flatMap { artist -> EventLoopFuture<View> in
+        let data = ["artists": Artist.query(on: req).sort(\Artist.name, .descending).all()]
+        return try req.view().render("artistManagement", data)
+      }
     }
   }
 }

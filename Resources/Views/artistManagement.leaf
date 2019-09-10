@@ -1,4 +1,6 @@
 #set("content") {
+  <a href="/app">Home</a>
+
   <h1>Artist Management</h1>
 
   <h2>Create A New Artist</h2>
