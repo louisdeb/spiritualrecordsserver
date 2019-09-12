@@ -5,7 +5,7 @@
     <input type="text" name="id" value="#(artist.id)" style="display:none" readonly/>
     <input type="text" name="name" placeholder="Artist Name" value="#(artist.name)"/>
     <input type="text" name="description" placeholder="Description" value="#(artist.description)"/>
-    <input type="text" name="image" placeholder="Image URL" value="#(artist.image)"/>
+    <input type="text" name="imageURL" placeholder="Image URL" value="#(artist.imageURL)"/>
     <input type="text" name="website" placeholder="Website URL" value="#(artist.website)"/>
     <input type="text" name="spotify" placeholder="Spotify URL" value="#(artist.spotify)"/>
     <input type="text" name="instagram" placeholder="Instagram URL" value="#(artist.instagram)"/>

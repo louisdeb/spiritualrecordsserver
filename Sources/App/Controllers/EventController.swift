@@ -15,33 +15,34 @@ struct EventController: RouteCollection {
     route.get(use: get)
   }
   
-  func create(_ req: Request) throws -> Future<Event> {
+  func create(_ req: Request) throws -> Future<View> {
     let body = req.http.body.description
     
-    if (body.contains("date=&")) {
-      throw CreateError.runtimeError("no date provided")
+    guard let data = body.data(using: .utf8) else {
+      return try req.view().render("eventManagement")
     }
     
-    let startIndex = body.index(body.startIndex, offsetBy: String("date=").count)
-    let endIndex = body.index(body.startIndex, offsetBy: String("date=yyyy-mm-dd").count - 1)
-    let dateString = String(body[startIndex...endIndex])
-    
-    var artistsString = String(body[body.index(endIndex, offsetBy: String("&artists=").count + 1)...])
-    artistsString = artistsString.replacingOccurrences(of: "&artists=", with: ",")
-    
-    let artistNames = artistsString.split(separator: ",").map { s -> String in
-      return String(s)
+    guard let json = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? Dictionary<String, Any> else {
+      return try req.view().render("eventManagement")
     }
     
     let formatter = DateFormatter()
     formatter.dateFormat = "yyyy-MM-dd"
     formatter.timeZone = TimeZone(secondsFromGMT: 0)
     
-    let date = formatter.date(from: dateString)
+    let name = json["name"] as? String
+    let date = formatter.date(from: json["date"] as! String)
+    let artistNames = json["artists"] as! [String]
+    let unsignedArtistNames = json["unsignedArtists"] as! [String]
+    let price = json["price"] as! String
     
-    return Artist.query(on: req).all().flatMap({ (artistFutures) -> Future<Event> in
+    return Artist.query(on: req).all().flatMap({ (artistFutures) -> Future<View> in
       let artists = artistFutures.filter { artistNames.contains($0.name) }
-      return Event(date: date!, artists: artists).save(on: req)
+      return Event(name: name, date: date!, artists: artists, unsignedArtists: unsignedArtistNames, price: price)
+        .save(on: req).flatMap { event -> EventLoopFuture<View> in
+        let data = ["artists": Artist.query(on: req).sort(\Artist.name, .ascending).all()]
+        return try req.view().render("eventManagement", data)
+      }
     })
   }
   

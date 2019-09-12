@@ -11,12 +11,18 @@ import Vapor
 final class Event: Codable {
   var id: UUID?
   
+  var name: String
   var date: Date
   var artists: [Artist]
+  var unsignedArtists: [String]
+  var price: String
   
-  init(date: Date, artists: [Artist]) {
+  init(name: String?, date: Date, artists: [Artist], unsignedArtists: [String], price: String) {
+    self.name = name ?? date.description // Temporary - elaborate with 'Tuesday Live 18th Oct', e.g.
     self.date = date
     self.artists = artists
+    self.unsignedArtists = unsignedArtists
+    self.price = price
   }
 }
 

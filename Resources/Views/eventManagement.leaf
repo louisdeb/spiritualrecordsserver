@@ -1,26 +1,42 @@
 #set("content") {
-  <a href="/app">Home</a>
+  <a href='/app'>Home</a>
 
   <h1>Event Management</h1>
 
   <h2>Create A New Event</h2>
 
-  <form method="post" action="/api/event">
-    <div class="input-group">
-      <label for="date">Select Date</label>
-      <input name="date" type="date" class="form-control"/>
+  <form method='post' action='/api/event'>
+    <div class='input-group event-create-form'>
+      
+      <div class='select-date'>
+        <label for='date'>Select Date</label>
+        <input id='date-select' name='date' type='date' class='form-control'/>
+        <div id='dateWarning' style='color: red; display: none; margin-left: 10px'>A date must be selected</div>
+        <!-- could add 'submit as open mic option here -->
+      </div>
+      
+      <div class='select-name'>
+        <label for='name'>Enter Name (Optional)</label>
+        <input id='name-input' name='name' type='text' style='margin-left: 10px'>
+      </div>
 
-      <label for="artists">Select Artists</label>
-      <select id="artists" name="artists" class="form-control" multiple="multiple">
-        #for(artist in artists) {
-          <option value="#(artist.name)">#(artist.name)</option>
-        }
-      </select>
+      <div class='select-artists'>
+        <label for='artists'>Select Signed Artists</label>
+        <input type='button' value='+' onclick='addArtistToSelect(this)' style='margin-left: 10px'>
+      </div>
+      
+      <div class='select-unsigned-artists'>
+        <label for='unsigned-artists'>Select Unsigned Artists</label>
+        <input type='button' value='+' onclick='addUnsignedArtist(this)' style='margin-left: 10px'>
+      </div>
+      
+      <div class='input-price'>
+        <label for='price'>Price</label>
+        <input id='price-input' type='text' placeholder='Free' value='Free' style='margin-left: 10px'>
+      </div>
     </div>
 
-    <span class="input-group-btn">
-    <input class="btn btn-primary" type="submit" value="create"/>
-    </span>
+    <input type='button' value='Create' onclick='submitEvent(this)'>
   </form>
 }
 #embed("base")

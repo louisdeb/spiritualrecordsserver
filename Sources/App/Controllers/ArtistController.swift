@@ -19,14 +19,15 @@ struct ArtistController: RouteCollection {
     if artist.id != nil {
       return try update(req, updatedArtist: artist)
     }
+    
     return artist.save(on: req).flatMap { artist -> EventLoopFuture<View> in
-      let data = ["artists": Artist.query(on: req).sort(\Artist.name, .descending).all()]
+      let data = ["artists": Artist.query(on: req).sort(\Artist.name, .ascending).all()]
       return try req.view().render("artistManagement", data)
     }
   }
   
   func get(_ req: Request) throws -> Future<[Artist]> {
-    return Artist.query(on: req).sort(\Artist.name, .descending).all()
+    return Artist.query(on: req).sort(\Artist.name, .ascending).all()
   }
   
   func update(_ req: Request, updatedArtist: Artist) throws -> Future<View> {
@@ -34,13 +35,13 @@ struct ArtistController: RouteCollection {
     return artistFuture.flatMap { (artist) -> EventLoopFuture<View> in
       artist!.name = updatedArtist.name
       artist!.description = updatedArtist.description
-      artist!.image = updatedArtist.image
+      artist!.imageURL = updatedArtist.imageURL
       artist!.website = updatedArtist.website
       artist!.spotify = updatedArtist.spotify
       artist!.instagram = updatedArtist.instagram
       artist!.facebook = updatedArtist.facebook
       return artist!.save(on: req).flatMap { artist -> EventLoopFuture<View> in
-        let data = ["artists": Artist.query(on: req).sort(\Artist.name, .descending).all()]
+        let data = ["artists": Artist.query(on: req).sort(\Artist.name, .ascending).all()]
         return try req.view().render("artistManagement", data)
       }
     }

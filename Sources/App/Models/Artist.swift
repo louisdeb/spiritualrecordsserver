@@ -12,7 +12,7 @@ final class Artist: Codable {
   var id: UUID?
   
   var name: String
-  var image: String
+  var imageURL: String
   var description: String
   var website: String
   var spotify: String

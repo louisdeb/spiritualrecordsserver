@@ -31,7 +31,7 @@ struct AppController: RouteCollection {
   }
   
   func artistManagement(_ req: Request) throws -> Future<View> {
-    let data = ["artists": Artist.query(on: req).sort(\Artist.name, .descending).all()]
+    let data = ["artists": Artist.query(on: req).sort(\Artist.name, .ascending).all()]
     return try req.view().render("artistManagement", data)
   }
   
@@ -44,7 +44,6 @@ struct AppController: RouteCollection {
   }
   
   func eventManagement(_ req: Request) throws -> Future<View> {
-    let data = ["artists": Artist.query(on: req).sort(\Artist.name, .descending).all()]
-    return try req.view().render("eventManagement", data)
+    return try req.view().render("eventManagement")
   }
 }

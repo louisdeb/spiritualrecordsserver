@@ -7,7 +7,7 @@
   <form id="artist-form" method="POST" action="/api/artist">
     <input type="text" name="name" placeholder="Artist Name"/>
     <input type="text" name="description" placeholder="Description"/>
-    <input type="text" name="image" placeholder="Image URL"/>
+    <input type="text" name="imageURL" placeholder="Image URL"/>
     <input type="text" name="website" placeholder="Website URL"/>
     <input type="text" name="spotify" placeholder="Spotify URL"/>
     <input type="text" name="instagram" placeholder="Instagram URL"/>
@@ -21,7 +21,7 @@
   <div class="artists">
     #for(artist in artists) {
       <div class="artist">
-        <img src="#(artist.image)"/>
+        <img src="#(artist.imageURL)"/>
         <h3>#(artist.name)</h3>
         <p class="description">#(artist.description)</p>
         <ul>

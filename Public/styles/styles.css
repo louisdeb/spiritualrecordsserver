@@ -36,3 +36,56 @@ body {
 .artist .edit-profile {
   float: right;
 }
+
+.event-create-form {
+  display: flex;
+  flex-direction: column;
+  margin-left: 20px;
+}
+
+.event-create-form > div {
+  margin-bottom: 33px;
+}
+
+.select-date {
+  height: 33px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.select-date #date-select {
+  margin-left: 10px;
+}
+
+.select-artists, .select-unsigned-artists, .input-price, .select-name {
+  height: 33px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.artist-select {
+  margin-left: 20px;
+  margin-bottom: 0px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+#add-artist {
+  margin-left: 20px;
+  color: blue;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+#delete-artist {
+  margin-left: 5px;
+  color: red;
+  cursor: pointer;
+}
+
+.unsigned-artist-input {
+  margin-left: 20px;
+}
