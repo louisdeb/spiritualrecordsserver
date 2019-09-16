@@ -1,3 +1,8 @@
+function toggleShowCreateEvent() {
+  var form = document.getElementById("create-event-form")
+  form.style.display = form.style.display == "none" ? "block" : "none"
+}
+
 function addArtistToSelect(e) {
   var parent = e.parentElement
   
@@ -78,7 +83,8 @@ function submitEvent(e) {
   formreq.open(form.method, form.action, true)
   formreq.setRequestHeader("Content-Type", "application/json; charset=UTF-8")
   formreq.onreadystatechange = function() {
-    console.log("... Submitted")
+    console.log("... Submitted. Reloading page")
+    location.reload(true)
   }
   
   formreq.send(JSON.stringify(json))

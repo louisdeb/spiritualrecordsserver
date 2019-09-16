@@ -20,6 +20,7 @@ struct AppController: RouteCollection {
     
     let eventRoute = route.grouped("events")
     eventRoute.get(use: eventManagement)
+    eventRoute.get(Event.parameter, "edit", use: eventEdit)
   }
   
   func index(_ req: Request) throws -> Future<View> {
@@ -44,6 +45,13 @@ struct AppController: RouteCollection {
   }
   
   func eventManagement(_ req: Request) throws -> Future<View> {
-    return try req.view().render("eventManagement")
+    // TODO: Drop all events from previous dates.
+    let events = Event.query(on: req).sort(\Event.date, .ascending).all()
+    let data = ["events": events]
+    return try req.view().render("eventManagement", data)
+  }
+  
+  func eventEdit(_ req: Request) throws -> Future<View> {
+    return try req.view().render("eventManagement") //placeholder return
   }
 }

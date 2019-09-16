@@ -37,10 +37,10 @@ struct EventController: RouteCollection {
     let price = json["price"] as! String
     
     return Artist.query(on: req).all().flatMap({ (artistFutures) -> Future<View> in
-      let artists = artistFutures.filter { artistNames.contains($0.name) }
-      return Event(name: name, date: date!, artists: artists, unsignedArtists: unsignedArtistNames, price: price)
-        .save(on: req).flatMap { event -> EventLoopFuture<View> in
-        let data = ["artists": Artist.query(on: req).sort(\Artist.name, .ascending).all()]
+      let artists = artistFutures.filter { artistNames.contains($0.name) } // Get Artist models from Strings
+      let event = Event(name: name, date: date!, artists: artists, unsignedArtists: unsignedArtistNames, price: price)
+      return event.save(on: req).flatMap { (_) -> EventLoopFuture<View> in
+        let data = ["events": Event.query(on: req).sort(\Event.date, .ascending).all()]
         return try req.view().render("eventManagement", data)
       }
     })
@@ -49,8 +49,4 @@ struct EventController: RouteCollection {
   func get(_ req: Request) throws -> Future<[Event]> {
     return Event.query(on: req).all()
   }
-}
-
-enum CreateError: Error {
-  case runtimeError(String)
 }

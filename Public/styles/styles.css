@@ -37,10 +37,20 @@ body {
   float: right;
 }
 
+#create-event-title {
+/*  color: blue;*/
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .event-create-form {
   display: flex;
   flex-direction: column;
   margin-left: 20px;
+}
+
+#form-create-button {
+  margin-left: 18px;
 }
 
 .event-create-form > div {
@@ -88,4 +98,38 @@ body {
 
 .unsigned-artist-input {
   margin-left: 20px;
+}
+
+#events {
+  width: 1000px;
+}
+
+#events > h2 {
+  text-decoration: underline;
+}
+
+.event-date {
+  color: grey;
+}
+
+.event-artists {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.event-artists > h3 {
+  margin-right: 10px;
+}
+
+.event-artists > div {
+  margin-left: 5px;
+}
+
+.vertical-break {
+  color: grey;
+}
+
+.edit-event {
+  float: right;
 }
