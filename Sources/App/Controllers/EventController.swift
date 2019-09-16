@@ -39,6 +39,11 @@ struct EventController: RouteCollection {
     return Artist.query(on: req).all().flatMap({ (artistFutures) -> Future<View> in
       let artists = artistFutures.filter { artistNames.contains($0.name) } // Get Artist models from Strings
       let event = Event(name: name, date: date!, artists: artists, unsignedArtists: unsignedArtistNames, price: price)
+      
+      if (event.name == "") {
+        event.name = Event.generateName(event: event)
+      }
+      
       return event.save(on: req).flatMap { (_) -> EventLoopFuture<View> in
         let data = ["events": Event.query(on: req).sort(\Event.date, .ascending).all()]
         return try req.view().render("eventManagement", data)

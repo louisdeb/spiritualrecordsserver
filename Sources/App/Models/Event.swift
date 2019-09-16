@@ -45,6 +45,21 @@ extension Event {
     
     return event.date >= today
   }
+  
+  static func generateName(event: Event) -> String {
+    let date = event.date
+    let calendar = Calendar.current
+    let weekday = calendar.component(.weekday, from: date)
+    let day = calendar.component(.day, from: date)
+    let month = calendar.component(.month, from: date)
+    
+    var generatedName = calendar.weekdaySymbols[weekday-1]
+    generatedName += " " + String(day)
+    generatedName += " " + calendar.shortMonthSymbols[month]
+    generatedName += " Live"
+    
+    return generatedName
+  }
 }
 
 extension Event: Migration {
