@@ -42,6 +42,7 @@ struct EventController: RouteCollection {
       return event.save(on: req).flatMap { (_) -> EventLoopFuture<View> in
         let data = ["events": Event.query(on: req).sort(\Event.date, .ascending).all()]
         return try req.view().render("eventManagement", data)
+        // Not actually used. Front-end performs a refresh which uses AppController's route.
       }
     })
   }

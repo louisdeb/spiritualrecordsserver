@@ -45,10 +45,11 @@ struct AppController: RouteCollection {
   }
   
   func eventManagement(_ req: Request) throws -> Future<View> {
-    // TODO: Drop all events from previous dates.
-    let events = Event.query(on: req).sort(\Event.date, .ascending).all()
-    let data = ["events": events]
-    return try req.view().render("eventManagement", data)
+    return Event.query(on: req).sort(\Event.date, .ascending).all().flatMap { (eventFutures) -> EventLoopFuture<View> in
+      let events = eventFutures.filter { Event.isUpcoming(event: $0) }
+      let data = ["events": events]
+      return try req.view().render("eventManagement", data)
+    }
   }
   
   func eventEdit(_ req: Request) throws -> Future<View> {

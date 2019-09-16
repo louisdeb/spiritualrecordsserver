@@ -26,6 +26,27 @@ final class Event: Codable {
   }
 }
 
+extension Event {
+  static func isUpcoming(event: Event) -> Bool {
+    let now = Date.init(timeIntervalSinceNow: 0)
+    let calendar = Calendar.current
+    let year = calendar.component(.year, from: now)
+    let month = calendar.component(.month, from: now)
+    let day = calendar.component(.day, from: now)
+    
+    var dateComponents = DateComponents()
+    dateComponents.year = year
+    dateComponents.month = month
+    dateComponents.day = day
+    dateComponents.minute = 0
+    dateComponents.second = 0
+    
+    let today = calendar.date(from: dateComponents)!
+    
+    return event.date >= today
+  }
+}
+
 extension Event: Migration {
   static func prepare(on connection: SQLiteConnection) -> Future<Void> {
     return Database.create(self, on: connection) { builder in
