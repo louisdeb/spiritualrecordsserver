@@ -45,7 +45,10 @@
       </div>
     </div>
 
-    <input id='form-create-button' type='button' value='Create' onclick='updateEvent(this)'>
+    <input id='form-create-button' type='button' value='Update' onclick='updateEvent(this)'>
+    
+    <br><br>
+    <input id='event-delete-button' type='button' value='Delete Event' onclick='deleteEvent("#(event.id)")'>
   </form>
 
   <script>

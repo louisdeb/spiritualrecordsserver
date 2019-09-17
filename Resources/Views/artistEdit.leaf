@@ -13,6 +13,9 @@
     <span class="input-group-btn">
       <input class="btn btn-primary" type="submit" value="Update"/>
     </span>
+    
+    <br><br>
+    <input id='artist-delete-button' type='button' value='Delete Artist' onclick='deleteArtist("#(artist.id)")'>
   </form>
 }
 #embed("base")

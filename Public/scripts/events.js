@@ -146,3 +146,23 @@ function populateArtistSelectors(selectionElems) {
     addArtistToSelect(selectionElems[0].parentElement, selectedArtist)
   }
 }
+
+function deleteArtist(id) {
+  let delreq = new XMLHttpRequest()
+  delreq.open("POST", "/api/artist/" + id + "/delete", true)
+  delreq.onreadystatechange = function () {
+    location.replace("/app/artists")
+  }
+  
+  delreq.send()
+}
+
+function deleteEvent(id) {
+  let delreq = new XMLHttpRequest()
+  delreq.open("POST", "/api/event/" + id + "/delete", true)
+  delreq.onreadystatechange = function () {
+    location.replace("/app/events")
+  }
+  
+  delreq.send()
+}

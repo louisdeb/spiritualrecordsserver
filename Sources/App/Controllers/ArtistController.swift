@@ -13,6 +13,7 @@ struct ArtistController: RouteCollection {
     let route = router.grouped("api", "artist")
     route.post(Artist.self, use: create)
     route.get(use: get)
+    route.post(Artist.parameter, "delete", use: delete)
   }
   
   func create(_ req: Request, artist: Artist) throws -> Future<View> {
@@ -45,5 +46,10 @@ struct ArtistController: RouteCollection {
         return try req.view().render("artistManagement", data)
       }
     }
+  }
+  
+  func delete(_ req: Request) throws -> Future<Artist> {
+    let artist = try req.parameters.next(Artist.self)
+    return artist.delete(on: req)
   }
 }

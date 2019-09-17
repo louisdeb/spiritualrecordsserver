@@ -13,6 +13,7 @@ struct EventController: RouteCollection {
     let route = router.grouped("api", "event")
     route.post(use: create)
     route.get(use: get)
+    route.post(Event.parameter, "delete", use: delete)
   }
   
   func create(_ req: Request) throws -> Future<Event> {
@@ -64,6 +65,11 @@ struct EventController: RouteCollection {
 
   func get(_ req: Request) throws -> Future<[Event]> {
     return Event.query(on: req).all()
+  }
+  
+  func delete(_ req: Request) throws -> Future<Event> {
+    let event = try req.parameters.next(Event.self)
+    return event.delete(on: req)
   }
 }
 
