@@ -3,7 +3,7 @@ function toggleShowCreateEvent() {
   form.style.display = form.style.display == "none" ? "block" : "none"
 }
 
-function addArtistToSelect(e) {
+function addArtistToSelect(e, value) {
   var parent = e.parentElement
   
   var httpreq = new XMLHttpRequest()
@@ -13,13 +13,27 @@ function addArtistToSelect(e) {
       var artists = JSON.parse(httpreq.responseText)
       
       var div = document.createElement("div")
-      var html = "<select id='artists' name='artists' class='form-control artists-select'>"
-      artists.forEach(function (artist, index) {
-        html += "<option value = '" + artist.name + "'>" + artist.name + "</option>"
-      })
-      html += "</select><input type='button' value='-' onclick='deleteArtistInSelection(this)'>"
-      div.innerHTML = html
       div.setAttribute("class", "artist-select")
+      
+      var select = document.createElement("select")
+      select.setAttribute("name", "artists")
+      select.setAttribute("class", "form-control artists-select")
+      
+      artists.forEach(function (artist, index) {
+        select.options[select.options.length] = new Option(artist.name, artist.name)
+      })
+      
+      if (value != null) {
+        select.value = value
+      }
+      
+      var input = document.createElement("input")
+      input.setAttribute("type", "button")
+      input.setAttribute("value", "-")
+      input.setAttribute("onclick", "deleteArtistInSelection(this)")
+      
+      div.appendChild(select)
+      div.appendChild(input)
       
       parent.appendChild(div)
     }
@@ -43,14 +57,12 @@ function addUnsignedArtist(e) {
   parent.appendChild(div)
 }
 
-function submitEvent(e) {
-  var form = e.parentElement
-  
+function parseEventForm(form) {
   var date = form.date.value
   if (date == "") {
     var dateWarning = document.getElementById("dateWarning")
     dateWarning.style.display = "block"
-    return
+    return {"error": true}
   }
   
   var nameInput = document.getElementById("name-input")
@@ -60,7 +72,7 @@ function submitEvent(e) {
   var artistSelectors = document.getElementsByClassName("artists-select")
   for (let selector of artistSelectors)
     artists.push(selector.value)
-  
+    
   var unsignedArtists = []
   var unsignedArtistSelectors = document.getElementsByClassName("unsigned-artist-input")
   for (let selector of unsignedArtistSelectors)
@@ -76,6 +88,17 @@ function submitEvent(e) {
   json["unsignedArtists"] = unsignedArtists
   json["price"] = price
   
+  return json
+}
+
+function submitEvent(e) {
+  console.log("create event")
+  var form = e.parentElement
+  var json = parseEventForm(form)
+  
+  if (json["error"])
+    return
+  
   console.log("Submitting event creation with JSON:")
   console.log(json)
   
@@ -88,4 +111,38 @@ function submitEvent(e) {
   }
   
   formreq.send(JSON.stringify(json))
+}
+
+function updateEvent(e) {
+  var form = e.parentElement
+  var json = parseEventForm(form)
+  
+  var idInput = document.getElementById("event-id")
+  var id = idInput.value
+  json["id"] = id
+  
+  console.log("Updating event with JSON:")
+  console.log(json)
+  
+  var formreq = new XMLHttpRequest()
+  formreq.open(form.method, form.action, true)
+  formreq.setRequestHeader("Content-Type", "application/json; charset=UTF-8")
+  formreq.onreadystatechange = function () {
+    location.replace("/app/events")
+  }
+  
+  formreq.send(JSON.stringify(json))
+}
+
+function populateArtistSelectors(selectionElems) {
+  if (selectionElems.length == 0) { return }
+
+  var selectedArtists = []
+  for (let selection of selectionElems) {
+    selectedArtists.push(selection.textContent)
+  }
+  
+  for (let selectedArtist of selectedArtists) {
+    addArtistToSelect(selectionElems[0].parentElement, selectedArtist)
+  }
 }

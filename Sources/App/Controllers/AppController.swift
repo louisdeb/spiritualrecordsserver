@@ -53,6 +53,10 @@ struct AppController: RouteCollection {
   }
   
   func eventEdit(_ req: Request) throws -> Future<View> {
-    return try req.view().render("eventManagement") //placeholder return
+    let event = try req.parameters.next(Event.self)
+    return event.flatMap { (eventFuture) -> EventLoopFuture<View> in
+      let data = ["event": eventFuture]
+      return try req.view().render("eventEdit", data)
+    }
   }
 }

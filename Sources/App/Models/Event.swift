@@ -18,7 +18,7 @@ final class Event: Codable {
   var price: String
   
   init(name: String?, date: Date, artists: [Artist], unsignedArtists: [String], price: String) {
-    self.name = name ?? date.description // Temporary - elaborate with 'Tuesday Live 18th Oct', e.g.
+    self.name = name == "" ? Event.generateName(date: date) : name ?? Event.generateName(date: date)
     self.date = date
     self.artists = artists
     self.unsignedArtists = unsignedArtists
@@ -46,8 +46,7 @@ extension Event {
     return event.date >= today
   }
   
-  static func generateName(event: Event) -> String {
-    let date = event.date
+  static func generateName(date: Date) -> String {
     let calendar = Calendar.current
     let weekday = calendar.component(.weekday, from: date)
     let day = calendar.component(.day, from: date)

@@ -15,15 +15,15 @@ struct EventController: RouteCollection {
     route.get(use: get)
   }
   
-  func create(_ req: Request) throws -> Future<View> {
+  func create(_ req: Request) throws -> Future<Event> {
     let body = req.http.body.description
     
     guard let data = body.data(using: .utf8) else {
-      return try req.view().render("eventManagement")
+      throw CreateError.runtimeError("Bad request body")
     }
     
     guard let json = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? Dictionary<String, Any> else {
-      return try req.view().render("eventManagement")
+      throw CreateError.runtimeError("Could not parse request body as JSON")
     }
     
     let formatter = DateFormatter()
@@ -31,28 +31,42 @@ struct EventController: RouteCollection {
     formatter.timeZone = TimeZone(secondsFromGMT: 0)
     
     let name = json["name"] as? String
-    let date = formatter.date(from: json["date"] as! String)
+    let date = formatter.date(from: json["date"] as! String)!
     let artistNames = json["artists"] as! [String]
     let unsignedArtistNames = json["unsignedArtists"] as! [String]
     let price = json["price"] as! String
     
-    return Artist.query(on: req).all().flatMap({ (artistFutures) -> Future<View> in
+    return Artist.query(on: req).all().flatMap({ (artistFutures) -> Future<Event> in
       let artists = artistFutures.filter { artistNames.contains($0.name) } // Get Artist models from Strings
-      let event = Event(name: name, date: date!, artists: artists, unsignedArtists: unsignedArtistNames, price: price)
+      let event = Event(name: name, date: date, artists: artists, unsignedArtists: unsignedArtistNames, price: price)
       
-      if (event.name == "") {
-        event.name = Event.generateName(event: event)
+      if json["id"] != nil {
+        let id = UUID(uuidString: json["id"] as! String)!
+        return try self.update(req, id: id, updatedEvent: event)
       }
       
-      return event.save(on: req).flatMap { (_) -> EventLoopFuture<View> in
-        let data = ["events": Event.query(on: req).sort(\Event.date, .ascending).all()]
-        return try req.view().render("eventManagement", data)
-        // Not actually used. Front-end performs a refresh which uses AppController's route.
-      }
+      return event.save(on: req)
     })
   }
   
+  func update(_ req: Request, id: UUID, updatedEvent: Event) throws -> Future<Event> {
+    let eventFuture = Event.find(id, on: req)
+    return eventFuture.flatMap { (event) -> EventLoopFuture<Event> in
+      event?.name = updatedEvent.name
+      event?.date = updatedEvent.date
+      event?.artists = updatedEvent.artists
+      event?.unsignedArtists = updatedEvent.unsignedArtists
+      event?.price = updatedEvent.price
+      
+      return event!.save(on: req)
+    }
+  }
+
   func get(_ req: Request) throws -> Future<[Event]> {
     return Event.query(on: req).all()
   }
+}
+
+enum CreateError: Error {
+  case runtimeError(String)
 }
