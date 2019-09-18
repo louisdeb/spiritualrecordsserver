@@ -12,20 +12,23 @@ struct ArtistController: RouteCollection {
   func boot(router: Router) throws {
     let route = router.grouped("api", "artist")
     route.get(use: get)
-    route.get(Artist.parameter, "events", use: getEvents)
     route.post(Artist.self, use: create)
     route.post(Artist.parameter, "delete", use: delete)
   }
   
-  func get(_ req: Request) throws -> Future<[Artist]> {
-    return Artist.query(on: req).sort(\Artist.name, .ascending).all()
-  }
-  
-  // Does not filter for upcoming events
-  func getEvents(_ req: Request) throws -> Future<[Event]> {
-    let artistFuture = try req.parameters.next(Artist.self)
-    return artistFuture.flatMap(to: [Event].self) { (artist) in
-      return try artist.events.query(on: req).all()
+  func get(_ req: Request) throws -> Future<[ArtistResponse]> {
+    let artists = Artist.query(on: req).sort(\Artist.name, .ascending).all()
+    
+    return artists.flatMap { artists -> EventLoopFuture<[ArtistResponse]> in
+      return try artists.map { artist -> Future<ArtistResponse> in
+        return try artist.events.query(on: req).all().flatMap { allEvents -> EventLoopFuture<ArtistResponse> in
+          let events = allEvents.filter { Event.isUpcoming(event: $0) }
+          return Future.map(on: req, { () -> ArtistResponse in
+            return ArtistResponse(artist: artist, events: events)
+          })
+        }
+      }
+      .flatten(on: req)
     }
   }
   

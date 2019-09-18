@@ -10,7 +10,7 @@ function addArtistToSelect(e, value) {
   httpreq.open("GET", "/api/artist", true)
   httpreq.onreadystatechange = function () {
     if (httpreq.readyState == 4 && httpreq.status == 200) {
-      var artists = JSON.parse(httpreq.responseText)
+      var artistResponses = JSON.parse(httpreq.responseText)
       
       var div = document.createElement("div")
       div.setAttribute("class", "artist-select")
@@ -19,7 +19,8 @@ function addArtistToSelect(e, value) {
       select.setAttribute("name", "artists")
       select.setAttribute("class", "form-control artists-select")
       
-      artists.forEach(function (artist, index) {
+      artistResponses.forEach(function (artistResponse, index) {
+        var artist = artistResponse.artist
         select.options[select.options.length] = new Option(artist.name, artist.name)
       })
       

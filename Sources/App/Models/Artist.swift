@@ -38,3 +38,13 @@ extension Artist: Migration {
 extension Artist: SQLiteUUIDModel {}
 extension Artist: Content {}
 extension Artist: Parameter {}
+
+struct ArtistResponse: Content {
+  var artist: Artist
+  var events: [Event]
+  
+  init(artist: Artist, events: [Event]) {
+    self.artist = artist
+    self.events = events
+  }
+}

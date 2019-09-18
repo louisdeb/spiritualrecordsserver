@@ -44,9 +44,10 @@ struct AppController: RouteCollection {
   }
   
   func eventManagement(_ req: Request) throws -> Future<View> {
-    return Event.query(on: req).sort(\Event.date, .ascending).all().flatMap { (eventFutures) -> EventLoopFuture<View> in
+    let events = Event.query(on: req).sort(\Event.date, .ascending).all()
+    
+    return events.flatMap { eventFutures -> EventLoopFuture<View> in
       let events = eventFutures.filter { Event.isUpcoming(event: $0) }
-      
       let eventResponses = try events.map { event -> Future<EventResponse> in
         return try event.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<EventResponse> in
           return Future.map(on: req, { () -> EventResponse in

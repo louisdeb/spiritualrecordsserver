@@ -17,7 +17,9 @@ struct EventController: RouteCollection {
   }
   
   func get(_ req: Request) throws -> Future<[EventResponse]> {
-    return Event.query(on: req).all().flatMap { events -> EventLoopFuture<[EventResponse]> in
+    let events = Event.query(on: req).all()
+    
+    return events.flatMap { events -> EventLoopFuture<[EventResponse]> in
       return try events.map { event -> Future<EventResponse> in
         return try event.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<EventResponse> in
           return Future.map(on: req, { () -> EventResponse in
