@@ -13,12 +13,14 @@ final class Event: Codable {
   
   var name: String
   var date: Date
+  var description: String
   var unsignedArtists: [String]
   var price: String
   
-  init(name: String?, date: Date, unsignedArtists: [String], price: String) {
+  init(name: String?, date: Date, description: String?, unsignedArtists: [String], price: String) {
     self.name = name == "" ? Event.generateName(date: date) : name ?? Event.generateName(date: date)
     self.date = date
+    self.description = description ?? ""
     self.unsignedArtists = unsignedArtists
     self.price = price
   }
@@ -77,8 +79,6 @@ extension Event: Migration {
 extension Event: SQLiteUUIDModel {}
 extension Event: Content {}
 extension Event: Parameter {}
-
-// Could add a default event for open mics
 
 struct EventResponse: Content {
   var event: Event

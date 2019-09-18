@@ -5,6 +5,11 @@
     <div class='input-group event-create-form'>
       
       <input id='event-id' type='text' name='id' value='#(eventResponse.event.id)' style='display:none' readonly>
+        
+      <div class='select-name'>
+        <label for='name'>Enter Name (Optional)</label>
+        <input id='name-input' name='name' type='text' style='margin-left: 10px' value='#(eventResponse.event.name)'>
+      </div>
 
       <div class='select-date'>
         <label for='date'>Select Date</label>
@@ -12,9 +17,9 @@
         <div id='dateWarning' style='color: red; display: none; margin-left: 10px'>A date must be selected</div>
       </div>
 
-      <div class='select-name'>
-        <label for='name'>Enter Name (Optional)</label>
-        <input id='name-input' name='name' type='text' style='margin-left: 10px' value='#(eventResponse.event.name)'>
+      <div class='input-description'>
+        <label for='description'>Description (Optional)</label>
+        <input id='description-input' name='description' type='text' style='margin-left: 10px' value='#(eventResponse.event.description)'>
       </div>
 
       <div class='select-artists'>

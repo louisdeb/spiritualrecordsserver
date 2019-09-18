@@ -48,12 +48,13 @@ struct EventController: RouteCollection {
     
     let name = json["name"] as? String
     let date = formatter.date(from: json["date"] as! String)!
+    let description = json["description"] as? String
     let artistNames = json["artists"] as! [String]
     let unsignedArtistNames = json["unsignedArtists"] as! [String]
     let price = json["price"] as! String
     
     let artists = Artist.query(on: req).all()
-    let event = Event(name: name, date: date, unsignedArtists: unsignedArtistNames, price: price)
+    let event = Event(name: name, date: date, description: description, unsignedArtists: unsignedArtistNames, price: price)
     
     if json["id"] != nil {
       let id = UUID(uuidString: json["id"] as! String)!
@@ -84,6 +85,7 @@ struct EventController: RouteCollection {
       
       event.name = updatedEvent.name
       event.date = updatedEvent.date
+      event.description = updatedEvent.description
       event.unsignedArtists = updatedEvent.unsignedArtists
       event.price = updatedEvent.price
       

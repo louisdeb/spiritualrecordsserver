@@ -110,6 +110,7 @@ body {
 
 .event-date {
   color: grey;
+  margin-bottom: 10px;
 }
 
 .event-artists {
@@ -132,4 +133,8 @@ body {
 
 .edit-event {
   float: right;
+}
+
+.event h2 {
+  margin-bottom: 0px;
 }

@@ -8,16 +8,20 @@
   <form id='create-event-form' style='display:none' method='post' action='/api/event'>
     <div class='input-group event-create-form'>
       
+      <div class='select-name'>
+        <label for='name'>Name (Optional)</label>
+        <input id='name-input' name='name' type='text' style='margin-left: 10px'>
+      </div>
+      
       <div class='select-date'>
         <label for='date'>Select Date</label>
         <input id='date-select' name='date' type='date' class='form-control'/>
         <div id='dateWarning' style='color: red; display: none; margin-left: 10px'>A date must be selected</div>
-        <!-- could add 'submit as open mic option here -->
       </div>
       
-      <div class='select-name'>
-        <label for='name'>Enter Name (Optional)</label>
-        <input id='name-input' name='name' type='text' style='margin-left: 10px'>
+      <div class='input-description'>
+        <label for='description'>Description (Optional)</label>
+        <input id='description-input' name='description' type='text' style='margin-left: 10px'>
       </div>
 
       <div class='select-artists'>
@@ -44,7 +48,10 @@
     #for(eventResponse in eventResponses) {
       <div class='event'>
         <div><h2>#(eventResponse.event.name)</h2></div>
+        
         <div class='event-date'>#date(eventResponse.event.date, "dd-MM-yyyy")</div>
+        
+        <div class='event-description'>#(eventResponse.event.description)</div>
         
         <div class='event-artists'>
           <h3>Artists</h3>
@@ -60,6 +67,7 @@
         </div>
         
         <div class='price'>Price: #(eventResponse.event.price)</div>
+        
         <div><a class="edit-event" href="/app/events/#(eventResponse.event.id)/edit">Edit Event</a></div>
         <br>
         <hr>

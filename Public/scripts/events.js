@@ -59,6 +59,9 @@ function addUnsignedArtist(e) {
 }
 
 function parseEventForm(form) {
+  var nameInput = document.getElementById("name-input")
+  var name = nameInput.value
+  
   var date = form.date.value
   if (date == "") {
     var dateWarning = document.getElementById("dateWarning")
@@ -66,8 +69,8 @@ function parseEventForm(form) {
     return {"error": true}
   }
   
-  var nameInput = document.getElementById("name-input")
-  var name = nameInput.value
+  var descriptionInput = document.getElementById("description-input")
+  var description = descriptionInput.value
   
   var artists = []
   var artistSelectors = document.getElementsByClassName("artists-select")
@@ -83,8 +86,9 @@ function parseEventForm(form) {
   var price = priceInput.value
   
   var json = {}
-  json["date"] = date
   json["name"] = name
+  json["date"] = date
+  json["description"] = description
   json["artists"] = artists
   json["unsignedArtists"] = unsignedArtists
   json["price"] = price
