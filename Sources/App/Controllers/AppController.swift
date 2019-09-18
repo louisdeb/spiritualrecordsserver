@@ -32,31 +32,45 @@ struct AppController: RouteCollection {
   }
   
   func artistManagement(_ req: Request) throws -> Future<View> {
-    let data = ["artists": Artist.query(on: req).sort(\Artist.name, .ascending).all()]
+    let artists = Artist.query(on: req).sort(\Artist.name, .ascending).all()
+    let data = ["artists": artists]
     return try req.view().render("artistManagement", data)
   }
   
   func artistEdit(_ req: Request) throws -> Future<View> {
     let artist = try req.parameters.next(Artist.self)
-    return artist.flatMap { (artistFuture) -> EventLoopFuture<View> in
-      let data = ["artist": artistFuture]
-      return try req.view().render("artistEdit", data)
-    }
+    let data = ["artist": artist]
+    return try req.view().render("artistEdit", data)
   }
   
   func eventManagement(_ req: Request) throws -> Future<View> {
     return Event.query(on: req).sort(\Event.date, .ascending).all().flatMap { (eventFutures) -> EventLoopFuture<View> in
       let events = eventFutures.filter { Event.isUpcoming(event: $0) }
-      let data = ["events": events]
-      return try req.view().render("eventManagement", data)
+      
+      let eventResponses = try events.map { event -> Future<EventResponse> in
+        return try event.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<EventResponse> in
+          return Future.map(on: req, { () -> EventResponse in
+            return EventResponse(event: event, artists: artists)
+          })
+        }
+      }
+      .flatten(on: req)
+      
+      return eventResponses.flatMap { eventResponses -> EventLoopFuture<View> in
+        let data = ["eventResponses": eventResponses]
+        return try req.view().render("eventManagement", data)
+      }
     }
   }
   
   func eventEdit(_ req: Request) throws -> Future<View> {
     let event = try req.parameters.next(Event.self)
-    return event.flatMap { (eventFuture) -> EventLoopFuture<View> in
-      let data = ["event": eventFuture]
-      return try req.view().render("eventEdit", data)
+    return event.flatMap { event -> EventLoopFuture<View> in
+      return try event.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<View> in
+        let eventResponse = EventResponse(event: event, artists: artists)
+        let data = ["eventResponse": eventResponse]
+        return try req.view().render("eventEdit", data)
+      }
     }
   }
 }

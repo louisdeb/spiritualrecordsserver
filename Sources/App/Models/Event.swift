@@ -13,16 +13,20 @@ final class Event: Codable {
   
   var name: String
   var date: Date
-  var artists: [Artist]
   var unsignedArtists: [String]
   var price: String
   
-  init(name: String?, date: Date, artists: [Artist], unsignedArtists: [String], price: String) {
+  init(name: String?, date: Date, unsignedArtists: [String], price: String) {
     self.name = name == "" ? Event.generateName(date: date) : name ?? Event.generateName(date: date)
     self.date = date
-    self.artists = artists
     self.unsignedArtists = unsignedArtists
     self.price = price
+  }
+}
+
+extension Event {
+  var artists : Siblings<Event, Artist, ArtistEventPivot> {
+    return siblings()
   }
 }
 
@@ -75,3 +79,13 @@ extension Event: Content {}
 extension Event: Parameter {}
 
 // Could add a default event for open mics
+
+struct EventResponse: Content {
+  var event: Event
+  var artists: [Artist]
+  
+  init(event: Event, artists: [Artist]) {
+    self.event = event
+    self.artists = artists
+  }
+}

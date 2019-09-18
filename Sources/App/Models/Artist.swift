@@ -20,6 +20,12 @@ final class Artist: Codable {
   var facebook: String
 }
 
+extension Artist {
+  var events: Siblings<Artist, Event, ArtistEventPivot> {
+    return siblings()
+  }
+}
+
 extension Artist: Migration {
   static func prepare(on connection: SQLiteConnection) -> Future<Void> {
     return Database.create(self, on: connection) { builder in

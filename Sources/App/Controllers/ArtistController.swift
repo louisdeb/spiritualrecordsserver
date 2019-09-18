@@ -11,9 +11,22 @@ import Authentication
 struct ArtistController: RouteCollection {
   func boot(router: Router) throws {
     let route = router.grouped("api", "artist")
-    route.post(Artist.self, use: create)
     route.get(use: get)
+    route.get(Artist.parameter, "events", use: getEvents)
+    route.post(Artist.self, use: create)
     route.post(Artist.parameter, "delete", use: delete)
+  }
+  
+  func get(_ req: Request) throws -> Future<[Artist]> {
+    return Artist.query(on: req).sort(\Artist.name, .ascending).all()
+  }
+  
+  // Does not filter for upcoming events
+  func getEvents(_ req: Request) throws -> Future<[Event]> {
+    let artistFuture = try req.parameters.next(Artist.self)
+    return artistFuture.flatMap(to: [Event].self) { (artist) in
+      return try artist.events.query(on: req).all()
+    }
   }
   
   func create(_ req: Request, artist: Artist) throws -> Future<View> {
@@ -27,13 +40,10 @@ struct ArtistController: RouteCollection {
     }
   }
   
-  func get(_ req: Request) throws -> Future<[Artist]> {
-    return Artist.query(on: req).sort(\Artist.name, .ascending).all()
-  }
-  
   func update(_ req: Request, updatedArtist: Artist) throws -> Future<View> {
     let artistFuture = Artist.find(updatedArtist.id!, on: req)
-    return artistFuture.flatMap { (artist) -> EventLoopFuture<View> in
+    
+    return artistFuture.flatMap { artist -> EventLoopFuture<View> in
       artist!.name = updatedArtist.name
       artist!.description = updatedArtist.description
       artist!.imageURL = updatedArtist.imageURL
@@ -41,6 +51,7 @@ struct ArtistController: RouteCollection {
       artist!.spotify = updatedArtist.spotify
       artist!.instagram = updatedArtist.instagram
       artist!.facebook = updatedArtist.facebook
+      
       return artist!.save(on: req).flatMap { artist -> EventLoopFuture<View> in
         let data = ["artists": Artist.query(on: req).sort(\Artist.name, .ascending).all()]
         return try req.view().render("artistManagement", data)

@@ -1,25 +1,25 @@
 #set("content") {
-  <h1>Editing #(event.name)</h1>
+  <h1>Editing #(eventResponse.event.name)</h1>
 
   <form id='create-event-form' method='post' action='/api/event'>
     <div class='input-group event-create-form'>
       
-      <input id='event-id' type='text' name='id' value='#(event.id)' style='display:none' readonly>
+      <input id='event-id' type='text' name='id' value='#(eventResponse.event.id)' style='display:none' readonly>
 
       <div class='select-date'>
         <label for='date'>Select Date</label>
-        <input id='date-select' name='date' type='date' class='form-control' value='#date(event.date, "yyyy-MM-dd")'/>
+        <input id='date-select' name='date' type='date' class='form-control' value='#date(eventResponse.event.date, "yyyy-MM-dd")'/>
         <div id='dateWarning' style='color: red; display: none; margin-left: 10px'>A date must be selected</div>
       </div>
 
       <div class='select-name'>
         <label for='name'>Enter Name (Optional)</label>
-        <input id='name-input' name='name' type='text' style='margin-left: 10px' value='#(event.name)'>
+        <input id='name-input' name='name' type='text' style='margin-left: 10px' value='#(eventResponse.event.name)'>
       </div>
 
       <div class='select-artists'>
         <label for='artists'>Select Signed Artists</label>
-        #for(artist in event.artists) {
+        #for(artist in eventResponse.artists) {
           <div class='artist-select'>
             <span class='artist-selection' style='display:none'>#(artist.name)</span>
           </div>
@@ -31,7 +31,7 @@
         <label for='unsigned-artists'>Select Unsigned Artists</label>
         <input type='button' value='+' onclick='addUnsignedArtist(this)' style='margin-left: 10px'>
 
-        #for(unsignedArtist in event.unsignedArtists) {
+        #for(unsignedArtist in eventResponse.event.unsignedArtists) {
           <div>
             <input class='unsigned-artist-input' type='text' value='#(unsignedArtist)'>
             <input type='button' value='-' onclick='deleteArtistInSelection(this)'>
@@ -41,14 +41,14 @@
 
       <div class='input-price'>
         <label for='price'>Price</label>
-        <input id='price-input' type='text' placeholder='Free' value='Free' style='margin-left: 10px' value='#(event.price)'>
+        <input id='price-input' type='text' placeholder='Free' value='Free' style='margin-left: 10px' value='#(eventResponse.event.price)'>
       </div>
     </div>
 
     <input id='form-create-button' type='button' value='Update' onclick='updateEvent(this)'>
     
     <br><br>
-    <input id='event-delete-button' type='button' value='Delete Event' onclick='deleteEvent("#(event.id)")'>
+    <input id='event-delete-button' type='button' value='Delete Event' onclick='deleteEvent("#(eventResponse.event.id)")'>
   </form>
 
   <script>

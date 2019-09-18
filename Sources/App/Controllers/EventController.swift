@@ -11,9 +11,22 @@ import Authentication
 struct EventController: RouteCollection {
   func boot(router: Router) throws {
     let route = router.grouped("api", "event")
-    route.post(use: create)
     route.get(use: get)
+    route.post(use: create)
     route.post(Event.parameter, "delete", use: delete)
+  }
+  
+  func get(_ req: Request) throws -> Future<[EventResponse]> {
+    return Event.query(on: req).all().flatMap { events -> EventLoopFuture<[EventResponse]> in
+      return try events.map { event -> Future<EventResponse> in
+        return try event.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<EventResponse> in
+          return Future.map(on: req, { () -> EventResponse in
+            return EventResponse(event: event, artists: artists)
+          })
+        }
+      }
+      .flatten(on: req)
+    }
   }
   
   func create(_ req: Request) throws -> Future<Event> {
@@ -37,34 +50,49 @@ struct EventController: RouteCollection {
     let unsignedArtistNames = json["unsignedArtists"] as! [String]
     let price = json["price"] as! String
     
-    return Artist.query(on: req).all().flatMap({ (artistFutures) -> Future<Event> in
-      let artists = artistFutures.filter { artistNames.contains($0.name) } // Get Artist models from Strings
-      let event = Event(name: name, date: date, artists: artists, unsignedArtists: unsignedArtistNames, price: price)
-      
-      if json["id"] != nil {
-        let id = UUID(uuidString: json["id"] as! String)!
-        return try self.update(req, id: id, updatedEvent: event)
+    let artists = Artist.query(on: req).all()
+    let event = Event(name: name, date: date, unsignedArtists: unsignedArtistNames, price: price)
+    
+    if json["id"] != nil {
+      let id = UUID(uuidString: json["id"] as! String)!
+      return artists.flatMap { allArtists -> EventLoopFuture<Event> in
+        let artists = allArtists.filter { artistNames.contains($0.name) }
+        return try self.update(req, id: id, updatedEvent: event, artists: artists)
       }
+    }
+    
+    return flatMap(artists, event.save(on: req), { (allArtists, event) -> EventLoopFuture<Event> in
+      let artists = allArtists.filter { artistNames.contains($0.name) }
       
-      return event.save(on: req)
+      return artists.map { artist in
+        return event.artists.attach(artist, on: req)
+      }
+      .flatten(on: req)
+      .transform(to: event)
     })
   }
   
-  func update(_ req: Request, id: UUID, updatedEvent: Event) throws -> Future<Event> {
-    let eventFuture = Event.find(id, on: req)
-    return eventFuture.flatMap { (event) -> EventLoopFuture<Event> in
-      event?.name = updatedEvent.name
-      event?.date = updatedEvent.date
-      event?.artists = updatedEvent.artists
-      event?.unsignedArtists = updatedEvent.unsignedArtists
-      event?.price = updatedEvent.price
+  func update(_ req: Request, id: UUID, updatedEvent: Event, artists: [Artist]) throws -> Future<Event> {
+    let eventFindFuture = Event.find(id, on: req)
+    
+    return eventFindFuture.flatMap { event_ -> EventLoopFuture<Event> in
+      guard let event = event_ else {
+        throw CreateError.runtimeError("Could not find event to update")
+      }
       
-      return event!.save(on: req)
+      event.name = updatedEvent.name
+      event.date = updatedEvent.date
+      event.unsignedArtists = updatedEvent.unsignedArtists
+      event.price = updatedEvent.price
+      
+      return flatMap(event.artists.detachAll(on: req), event.save(on: req), { (_, event) in
+        return artists.map { artist in
+          return event.artists.attach(artist, on: req)
+          }
+          .flatten(on: req)
+          .transform(to: event)
+      })
     }
-  }
-
-  func get(_ req: Request) throws -> Future<[Event]> {
-    return Event.query(on: req).all()
   }
   
   func delete(_ req: Request) throws -> Future<Event> {

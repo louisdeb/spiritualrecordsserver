@@ -36,5 +36,6 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
   migrations.add(model: User.self, database: .sqlite)
   migrations.add(model: Artist.self, database: .sqlite)
   migrations.add(model: Event.self, database: .sqlite)
+  migrations.add(model: ArtistEventPivot.self, database: .sqlite)
   services.register(migrations)
 }

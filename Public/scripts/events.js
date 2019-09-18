@@ -92,7 +92,6 @@ function parseEventForm(form) {
 }
 
 function submitEvent(e) {
-  console.log("create event")
   var form = e.parentElement
   var json = parseEventForm(form)
   
