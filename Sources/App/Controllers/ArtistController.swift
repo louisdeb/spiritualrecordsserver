@@ -22,7 +22,7 @@ struct ArtistController: RouteCollection {
     return artists.flatMap { artists -> EventLoopFuture<[ArtistResponse]> in
       return try artists.map { artist -> Future<ArtistResponse> in
         return try artist.events.query(on: req).all().flatMap { allEvents -> EventLoopFuture<ArtistResponse> in
-          let events = allEvents.filter { Event.isUpcoming(event: $0) }
+          let events = allEvents.filter { $0.isUpcoming() }
           return Future.map(on: req, { () -> ArtistResponse in
             return ArtistResponse(artist: artist, events: events)
           })

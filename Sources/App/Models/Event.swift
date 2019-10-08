@@ -16,13 +16,21 @@ final class Event: Codable {
   var description: String
   var unsignedArtists: [String]
   var price: String
+  var noEvent: Bool
   
-  init(name: String?, date: Date, description: String?, unsignedArtists: [String], price: String) {
-    self.name = name == "" ? Event.generateName(date: date) : name ?? Event.generateName(date: date)
+  init(name: String?, date: Date, description: String?, unsignedArtists: [String], price: String, noEvent: Bool = false) {
+//    The following line creates a name for all events.
+//    self.name = (name == nil || name == "") ? Event.generateName(date: date) : name!
+    self.name = name ?? ""
     self.date = date
     self.description = description ?? ""
     self.unsignedArtists = unsignedArtists
     self.price = price
+    
+    self.noEvent = noEvent
+    if (noEvent) {
+      self.id = UUID.init()
+    }
   }
 }
 
@@ -33,9 +41,9 @@ extension Event {
 }
 
 extension Event {
-  static func isUpcoming(event: Event) -> Bool {
-    let now = Date.init(timeIntervalSinceNow: 0)
-    let calendar = Calendar.current
+  func isUpcoming() -> Bool {
+    let now = Date()
+    let calendar = Calendar(identifier: .gregorian)
     let year = calendar.component(.year, from: now)
     let month = calendar.component(.month, from: now)
     let day = calendar.component(.day, from: now)
@@ -49,11 +57,11 @@ extension Event {
     
     let today = calendar.date(from: dateComponents)!
     
-    return event.date >= today
+    return self.date >= today
   }
   
   static func generateName(date: Date) -> String {
-    let calendar = Calendar.current
+    let calendar = Calendar(identifier: .gregorian)
     let weekday = calendar.component(.weekday, from: date)
     let day = calendar.component(.day, from: date)
     let month = calendar.component(.month, from: date)
@@ -79,13 +87,3 @@ extension Event: Migration {
 extension Event: SQLiteUUIDModel {}
 extension Event: Content {}
 extension Event: Parameter {}
-
-struct EventResponse: Content {
-  var event: Event
-  var artists: [Artist]
-  
-  init(event: Event, artists: [Artist]) {
-    self.event = event
-    self.artists = artists
-  }
-}
