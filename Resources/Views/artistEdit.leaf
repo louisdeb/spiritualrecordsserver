@@ -1,18 +1,48 @@
 #set("content") {
   <h1>Editing #(artist.name)</h1>
 
-  <form id="artist-form" method="POST" action="/api/artist">
-    <input type="text" name="id" value="#(artist.id)" style="display:none" readonly/>
-    <input type="text" name="name" placeholder="Artist Name" value="#(artist.name)"/>
-    <input type="text" name="description" placeholder="Description" value="#(artist.description)"/>
-    <input type="text" name="imageURL" placeholder="Image URL" value="#(artist.imageURL)"/>
-    <input type="text" name="website" placeholder="Website URL" value="#(artist.website)"/>
-    <input type="text" name="spotify" placeholder="Spotify URL" value="#(artist.spotify)"/>
-    <input type="text" name="instagram" placeholder="Instagram URL" value="#(artist.instagram)"/>
-    <input type="text" name="facebook" placeholder="Facebook URL" value="#(artist.facebook)"/>
-    <span class="input-group-btn">
-      <input class="btn btn-primary" type="submit" value="Update"/>
-    </span>
+  <form id='create-artist-form' method='post' action='/api/artist'>
+    <div class='input-group artist-create-form'>
+      
+      <input id='artist-id' type='text' name='id' value='#(artist.id)' style='display:none' readonly>
+      
+      <div class='input-name'>
+        <label for='name'>Name</label>
+        <input id='name-input' type="text" name="name" style='margin-left: 10px' value='#(artist.name)'>
+      </div>
+      
+      <div class='input-description'>
+        <label for='description'>Description</label>
+        <input id='description-input' type="text" name="description" value='#(artist.description)'>
+      </div>
+      
+      <div class='input-image'>
+        <label for='image'>Images</label>
+        <input id='image-input' type="text" name="imageURL" value='#(artist.imageURL)'>
+      </div>
+      
+      <div class='input-spotify'>
+        <label for='spotify'>Spotify URL</label>
+        <input id='spotify-input' type="text" name="spotify" value='#(artist.spotify)'>
+      </div>
+      
+      <div class='input-instagram'>
+        <label for='instagram'>Instagram URL</label>
+        <input id='instagram-input' type="text" name='instagram' value='#(artist.instagram)'>
+      </div>
+      
+      <div class='input-facebook'>
+        <label for='facebook'>Facebook URL</label>
+        <input id='facebook-input' type="text" name='facebook' value='#(artist.facebook)'>
+      </div>
+      
+      <div class='input-website'>
+        <label for='website'>Website URL</label>
+        <input id='website-input' type="text" name='website' value='#(artist.website)'>
+      </div>
+    </div>
+  
+    <input id='form-create-button' type='button' value='Update' onclick='updateArtist(this)'>
     
     <br><br>
     <input id='artist-delete-button' type='button' value='Delete Artist' onclick='deleteArtist("#(artist.id)")'>

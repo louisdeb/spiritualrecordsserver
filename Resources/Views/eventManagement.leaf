@@ -45,6 +45,7 @@
 
   <div id='events'>
     <h2>Events</h2>
+    
     #for(eventResponse in eventResponses) {
       <div class='event'>
         <div><h2>#(eventResponse.event.name)</h2></div>

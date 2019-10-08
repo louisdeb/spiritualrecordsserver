@@ -12,12 +12,22 @@ final class Artist: Codable {
   var id: UUID?
   
   var name: String
-  var imageURL: String
   var description: String
-  var website: String
+  var imageURL: String
   var spotify: String
   var instagram: String
   var facebook: String
+  var website: String
+  
+  init(name: String, description: String?, imageURL: String, spotify: String?, instagram: String?, facebook: String?, website: String?) {
+    self.name = name
+    self.description = description ?? ""
+    self.imageURL = imageURL
+    self.spotify = spotify ?? ""
+    self.instagram = instagram ?? ""
+    self.facebook = facebook ?? ""
+    self.website = website ?? ""
+  }
 }
 
 extension Artist {

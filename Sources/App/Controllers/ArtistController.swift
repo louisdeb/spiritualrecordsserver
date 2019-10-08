@@ -12,7 +12,7 @@ struct ArtistController: RouteCollection {
   func boot(router: Router) throws {
     let route = router.grouped("api", "artist")
     route.get(use: get)
-    route.post(Artist.self, use: create)
+    route.post(use: create)
     route.post(Artist.parameter, "delete", use: delete)
   }
   
@@ -32,9 +32,36 @@ struct ArtistController: RouteCollection {
     }
   }
   
-  func create(_ req: Request, artist: Artist) throws -> Future<View> {
-    if artist.id != nil {
-      return try update(req, updatedArtist: artist)
+  func create(_ req: Request) throws -> Future<View> {
+    let body = req.http.body.description
+    
+    guard let data = body.data(using: .utf8) else {
+      throw CreateError.runtimeError("Bad request body")
+    }
+    
+    guard let json = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? Dictionary<String, Any> else {
+      throw CreateError.runtimeError("Could not arse request body as JSON")
+    }
+    
+    let name = json["name"] as! String
+    let description = json["description"] as? String
+    let image = json["image"] as! String
+    let spotify = json["spotify"] as? String
+    let instagram = json["instagram"] as? String
+    let facebook = json["facebook"] as? String
+    let website = json["website"] as? String
+    
+    let artist = Artist(name: name,
+                        description: description,
+                        imageURL: image,
+                        spotify: spotify,
+                        instagram: instagram,
+                        facebook: facebook,
+                        website: website)
+    
+    if json["id"] != nil {
+      let id = UUID(uuidString: json["id"] as! String)!
+      return try update(req, id: id, updatedArtist: artist)
     }
     
     return artist.save(on: req).flatMap { artist -> EventLoopFuture<View> in
@@ -43,8 +70,8 @@ struct ArtistController: RouteCollection {
     }
   }
   
-  func update(_ req: Request, updatedArtist: Artist) throws -> Future<View> {
-    let artistFuture = Artist.find(updatedArtist.id!, on: req)
+  func update(_ req: Request, id: UUID, updatedArtist: Artist) throws -> Future<View> {
+    let artistFuture = Artist.find(id, on: req)
     
     return artistFuture.flatMap { artist -> EventLoopFuture<View> in
       artist!.name = updatedArtist.name

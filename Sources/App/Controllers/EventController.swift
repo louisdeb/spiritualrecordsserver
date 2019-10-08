@@ -100,7 +100,11 @@ struct EventController: RouteCollection {
     let price = json["price"] as! String
     
     let artists = Artist.query(on: req).all()
-    let event = Event(name: name, date: date, description: description, unsignedArtists: unsignedArtistNames, price: price)
+    let event = Event(name: name,
+                      date: date,
+                      description: description,
+                      unsignedArtists: unsignedArtistNames,
+                      price: price)
     
     if json["id"] != nil {
       let id = UUID(uuidString: json["id"] as! String)!
