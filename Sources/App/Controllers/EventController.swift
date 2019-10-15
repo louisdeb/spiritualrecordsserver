@@ -39,7 +39,7 @@ struct EventController: RouteCollection {
     let eventsFuture = Event.query(on: req).all()
     
     return eventsFuture.flatMap { events -> EventLoopFuture<[EventResponse]> in
-      let eventsThisWeek = events.filter { $0.date > lastMonday && $0.date < nextMonday }
+      let eventsThisWeek = events.filter { $0.date >= lastMonday && $0.date < nextMonday }
       
       var missingDays: [Weekday] = [.tuesday, .wednesday, .thursday, .friday, .saturday, .sunday]
       let calendar = Calendar(identifier: .gregorian)
