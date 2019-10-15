@@ -56,7 +56,7 @@ struct ArtistController: RouteCollection {
     
     let name = json["name"] as! String
     let description = json["description"] as? String
-    let image = json["image"] as! String
+    let imageURLs = json["imageURLs"] as! [String]
     let spotify = json["spotify"] as? String
     let instagram = json["instagram"] as? String
     let facebook = json["facebook"] as? String
@@ -64,7 +64,7 @@ struct ArtistController: RouteCollection {
     
     let artist = Artist(name: name,
                         description: description,
-                        imageURL: image,
+                        imageURLs: imageURLs,
                         spotify: spotify,
                         instagram: instagram,
                         facebook: facebook,
@@ -87,7 +87,7 @@ struct ArtistController: RouteCollection {
     return artistFuture.flatMap { artist -> EventLoopFuture<View> in
       artist!.name = updatedArtist.name
       artist!.description = updatedArtist.description
-      artist!.imageURL = updatedArtist.imageURL
+      artist!.imageURLs = updatedArtist.imageURLs
       artist!.website = updatedArtist.website
       artist!.spotify = updatedArtist.spotify
       artist!.instagram = updatedArtist.instagram

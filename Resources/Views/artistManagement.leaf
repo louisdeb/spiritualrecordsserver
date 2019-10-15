@@ -20,7 +20,7 @@
       
       <div class='input-image'>
         <label for='image'>Images</label>
-        <input id='image-input' type="text" name="imageURL">
+        <input type='button' value='+' onclick='addImageToArtist(this)' style='margin-left: 10px'>
       </div>
       
       <div class='input-spotify'>
@@ -52,7 +52,12 @@
     
     #for(artist in artists) {
       <div class="artist">
-        <img src="#(artist.imageURL)"/>
+        <div class="image-slider">
+          #for(imageURL in artist.imageURLs) {
+            <div class="image-slide"><img src="#(imageURL)"/></div>
+          }
+        </div>
+        
         <h3>#(artist.name)</h3>
         <p class="description">#(artist.description)</p>
         <ul>

@@ -18,7 +18,13 @@
       
       <div class='input-image'>
         <label for='image'>Images</label>
-        <input id='image-input' type="text" name="imageURL" value='#(artist.imageURL)'>
+        <input type='button' value='+' onclick='addImageToArtist(this)' style='margin-left: 10px'>
+        #for(imageURL in artist.imageURLs) {
+          <div>
+            <input class='image-input' type="text" name="imageURL" value='#(imageURL)'>
+            <input type='button' value='-' onclick='deleteImageInSelection(this)'>
+          </div>
+        }
       </div>
       
       <div class='input-spotify'>

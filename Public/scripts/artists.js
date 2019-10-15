@@ -9,9 +9,11 @@ function parseArtistForm(form) {
   
   var descriptionInput = document.getElementById("description-input")
   var description = descriptionInput.value
-  
-  var imageInput = document.getElementById("image-input")
-  var image = imageInput.value
+
+  var images = []
+  var imageInputs = document.getElementsByClassName("image-input")
+  for (let input of imageInputs)
+    images.push(input.value)
   
   var spotifyInput = document.getElementById("spotify-input")
   var spotify = spotifyInput.value
@@ -28,7 +30,7 @@ function parseArtistForm(form) {
   var json = {}
   json["name"] = name
   json["description"] = description
-  json["image"] = image
+  json["imageURLs"] = images
   json["spotify"] = spotify
   json["instagram"] = instagram
   json["facebook"] = facebook
@@ -78,3 +80,19 @@ function updateArtist(e) {
   
   formreq.send(JSON.stringify(json))
 }
+
+function addImageToArtist(e) {
+  var parent = e.parentElement
+  
+  var div = document.createElement("div")
+  var html = "<input class='image-input' type='text'><input type='button' value='-' onclick='deleteArtistInSelection(this)'>"
+  div.innerHTML = html
+  
+  parent.appendChild(div)
+}
+
+function deleteImageInSelection(e) {
+  var parent = e.parentElement
+  parent.parentElement.removeChild(parent)
+}
+

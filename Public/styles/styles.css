@@ -17,7 +17,6 @@ body {
   float: left;
   height: 300px;
   width: 300px;
-  margin-right: 30px;
 }
 
 .artist .description {
@@ -35,6 +34,26 @@ body {
 
 .artist .edit-profile {
   float: right;
+}
+
+.image-slider {
+  width: 300px;
+  height: 300px;
+  display: flex;
+  overflow: auto;
+  float: left;
+  margin-right: 30px;
+  
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+  scroll-behaviour: smooth;
+}
+
+.image-slide {
+  width: 300px;
+  flex-shrink: 0;
+  height: 100%;
+  scroll-snap-align: start;
 }
 
 #create-event-title, #create-artist-title {
