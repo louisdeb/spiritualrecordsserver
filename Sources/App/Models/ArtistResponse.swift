@@ -9,10 +9,10 @@ import Vapor
 
 struct ArtistResponse: Content {
   var artist: Artist
-  var events: [Event]
+  var eventResponses: [EventResponse]
   
-  init(artist: Artist, events: [Event]) {
+  init(artist: Artist, eventResponses: [EventResponse]) {
     self.artist = artist
-    self.events = events
+    self.eventResponses = eventResponses
   }
 }
