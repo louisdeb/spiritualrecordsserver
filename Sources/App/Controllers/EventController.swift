@@ -70,6 +70,10 @@ struct EventController: RouteCollection {
           eventResponses.append(eventResponse)
         }
         
+        eventResponses.sort { (e1, e2) -> Bool in
+          e1.event.date < e2.event.date
+        }
+        
         return EventLoopFuture.map(on: req, { () -> [EventResponse] in
           return eventResponses
         })
