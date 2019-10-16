@@ -19,7 +19,7 @@
 
       <div class='input-description'>
         <label for='description'>Description (Optional)</label>
-        <input id='description-input' name='description' type='text' style='margin-left: 10px' value='#(eventResponse.event.description)'>
+        <textarea id='description-input' name='description' type='text' style='margin-left: 10px'>#(eventResponse.event.description)</textarea>
       </div>
 
       <div class='select-artists'>

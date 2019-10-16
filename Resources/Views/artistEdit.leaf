@@ -13,7 +13,7 @@
       
       <div class='input-description'>
         <label for='description'>Description</label>
-        <input id='description-input' type="text" name="description" value='#(artist.description)'>
+        <textarea id='description-input' type="text" name="description">#(artist.description)</textarea>
       </div>
       
       <div class='input-image'>

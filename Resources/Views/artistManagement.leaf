@@ -15,7 +15,7 @@
       
       <div class='input-description'>
         <label for='description'>Description</label>
-        <input id='description-input' type="text" name="description">
+        <textarea id='description-input' type="text" name="description"></textarea>
       </div>
       
       <div class='input-image'>
@@ -59,12 +59,24 @@
         </div>
         
         <h3>#(artist.name)</h3>
-        <p class="description">#(artist.description)</p>
+        
+        <div class="description">
+          <pre style="font-family:Helvetica">#(artist.description)</pre>
+        </div>
+        
         <ul>
-          <li><a href="#(artist.website)">#(artist.website)</a></li>
-          <li><a href="#(artist.spotify)">Spotify</a></li>
-          <li><a href="#(artist.instagram)">Instagram</a></li>
-          <li><a href="#(artist.facebook)">Facebook</a></li>
+          #if(artist.website != "") {
+            <li><a href="#(artist.website)">#(artist.website)</a></li>
+          }
+          #if(artist.spotify != "") {
+            <li><a href="#(artist.spotify)">Spotify</a></li>
+          }
+          #if(artist.instagram != "") {
+            <li><a href="#(artist.instagram)">Instagram</a></li>
+          }
+          #if(artist.facebook != "") {
+            <li><a href="#(artist.facebook)">Facebook</a></li>
+          }
         </ul>
         <a class="edit-profile" href="/app/artists/#(artist.id)/edit">Edit Profile</a>
       </div>

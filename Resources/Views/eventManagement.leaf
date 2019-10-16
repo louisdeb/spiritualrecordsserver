@@ -21,7 +21,7 @@
       
       <div class='input-description'>
         <label for='description'>Description (Optional)</label>
-        <input id='description-input' name='description' type='text' style='margin-left: 10px'>
+        <textarea id='description-input' name='description' type='text' style='margin-left: 10px'></textarea>
       </div>
 
       <div class='select-artists'>
@@ -52,7 +52,9 @@
         
         <div class='event-date'>#date(eventResponse.event.date, "dd-MM-yyyy")</div>
         
-        <div class='event-description'>#(eventResponse.event.description)</div>
+        <div class='event-description'>
+          <pre style='font-family:Helvetica'>#(eventResponse.event.description)</pre>
+        </div>
         
         <div class='event-artists'>
           <h3>Artists</h3>
