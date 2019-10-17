@@ -11,6 +11,11 @@
         <input id='name-input' type="text" name="name" style='margin-left: 10px' value='#(artist.name)'>
       </div>
       
+      <div class='input-short-description'>
+        <label for='description'>One Line Description</label>
+        <input id='short-description-input' type="text" name="short-description" value='#(artist.shortDescription)'>
+      </div>
+      
       <div class='input-description'>
         <label for='description'>Description</label>
         <textarea id='description-input' type="text" name="description">#(artist.description)</textarea>

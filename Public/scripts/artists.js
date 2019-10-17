@@ -7,6 +7,9 @@ function parseArtistForm(form) {
   var nameInput = document.getElementById("name-input")
   var name = nameInput.value
   
+  var shortDescriptionInput = document.getElementById("short-description-input")
+  var shortDescription = shortDescriptionInput.value
+  
   var descriptionInput = document.getElementById("description-input")
   var description = descriptionInput.value
 
@@ -29,6 +32,7 @@ function parseArtistForm(form) {
   
   var json = {}
   json["name"] = name
+  json["shortDescription"] = shortDescription
   json["description"] = description
   json["imageURLs"] = images
   json["spotify"] = spotify
@@ -95,4 +99,3 @@ function deleteImageInSelection(e) {
   var parent = e.parentElement
   parent.parentElement.removeChild(parent)
 }
-

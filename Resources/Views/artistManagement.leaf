@@ -13,6 +13,11 @@
         <input id='name-input' type="text" name="name" style='margin-left: 10px'>
       </div>
       
+      <div class='input-short-description'>
+        <label for='description'>One Line Description</label>
+        <input id='short-description-input' type="text" name="short-description">
+      </div>
+      
       <div class='input-description'>
         <label for='description'>Description</label>
         <textarea id='description-input' type="text" name="description"></textarea>
@@ -59,6 +64,8 @@
         </div>
         
         <h3>#(artist.name)</h3>
+        
+        <div class="short-description">#(artist.shortDescription)</div>
         
         <div class="description">
           <pre style="font-family:Helvetica">#(artist.description)</pre>
