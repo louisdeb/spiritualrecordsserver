@@ -37,6 +37,11 @@
         <input id='spotify-input' type="text" name="spotify" value='#(artist.spotify)'>
       </div>
       
+      <div class='input-appleMusic'>
+        <label for='appleMusic'>Apple Music URL</label>
+        <input id='appleMusic-input' type="text" name="appleMusic" value='#(artist.appleMusic)'>
+      </div>
+      
       <div class='input-instagram'>
         <label for='instagram'>Instagram URL</label>
         <input id='instagram-input' type="text" name='instagram' value='#(artist.instagram)'>

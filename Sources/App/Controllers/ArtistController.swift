@@ -59,6 +59,7 @@ struct ArtistController: RouteCollection {
     let description = json["description"] as? String
     let imageURLs = json["imageURLs"] as! [String]
     let spotify = json["spotify"] as? String
+    let appleMusic = json["appleMusic"] as? String
     let instagram = json["instagram"] as? String
     let facebook = json["facebook"] as? String
     let website = json["website"] as? String
@@ -68,6 +69,7 @@ struct ArtistController: RouteCollection {
                         description: description,
                         imageURLs: imageURLs,
                         spotify: spotify,
+                        appleMusic: appleMusic,
                         instagram: instagram,
                         facebook: facebook,
                         website: website)
@@ -93,6 +95,7 @@ struct ArtistController: RouteCollection {
       artist!.imageURLs = updatedArtist.imageURLs
       artist!.website = updatedArtist.website
       artist!.spotify = updatedArtist.spotify
+      artist!.appleMusic = updatedArtist.appleMusic
       artist!.instagram = updatedArtist.instagram
       artist!.facebook = updatedArtist.facebook
       

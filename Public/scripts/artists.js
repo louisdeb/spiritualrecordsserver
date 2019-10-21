@@ -20,6 +20,9 @@ function parseArtistForm(form) {
   
   var spotifyInput = document.getElementById("spotify-input")
   var spotify = spotifyInput.value
+    
+  var appleMusicInput = document.getElementById("appleMusic-input")
+  var appleMusic = appleMusicInput.value
   
   var instagramInput = document.getElementById("instagram-input")
   var instagram = instagramInput.value
@@ -36,6 +39,7 @@ function parseArtistForm(form) {
   json["description"] = description
   json["imageURLs"] = images
   json["spotify"] = spotify
+  json["appleMusic"] = appleMusic
   json["instagram"] = instagram
   json["facebook"] = facebook
   json["website"] = website

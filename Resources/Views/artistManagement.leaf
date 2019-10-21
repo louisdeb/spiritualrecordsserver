@@ -33,6 +33,11 @@
         <input id='spotify-input' type="text" name="spotify">
       </div>
       
+      <div class='input-appleMusic'>
+        <label for='appleMusic'>Apple Music URL</label>
+        <input id='appleMusic-input' type="text" name="appleMusic">
+      </div>
+      
       <div class='input-instagram'>
         <label for='instagram'>Instagram URL</label>
         <input id='instagram-input' type="text" name="instagram">
@@ -77,6 +82,9 @@
           }
           #if(artist.spotify != "") {
             <li><a href="#(artist.spotify)">Spotify</a></li>
+          }
+          #if(artist.appleMusic != "") {
+            <li><a href="#(artist.appleMusic)">Apple Music</a></li>
           }
           #if(artist.instagram != "") {
             <li><a href="#(artist.instagram)">Instagram</a></li>
