@@ -103,3 +103,13 @@ function deleteImageInSelection(e) {
   var parent = e.parentElement
   parent.parentElement.removeChild(parent)
 }
+
+function deleteArtist(id) {
+  let delreq = new XMLHttpRequest()
+  delreq.open("POST", "/api/artist/" + id + "/delete", true)
+  delreq.onreadystatechange = function () {
+    location.replace("/app/artists")
+  }
+  
+  delreq.send()
+}

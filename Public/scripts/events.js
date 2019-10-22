@@ -151,16 +151,6 @@ function populateArtistSelectors(selectionElems) {
   }
 }
 
-function deleteArtist(id) {
-  let delreq = new XMLHttpRequest()
-  delreq.open("POST", "/api/artist/" + id + "/delete", true)
-  delreq.onreadystatechange = function () {
-    location.replace("/app/artists")
-  }
-  
-  delreq.send()
-}
-
 function deleteEvent(id) {
   let delreq = new XMLHttpRequest()
   delreq.open("POST", "/api/event/" + id + "/delete", true)

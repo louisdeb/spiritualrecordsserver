@@ -21,6 +21,10 @@ struct AppController: RouteCollection {
     let eventRoute = route.grouped("events")
     eventRoute.get(use: eventManagement)
     eventRoute.get(Event.parameter, "edit", use: eventEdit)
+    
+    let releaseRoute = route.grouped("releases")
+    releaseRoute.get(use: releaseManagement)
+    releaseRoute.get(Release.parameter, "edit", use: releaseEdit)
   }
   
   func index(_ req: Request) throws -> Future<View> {
@@ -73,5 +77,17 @@ struct AppController: RouteCollection {
         return try req.view().render("eventEdit", data)
       }
     }
+  }
+  
+  func releaseManagement(_ req: Request) throws -> Future<View> {
+    let releases = Release.query(on: req).sort(\Release.date, .ascending).all()
+    let data = ["releases": releases]
+    return try req.view().render("releaseManagement", data)
+  }
+  
+  func releaseEdit(_ req: Request) throws -> Future<View> {
+    let release = try req.parameters.next(Release.self)
+    let data = ["release": release]
+    return try req.view().render("releaseEdit", data)
   }
 }

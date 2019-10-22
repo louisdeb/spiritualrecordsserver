@@ -1,4 +1,6 @@
 #set("content") {
+  <a href="/app">Home</a>
+  
   <h1>Editing #(eventResponse.event.name)</h1>
 
   <form id='create-event-form' method='post' action='/api/event'>

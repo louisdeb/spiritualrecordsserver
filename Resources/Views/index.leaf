@@ -4,5 +4,7 @@
   <h2><a href="/app/artists">Artist Management</a></h2>
 
   <h2><a href="/app/events">Event Management</a></h2>
+  
+  <h2><a href="/app/releases">Release Management</a></h2>
 }
 #embed("base")

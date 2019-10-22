@@ -56,12 +56,12 @@ body {
   scroll-snap-align: start;
 }
 
-#create-event-title, #create-artist-title {
+#create-event-title, #create-artist-title, #create-release-title {
   text-decoration: underline;
   cursor: pointer;
 }
 
-.event-create-form, .artist-create-form {
+.event-create-form, .artist-create-form, .release-create-form {
   display: flex;
   flex-direction: column;
   margin-left: 20px;
@@ -71,7 +71,7 @@ body {
   margin-left: 18px;
 }
 
-.event-create-form > div, .artist-create-form > div {
+.event-create-form > div, .artist-create-form > div, .release-create-form > div {
   margin-bottom: 33px;
 }
 
@@ -122,7 +122,7 @@ body {
   width: 1000px;
 }
 
-#events > h2, #artists > h2 {
+#events > h2, #artists > h2, #releases > h2 {
   text-decoration: underline;
 }
 

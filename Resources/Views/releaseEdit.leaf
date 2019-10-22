@@ -1,0 +1,48 @@
+#set("content") {
+  <a href="/app">Home</a>
+
+  <h1>Editing #(release.name)</h1>
+
+  <form id='create-release-form' method='post' action='/api/release'>
+    <div class='input-group release-create-form'>
+      
+      <input id='release-id' type='text' name='id' value='#(release.id)' style='display:none' readonly>
+      
+      <div class='input-name'>
+        <label for='name'>Name</label>
+        <input id='name-input' type="text" name="name" style='margin-left: 10px' value='#(release.name)'>
+      </div>
+      
+      <div class='select-date'>
+        <label for='date'>Release Date</label>
+        <input id='date-select' name='date' type='date' class='form-control' value='#date(release.date, "yyyy-MM-dd")'/>
+        <div id='dateWarning' style='color: red; display: none; margin-left: 10px'>A date must be selected</div>
+      </div>
+      
+      <div class='input-description'>
+        <label for='description'>Description</label>
+        <textarea id='description-input' type="text" name="description">#(release.description)</textarea>
+      </div>
+      
+      <div class='input-image'>
+        <label for='image'>Image URL</label>
+        <input class='image-input' type="text" name="imageURL" value='#(release.imageURL)'>
+      </div>
+      
+      <div class='input-spotify'>
+        <label for='spotify'>Spotify URL</label>
+        <input id='spotify-input' type="text" name="spotify" value='#(release.spotify)'>
+      </div>
+      
+      <div class='input-appleMusic'>
+        <label for='appleMusic'>Apple Music URL</label>
+        <input id='appleMusic-input' type="text" name="appleMusic" value='#(release.appleMusic)'>
+      </div>
+
+    <input id='form-create-button' type='button' value='Update' onclick='updateRelease(this)'>
+    
+    <br><br>
+    <input id='release-delete-button' type='button' value='Delete Release' onclick='deleteRelease("#(release.id)")'>
+  </form>
+}
+#embed("base")

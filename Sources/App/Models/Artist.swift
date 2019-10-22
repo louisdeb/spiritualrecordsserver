@@ -42,6 +42,12 @@ extension Artist {
   }
 }
 
+extension Artist {
+  var releases: Siblings<Artist, Release, ArtistReleasePivot> {
+    return siblings()
+  }
+}
+
 extension Artist: Migration {
   static func prepare(on connection: SQLiteConnection) -> Future<Void> {
     return Database.create(self, on: connection) { builder in
