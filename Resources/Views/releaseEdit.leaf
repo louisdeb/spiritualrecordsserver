@@ -1,24 +1,37 @@
 #set("content") {
   <h1>Editing Release</h1>
-  <h2>#(release.name)</h2>
+  <h2>#(releaseResponse.release.name)</h2>
 
   <form class='create-form' method='post' action='/api/release'>
     <div class='input-group create-form-inner'>
       
-      <input id='release-id' type='text' name='id' value='#(release.id)' style='display:none' readonly>
+      <input id='release-id' type='text' name='id' value='#(releaseResponse.release.id)' style='display:none' readonly>
 
       <div>
         <div class='label-wrapper'>
           <label for='name'>Name</label>
         </div>
-        <input id='name-input' type="text" name="name" value='#(release.name)'>
+        <input id='name-input' type="text" name="name" value='#(releaseResponse.release.name)'>
+      </div>
+
+      <div class='select-artists'>
+        <div class='label-wrapper'>
+          <label for='artists'>Select Signed Artists</label>
+          <input type='button' value='+' onclick='addArtistToSelect(this)'>
+        </div>
+
+        #for(artist in releaseResponse.artists) {
+          <div class='artist-select'>
+            <span class='artist-selection' style='display:none'>#(artist.name)</span>
+          </div>
+        }
       </div>
 
       <div>
         <div class='label-wrapper'>
           <label for='date'>Release Date</label>
         </div>
-        <input id='date-select' name='date' type='date' class='form-control' value='#date(release.date, "yyyy-MM-dd")'/>
+        <input id='date-select' name='date' type='date' class='form-control' value='#date(releaseResponse.release.date, "yyyy-MM-dd")'/>
         <div id='dateWarning' style='color: red; display: none; margin-left: 10px'>A date must be selected</div>
       </div>
 
@@ -26,35 +39,39 @@
         <div class='label-wrapper'>
           <label for='description'>Description</label>
         </div>
-        <textarea id='description-input' type="text" name="description">#(release.description)</textarea>
+        <textarea id='description-input' type="text" name="description">#(releaseResponse.release.description)</textarea>
       </div>
 
       <div>
         <div class='label-wrapper'>
           <label for='image'>Image URL</label>
         </div>
-        <input id='image-input' type="text" name="imageURL" value='#(release.imageURL)'>
+        <input id='image-input' type="text" name="imageURL" value='#(releaseResponse.release.imageURL)'>
       </div>
 
       <div>
         <div class='label-wrapper'>
           <label for='spotify'>Spotify URL</label>
         </div>
-        <input id='spotify-input' type="text" name="spotify" value='#(release.spotify)'>
+        <input id='spotify-input' type="text" name="spotify" value='#(releaseResponse.release.spotify)'>
       </div>
 
       <div>
         <div class='label-wrapper'>
           <label for='appleMusic'>Apple Music URL</label>
         </div>
-        <input id='appleMusic-input' type="text" name="appleMusic" value='#(release.appleMusic)'>
+        <input id='appleMusic-input' type="text" name="appleMusic" value='#(releaseResponse.release.appleMusic)'>
       </div>
 
     </div>
 
     <input class='form-create-button' type='button' value='Update' onclick='updateRelease(this)'>
     <br><br>
-    <input class='delete-button' type='button' value='Delete' onclick='deleteRelease("#(release.id)")'>
+    <input class='delete-button' type='button' value='Delete' onclick='deleteRelease("#(releaseResponse.release.id)")'>
   </form>
+
+  <script>
+    populateArtistSelectors(document.getElementsByClassName("artist-selection"))
+  </script>
 }
 #embed("base")

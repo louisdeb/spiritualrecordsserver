@@ -50,8 +50,8 @@ struct AppController: RouteCollection {
   func eventManagement(_ req: Request) throws -> Future<View> {
     let events = Event.query(on: req).sort(\Event.date, .ascending).all()
     
-    return events.flatMap { eventFutures -> EventLoopFuture<View> in
-      let events = eventFutures.filter { $0.isUpcoming() }
+    return events.flatMap { _events -> EventLoopFuture<View> in
+      let events = _events.filter { $0.isUpcoming() }
       let eventResponses = try events.map { event -> Future<EventResponse> in
         return try event.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<EventResponse> in
           return Future.map(on: req, { () -> EventResponse in
@@ -81,13 +81,33 @@ struct AppController: RouteCollection {
   
   func releaseManagement(_ req: Request) throws -> Future<View> {
     let releases = Release.query(on: req).sort(\Release.date, .ascending).all()
-    let data = ["releases": releases]
-    return try req.view().render("releaseManagement", data)
+    
+    return releases.flatMap { releases -> EventLoopFuture<View> in
+      let releaseResponses = try releases.map { release -> Future<ReleaseResponse> in
+        return try release.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<ReleaseResponse> in
+          return Future.map(on: req, { () -> ReleaseResponse in
+            return ReleaseResponse(release: release, artists: artists)
+          })
+        }
+      }
+      .flatten(on: req)
+      
+      return releaseResponses.flatMap { releaseResponses -> EventLoopFuture<View> in
+        let data = ["releaseResponses": releaseResponses]
+        return try req.view().render("releaseManagement", data)
+      }
+    }
   }
   
   func releaseEdit(_ req: Request) throws -> Future<View> {
     let release = try req.parameters.next(Release.self)
-    let data = ["release": release]
-    return try req.view().render("releaseEdit", data)
+    
+    return release.flatMap { release -> EventLoopFuture<View> in
+      return try release.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<View> in
+        let releaseResponse = ReleaseResponse(release: release, artists: artists)
+        let data = ["releaseResponse": releaseResponse]
+        return try req.view().render("releaseEdit", data)
+      }
+    }
   }
 }

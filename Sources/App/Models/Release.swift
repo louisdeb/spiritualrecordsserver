@@ -8,7 +8,6 @@
 import FluentSQLite
 import Vapor
 
-
 final class Release: Codable {
   var id: UUID?
   

@@ -65,30 +65,33 @@
   <div class='content-wrapper'>
     <h2>Releases</h2>
     
-    #for(release in releases) {
+    #for(response in releaseResponses) {
       <div class="release">
-        
-        <h2>#(release.artist.name)</h2>
-        <h3>#(release.name)</h3>
-        
-        <div class='date'>#date(release.date, "dd-MM-yyyy")</div>
 
-        <img src="#(release.imageURL)"/>
+        #for(artist in response.artists) {
+          <h2>#(artist.name) - #(response.release.name)</h2>
+        }
+        
+        <div class='date'>#date(response.release.date, "dd-MM-yyyy")</div>
+
+        <img src="#(response.release.imageURL)"/>
         
         <div class="description">
-          <pre style="font-family:Helvetica">#(release.description)</pre>
+          <pre style="font-family:Helvetica">#(response.release.description)</pre>
         </div>
         
         <ul>
-          #if(release.spotify != "") {
-            <li><a href="#(release.spotify)">Spotify</a></li>
+          #if(response.release.spotify != "") {
+            <li><a href="#(response.release.spotify)">Spotify</a></li>
           }
-          #if(artist.appleMusic != "") {
-            <li><a href="#(artist.appleMusic)">Apple Music</a></li>
+          #if(response.release.appleMusic != "") {
+            <li><a href="#(response.artists.first.appleMusic)">Apple Music</a></li>
           }
         </ul>
-        <a class="edit-profile" href="/app/releases/#(release.id)/edit">Edit Release</a>
+
+        <a class="edit-profile" href="/app/releases/#(response.release.id)/edit">Edit Release</a>
       </div>
+
       <hr/>
     }
   </div>

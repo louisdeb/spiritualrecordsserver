@@ -2,8 +2,9 @@ function parseReleaseForm(form) {
   var nameInput = document.getElementById("name-input")
   var name = nameInput.value
   
-  var artistInput = document.getElementsByClassName("artists-select")[0]
-  var artist = artistInput.value
+  // Extend here for multiple artists per release
+  var artistInputs = document.getElementsByClassName("artists-select")
+  var artist = artistInputs[0].value
   
   var date = form.date.value
   if (date == "") {
@@ -15,7 +16,7 @@ function parseReleaseForm(form) {
   var descriptionInput = document.getElementById("description-input")
   var description = descriptionInput.value
 
-  var imageInput = document.getElementsByClassName("image-input")
+  var imageInput = document.getElementById("image-input")
   var image = imageInput.value
   
   var spotifyInput = document.getElementById("spotify-input")
@@ -31,6 +32,8 @@ function parseReleaseForm(form) {
   json["imageURL"] = image
   json["spotify"] = spotify
   json["appleMusic"] = appleMusic
+
+  json["artist"] = artist
   
   return json
 }

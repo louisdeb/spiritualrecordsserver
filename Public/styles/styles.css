@@ -143,3 +143,8 @@ header > #title > h1 {
 .additional-field-input-wrapper .delete-input-button {
   margin-left: 5px;
 }
+
+.release img {
+  width: 300px;
+  height: 300px;
+}

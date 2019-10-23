@@ -64,19 +64,31 @@ struct ReleaseController: RouteCollection {
                           imageURL: imageURL,
                           spotify: spotify,
                           appleMusic: appleMusic)
+    
+    let artists = Artist.query(on: req).all()
+    let artistName = json["artist"] as? String
 
     if json["id"] != nil {
       let id = UUID(uuidString: json["id"] as! String)!
-      return try update(req, id: id, updatedRelease: release)
+      return artists.flatMap { artists -> EventLoopFuture<View> in
+        let artist = artists.filter { artistName == $0.name }.first
+        return try self.update(req, id: id, updatedRelease: release, artist: artist!)
+      }
     }
     
-    return release.save(on: req).flatMap { release -> EventLoopFuture<View> in
+    return flatMap(artists, release.save(on: req), { (allArtists, release) -> EventLoopFuture<View> in
+      let _artist = allArtists.filter { artistName == $0.name }.first
+
+      if let artist = _artist {
+        let _ = release.artists.attach(artist, on: req)
+      }
+      
       let data = ["releases": Release.query(on: req).sort(\Release.date, .ascending).all()]
       return try req.view().render("releaseManagement", data)
-    }
+    })
   }
 
-  func update(_ req: Request, id: UUID, updatedRelease: Release) throws -> Future<View> {
+  func update(_ req: Request, id: UUID, updatedRelease: Release, artist: Artist) throws -> Future<View> {
     let releaseFuture = Release.find(id, on: req)
     
     return releaseFuture.flatMap { release -> EventLoopFuture<View> in
@@ -86,11 +98,13 @@ struct ReleaseController: RouteCollection {
       release!.imageURL = updatedRelease.imageURL
       release!.spotify = updatedRelease.spotify
       release!.appleMusic = updatedRelease.appleMusic
-
-      return release!.save(on: req).flatMap { release -> EventLoopFuture<View> in
+      
+      return flatMap(release!.artists.detachAll(on: req), release!.save(on: req), { (_, event) -> EventLoopFuture<View> in
+        let _ = release!.artists.attach(artist, on: req)
+        
         let data = ["releases": Release.query(on: req).sort(\Release.date, .ascending).all()]
         return try req.view().render("releaseManagement", data)
-      }
+      })
     }
   }
   
