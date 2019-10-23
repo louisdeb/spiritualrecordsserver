@@ -1,10 +1,8 @@
 #set("content") {
-  <h1>Spiritual Records App Management Page</h1>
-
-  <h2><a href="/app/artists">Artist Management</a></h2>
-
-  <h2><a href="/app/events">Event Management</a></h2>
-  
-  <h2><a href="/app/releases">Release Management</a></h2>
+  <h2><a href="/app/artists">Artists</a></h2>
+  <h2><a href="/app/events">Events</a></h2>
+  <h2><a href="/app/releases">Releases</a></h2>
+  <h2><a href="/app/interviews">Interviews</a></h2>
+  <h2><a href="/app/news">News</a></h2>
 }
 #embed("base")

@@ -1,66 +1,79 @@
 #set("content") {
-  <a href="/app">Home</a>
-
   <h1>Releases Management</h1>
 
-  <h2 id='create-release-title' onclick='toggleShowCreateRelease()'>Create A New Release</h2>
+  <h2 class='create-content-title' onclick='toggleShowCreateForm()'>Create A New Release</h2>
 
-  <form id="create-release-form" method="post" action="/api/release" style='display:none'>
-    <div class='input-group release-create-form'>
+  <form class="create-form" method="post" action="/api/release" style='display:none'>
+    <div class='input-group create-form-inner'>
       
-      <div class='input-name'>
-        <label for='name'>Name</label>
-        <input id='name-input' type="text" name="name" style='margin-left: 10px'>
+      <div>
+        <div class='label-wrapper'>
+          <label for='name'>Name</label>
+        </div>
+        <input id='name-input' type="text" name="name">
       </div>
       
-      <div class='select-artists'>
-        <label for='artists'>Select Artist</label>
+      <div>
+        <div class='label-wrapper'>
+          <label for='artists'>Select Artist</label>
+        </div>
         <div id='artist-selection'></div>
       </div>
       
-      <div class='select-date'>
-        <label for='date'>Release Date</label>
+      <div>
+        <div class='label-wrapper'>
+          <label for='date'>Release Date</label>
+        </div>
         <input id='date-select' name='date' type='date' class='form-control'/>
         <div id='dateWarning' style='color: red; display: none; margin-left: 10px'>A date must be selected</div>
       </div>
       
-      <div class='input-description'>
-        <label for='description'>Description</label>
+      <div>
+        <div class='label-wrapper'>
+          <label for='description'>Description</label>
+        </div>
         <textarea id='description-input' type="text" name="description"></textarea>
       </div>
       
-      <div class='input-image'>
-        <label for='image'>Image URL</label>
+      <div>
+        <div class='label-wrapper'>
+          <label for='image'>Image URL</label>
+        </div>
         <input id='image-input' type="text" name="imageURL">
       </div>
       
-      <div class='input-spotify'>
-        <label for='spotify'>Spotify URL</label>
+      <div>
+        <div class='label-wrapper'>
+          <label for='spotify'>Spotify URL</label>
+        </div>
         <input id='spotify-input' type="text" name="spotify">
       </div>
       
-      <div class='input-appleMusic'>
-        <label for='appleMusic'>Apple Music URL</label>
+      <div>
+        <div class='label-wrapper'>
+          <label for='appleMusic'>Apple Music URL</label>
+        </div>
         <input id='appleMusic-input' type="text" name="appleMusic">
       </div>
       
     </div>
     
-    <input id='form-create-button' type='button' value='Create' onclick='submitRelease(this)'>
+    <input class='form-create-button' type='button' value='Create' onclick='submitRelease(this)'>
+    <hr>
   </form>
 
-  <div id="releases">
+  <div class='content-wrapper'>
     <h2>Releases</h2>
     
     #for(release in releases) {
       <div class="release">
-        <div class="image-slider">
-          <img src="#(release.imageURL)"/>
-        </div>
         
+        <h2>#(release.artist.name)</h2>
         <h3>#(release.name)</h3>
         
-        <div class='release-date'>#date(release.date, "dd-MM-yyyy")</div>
+        <div class='date'>#date(release.date, "dd-MM-yyyy")</div>
+
+        <img src="#(release.imageURL)"/>
         
         <div class="description">
           <pre style="font-family:Helvetica">#(release.description)</pre>

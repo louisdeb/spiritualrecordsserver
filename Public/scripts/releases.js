@@ -1,8 +1,3 @@
-function toggleShowCreateRelease() {
-  var form = document.getElementById("create-release-form")
-  form.style.display = form.style.display == "none" ? "block" : "none"
-}
-
 function parseReleaseForm(form) {
   var nameInput = document.getElementById("name-input")
   var name = nameInput.value
@@ -63,7 +58,7 @@ function submitRelease(e) {
 
 function updateRelease(e) {
   var form = e.parentElement
-  var json = parseArtistForm(form)
+  var json = parseReleaseForm(form)
   
   var idInput = document.getElementById("release-id")
   var id = idInput.value
@@ -102,7 +97,7 @@ function populateArtistSelector(e) {
       var artistResponses = JSON.parse(httpreq.responseText)
       
       var div = document.createElement("div")
-      div.setAttribute("class", "artist-select")
+      div.setAttribute("class", "additional-field-input-wrapper")
       
       var select = document.createElement("select")
       select.setAttribute("name", "artists")

@@ -1,42 +1,51 @@
 body {
   font-family: "Helvetica";
-  margin-left: 3em;
-  margin-top: 3em;
+  margin: 2em;
+  background-color: black;
+  color: white;
 }
 
-.artists {
-  width: 1000px;
+a {
+  color: white;
 }
 
-.artist {
-  width: 1000px;
-  height: 300px;
+hr {
+  color: white;
 }
 
-.artist img {
-  float: left;
-  height: 300px;
-  width: 300px;
+header {
+  display: flex;
+  flex-direction: row;
 }
 
-.artist .description {
-  height: 135px;
-  overflow-y: scroll;
+header > img {
+  height: 100px;
 }
 
-.artist ul {
-  list-style-type: none;
+header > #title {
+  margin-left: 20px;
 }
 
-.artist li {
-  line-height: 20px;
+header > #title > h1 {
+  margin-bottom: -10px;
 }
 
-.artist .edit-profile {
-  float: right;
+.content-wrapper {
+  max-width: 1000px;
 }
 
-.image-slider {
+.content-wrapper > h2 {
+  text-decoration: underline;
+}
+
+.content {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  min-height: 300px;
+}
+
+.content .image-slider {
   width: 300px;
   height: 300px;
   display: flex;
@@ -49,110 +58,88 @@ body {
   scroll-behaviour: smooth;
 }
 
-.image-slide {
+.content .image-slide {
   width: 300px;
   flex-shrink: 0;
   height: 100%;
   scroll-snap-align: start;
 }
 
-#create-event-title, #create-artist-title, #create-release-title {
+.content img {
+  float: left;
+  height: 300px;
+  width: 300px;
+}
+
+.content-details {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+}
+
+.content-details .description {
+  max-height: 135px;
+  width: inherit;
+  overflow-y: scroll;
+}
+
+.description > pre {
+  white-space: pre-wrap;
+}
+
+.content-details ul {
+  list-style-type: none;
+  padding: 0px;
+}
+
+.content-details li {
+  line-height: 20px;
+}
+
+.create-content-title {
   text-decoration: underline;
   cursor: pointer;
 }
 
-.event-create-form, .artist-create-form, .release-create-form {
+.create-form-inner {
   display: flex;
   flex-direction: column;
   margin-left: 20px;
 }
 
-#form-create-button {
-  margin-left: 18px;
-}
-
-.event-create-form > div, .artist-create-form > div, .release-create-form > div {
+.create-form-inner > div {
   margin-bottom: 33px;
 }
 
-.select-date {
-  height: 33px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+.create-form-inner .label-wrapper {
+  margin-bottom: 3px;
 }
 
-.select-date #date-select {
-  margin-left: 10px;
-}
-
-.select-artists, .select-unsigned-artists, .input-price, .select-name {
-  height: 33px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
-.artist-select {
-  margin-left: 20px;
-  margin-bottom: 0px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
-#add-artist {
-  margin-left: 20px;
-  color: blue;
-  text-decoration: underline;
-  cursor: pointer;
-}
-
-#delete-artist {
-  margin-left: 5px;
-  color: red;
-  cursor: pointer;
-}
-
-.unsigned-artist-input {
+.form-create-button, .delete-button {
   margin-left: 20px;
 }
 
-#events {
-  width: 1000px;
-}
-
-#events > h2, #artists > h2, #releases > h2 {
-  text-decoration: underline;
-}
-
-.event-date {
+.date, .date {
   color: grey;
   margin-bottom: 10px;
-}
-
-.event-artists {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
-.event-artists > h3 {
-  margin-right: 10px;
-}
-
-.event-artists > div {
-  margin-left: 5px;
 }
 
 .vertical-break {
   color: grey;
 }
 
-.edit-event {
-  float: right;
-}
-
 .event h2 {
   margin-bottom: 0px;
+}
+
+.price {
+  margin-bottom: 20px;
+}
+
+.additional-field-input-wrapper {
+  margin-top: 5px;
+}
+
+.additional-field-input-wrapper .delete-input-button {
+  margin-left: 5px;
 }

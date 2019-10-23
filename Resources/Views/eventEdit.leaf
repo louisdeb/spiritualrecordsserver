@@ -1,42 +1,52 @@
 #set("content") {
-  <a href="/app">Home</a>
-  
-  <h1>Editing #(eventResponse.event.name)</h1>
+  <h1>Editing Event</h1>
+  <h2>#(eventResponse.event.name)</h2>
 
-  <form id='create-event-form' method='post' action='/api/event'>
-    <div class='input-group event-create-form'>
+  <form class='create-form' method='post' action='/api/event'>
+    <div class='input-group create-form-inner'>
       
       <input id='event-id' type='text' name='id' value='#(eventResponse.event.id)' style='display:none' readonly>
-        
+
       <div class='select-name'>
-        <label for='name'>Enter Name (Optional)</label>
-        <input id='name-input' name='name' type='text' style='margin-left: 10px' value='#(eventResponse.event.name)'>
+        <div class='label-wrapper'>
+          <label for='name'>Name</label>
+        </div>
+        <input id='name-input' name='name' type='text' value='#(eventResponse.event.name)'>
       </div>
 
       <div class='select-date'>
-        <label for='date'>Select Date</label>
+        <div class='label-wrapper'>
+          <label for='date'>Select Date</label>
+        </div>
         <input id='date-select' name='date' type='date' class='form-control' value='#date(eventResponse.event.date, "yyyy-MM-dd")'/>
         <div id='dateWarning' style='color: red; display: none; margin-left: 10px'>A date must be selected</div>
       </div>
 
       <div class='input-description'>
-        <label for='description'>Description (Optional)</label>
-        <textarea id='description-input' name='description' type='text' style='margin-left: 10px'>#(eventResponse.event.description)</textarea>
+        <div class='label-wrapper'>
+          <label for='description'>Description</label>
+        </div>
+        <textarea id='description-input' name='description' type='text'>#(eventResponse.event.description)</textarea>
       </div>
 
       <div class='select-artists'>
-        <label for='artists'>Select Signed Artists</label>
+        <div class='label-wrapper'>
+          <label for='artists'>Select Signed Artists</label>
+          <input type='button' value='+' onclick='addArtistToSelect(this)'>
+        </div>
+
         #for(artist in eventResponse.artists) {
           <div class='artist-select'>
             <span class='artist-selection' style='display:none'>#(artist.name)</span>
           </div>
         }
-        <input type='button' value='+' onclick='addArtistToSelect(this)' style='margin-left: 10px'>
       </div>
 
       <div class='select-unsigned-artists'>
-        <label for='unsigned-artists'>Select Unsigned Artists</label>
-        <input type='button' value='+' onclick='addUnsignedArtist(this)' style='margin-left: 10px'>
+        <div class='label-wrapper'>
+          <label for='unsigned-artists'>Select Unsigned Artists</label>
+          <input type='button' value='+' onclick='addUnsignedArtist(this)'>
+        </div>
 
         #for(unsignedArtist in eventResponse.event.unsignedArtists) {
           <div>
@@ -47,15 +57,17 @@
       </div>
 
       <div class='input-price'>
-        <label for='price'>Price</label>
-        <input id='price-input' type='text' placeholder='Free' value='Free' style='margin-left: 10px' value='#(eventResponse.event.price)'>
+        <div class='label-wrapper'>
+          <label for='price'>Price</label>
+        </div>
+        <input id='price-input' type='text' placeholder='Free' value='#(eventResponse.event.price)'>
       </div>
+      
     </div>
 
-    <input id='form-create-button' type='button' value='Update' onclick='updateEvent(this)'>
-    
+    <input class='form-create-button' type='button' value='Update' onclick='updateEvent(this)'>
     <br><br>
-    <input id='event-delete-button' type='button' value='Delete Event' onclick='deleteEvent("#(eventResponse.event.id)")'>
+    <input class='delete-button' type='button' value='Delete' onclick='deleteEvent("#(eventResponse.event.id)")'>
   </form>
 
   <script>

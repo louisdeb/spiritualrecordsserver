@@ -1,101 +1,123 @@
 #set("content") {
-  <a href="/app">Home</a>
-
   <h1>Artist Management</h1>
 
-  <h2 id='create-artist-title' onclick='toggleShowCreateArtist()'>Create A New Artist</h2>
+  <h2 class='create-content-title' onclick='toggleShowCreateForm()'>Create A New Artist</h2>
 
-  <form id="create-artist-form" method="post" action="/api/artist" style='display:none'>
-    <div class='input-group artist-create-form'>
+  <form class='create-form' method='post' action='/api/artist' style='display:none'>
+    <div class='input-group create-form-inner'>
       
-      <div class='input-name'>
-        <label for='name'>Name</label>
-        <input id='name-input' type="text" name="name" style='margin-left: 10px'>
+      <div>
+        <div class='label-wrapper'>
+          <label for='name'>Name</label>
+        </div>
+        <input id='name-input' name='name' type='text'>
       </div>
       
-      <div class='input-short-description'>
-        <label for='description'>One Line Description</label>
+      <div>
+        <div class='label-wrapper'>
+          <label for='description'>One Line Description</label>
+        </div>
         <input id='short-description-input' type="text" name="short-description">
       </div>
       
-      <div class='input-description'>
-        <label for='description'>Description</label>
+      <div>
+        <div class='label-wrapper'>
+          <label for='description'>Description</label>
+        </div>
         <textarea id='description-input' type="text" name="description"></textarea>
       </div>
       
-      <div class='input-image'>
-        <label for='image'>Images</label>
-        <input type='button' value='+' onclick='addImageToArtist(this)' style='margin-left: 10px'>
+      <div>
+        <div class='label-wrapper'>
+          <label for='image'>Images</label>
+          <input type='button' value='+' onclick='addImageToArtist(this)'>
+        </div>
       </div>
       
-      <div class='input-spotify'>
-        <label for='spotify'>Spotify URL</label>
+      <div>
+        <div class='label-wrapper'>
+          <label for='spotify'>Spotify URL</label>
+        </div>
         <input id='spotify-input' type="text" name="spotify">
       </div>
       
-      <div class='input-appleMusic'>
-        <label for='appleMusic'>Apple Music URL</label>
+      <div>
+        <div class='label-wrapper'>
+          <label for='appleMusic'>Apple Music URL</label>
+        </div>
         <input id='appleMusic-input' type="text" name="appleMusic">
       </div>
       
-      <div class='input-instagram'>
-        <label for='instagram'>Instagram URL</label>
+      <div>
+        <div class='label-wrapper'>
+          <label for='instagram'>Instagram URL</label>
+        </div>
         <input id='instagram-input' type="text" name="instagram">
       </div>
       
-      <div class='input-facebook'>
-        <label for='facebook'>Facebook URL</label>
+      <div>
+        <div class='label-wrapper'>
+          <label for='facebook'>Facebook URL</label>
+        </div>
         <input id='facebook-input' type="text" name="facebook">
       </div>
       
-      <div class='input-website'>
-        <label for='website'>Website URL</label>
+      <div>
+        <div class='label-wrapper'>
+          <label for='website'>Website URL</label>
+        </div>
         <input id='website-input' type="text" name="website">
       </div>
     </div>
     
-    <input id='form-create-button' type='button' value='Create' onclick='submitArtist(this)'>
+    <input class='form-create-button' type='button' value='Create' onclick='submitArtist(this)'>
+    <hr>
   </form>
 
-  <div id="artists">
+  <div class='content-wrapper'>
     <h2>Artists</h2>
     
     #for(artist in artists) {
-      <div class="artist">
+      <div class="content">
         <div class="image-slider">
           #for(imageURL in artist.imageURLs) {
             <div class="image-slide"><img src="#(imageURL)"/></div>
           }
         </div>
         
-        <h3>#(artist.name)</h3>
-        
-        <div class="short-description">#(artist.shortDescription)</div>
-        
-        <div class="description">
-          <pre style="font-family:Helvetica">#(artist.description)</pre>
+        <div class="content-details">
+          <h3>#(artist.name)</h3>
+          
+          <div class="short-description">#(artist.shortDescription)</div>
+          
+          <div class="description">
+            <pre style="font-family:Helvetica">#(artist.description)</pre>
+          </div>
+          
+          <ul>
+            #if(artist.website != "") {
+              <li><a href="#(artist.website)">#(artist.website)</a></li>
+            }
+            #if(artist.spotify != "") {
+              <li><a href="#(artist.spotify)">Spotify</a></li>
+            }
+            #if(artist.appleMusic != "") {
+              <li><a href="#(artist.appleMusic)">Apple Music</a></li>
+            }
+            #if(artist.instagram != "") {
+              <li><a href="#(artist.instagram)">Instagram</a></li>
+            }
+            #if(artist.facebook != "") {
+              <li><a href="#(artist.facebook)">Facebook</a></li>
+            }
+          </ul>
+
+          <div style='flex-grow: 1'></div>
+
+          <a class="edit" href="/app/artists/#(artist.id)/edit">Edit Profile</a>
         </div>
-        
-        <ul>
-          #if(artist.website != "") {
-            <li><a href="#(artist.website)">#(artist.website)</a></li>
-          }
-          #if(artist.spotify != "") {
-            <li><a href="#(artist.spotify)">Spotify</a></li>
-          }
-          #if(artist.appleMusic != "") {
-            <li><a href="#(artist.appleMusic)">Apple Music</a></li>
-          }
-          #if(artist.instagram != "") {
-            <li><a href="#(artist.instagram)">Instagram</a></li>
-          }
-          #if(artist.facebook != "") {
-            <li><a href="#(artist.facebook)">Facebook</a></li>
-          }
-        </ul>
-        <a class="edit-profile" href="/app/artists/#(artist.id)/edit">Edit Profile</a>
       </div>
-      <hr/>
+      <hr />
     }
   </div>
 }

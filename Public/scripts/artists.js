@@ -1,8 +1,3 @@
-function toggleShowCreateArtist() {
-  var form = document.getElementById("create-artist-form")
-  form.style.display = form.style.display == "none" ? "block" : "none"
-}
-
 function parseArtistForm(form) {
   var nameInput = document.getElementById("name-input")
   var name = nameInput.value
@@ -93,7 +88,8 @@ function addImageToArtist(e) {
   var parent = e.parentElement
   
   var div = document.createElement("div")
-  var html = "<input class='image-input' type='text'><input type='button' value='-' onclick='deleteArtistInSelection(this)'>"
+  div.setAttribute('class', 'additional-field-input-wrapper')
+  var html = "<input class='image-input' type='text'><input class='delete-input-button' type='button' value='-' onclick='deleteArtistInSelection(this)'>"
   div.innerHTML = html
   
   parent.appendChild(div)

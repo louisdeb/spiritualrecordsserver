@@ -1,8 +1,3 @@
-function toggleShowCreateEvent() {
-  var form = document.getElementById("create-event-form")
-  form.style.display = form.style.display == "none" ? "block" : "none"
-}
-
 function addArtistToSelect(e, value) {
   var parent = e.parentElement
   
@@ -13,7 +8,7 @@ function addArtistToSelect(e, value) {
       var artistResponses = JSON.parse(httpreq.responseText)
       
       var div = document.createElement("div")
-      div.setAttribute("class", "artist-select")
+      div.setAttribute("class", "additional-field-input-wrapper")
       
       var select = document.createElement("select")
       select.setAttribute("name", "artists")
@@ -29,6 +24,7 @@ function addArtistToSelect(e, value) {
       }
       
       var input = document.createElement("input")
+      input.setAttribute("class", "delete-input-button")
       input.setAttribute("type", "button")
       input.setAttribute("value", "-")
       input.setAttribute("onclick", "deleteArtistInSelection(this)")
@@ -52,8 +48,20 @@ function addUnsignedArtist(e) {
   var parent = e.parentElement
   
   var div = document.createElement("div")
-  var html = "<input class='unsigned-artist-input' type='text'><input type='button' value='-' onclick='deleteArtistInSelection(this)'>"
-  div.innerHTML = html
+  div.setAttribute("class", "additional-field-input-wrapper")
+
+  var unsignedArtistInput = document.createElement("input")
+  unsignedArtistInput.setAttribute("class", "unsigned-artist-input")
+  unsignedArtistInput.setAttribute("type", "text")
+
+  var deleteInputButton = document.createElement("input")
+  deleteInputButton.setAttribute("class", "delete-input-button")
+  deleteInputButton.setAttribute("type", "button")
+  deleteInputButton.setAttribute("value", "-")
+  deleteInputButton.setAttribute("onclick", "deleteArtistInSelection(this)")
+
+  div.appendChild(unsignedArtistInput)
+  div.appendChild(deleteInputButton)
   
   parent.appendChild(div)
 }

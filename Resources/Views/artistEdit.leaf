@@ -1,69 +1,85 @@
 #set("content") {
-  <a href="/app">Home</a>
-  
-  <h1>Editing #(artist.name)</h1>
+  <h1>Editing Artist</h1>
+  <h2>#(artist.name)</h2>
 
-  <form id='create-artist-form' method='post' action='/api/artist'>
-    <div class='input-group artist-create-form'>
+  <form class='create-form' method='post' action='/api/artist'>
+    <div class='input-group create-form-inner'>
       
       <input id='artist-id' type='text' name='id' value='#(artist.id)' style='display:none' readonly>
       
-      <div class='input-name'>
-        <label for='name'>Name</label>
-        <input id='name-input' type="text" name="name" style='margin-left: 10px' value='#(artist.name)'>
+      <div>
+        <div class='label-wrapper'>
+          <label for='name'>Name</label>
+        </div>
+        <input id='name-input' type="text" name="name" value='#(artist.name)'>
       </div>
       
-      <div class='input-short-description'>
-        <label for='description'>One Line Description</label>
+      <div>
+        <div class='label-wrapper'>
+          <label for='description'>One Line Description</label>
+        </div>
         <input id='short-description-input' type="text" name="short-description" value='#(artist.shortDescription)'>
       </div>
       
-      <div class='input-description'>
-        <label for='description'>Description</label>
+      <div>
+        <div class='label-wrapper'>
+          <label for='description'>Description</label>
+        </div>
         <textarea id='description-input' type="text" name="description">#(artist.description)</textarea>
       </div>
       
-      <div class='input-image'>
-        <label for='image'>Images</label>
-        <input type='button' value='+' onclick='addImageToArtist(this)' style='margin-left: 10px'>
+      <div>
+        <div class='label-wrapper'>
+          <label for='image'>Images</label>
+          <input type='button' value='+' onclick='addImageToArtist(this)'>
+        </div>
         #for(imageURL in artist.imageURLs) {
-          <div>
+          <div class='additional-field-input-wrapper'>
             <input class='image-input' type="text" name="imageURL" value='#(imageURL)'>
-            <input type='button' value='-' onclick='deleteImageInSelection(this)'>
+            <input class='delete-input-button' type='button' value='-' onclick='deleteImageInSelection(this)'>
           </div>
         }
       </div>
       
-      <div class='input-spotify'>
-        <label for='spotify'>Spotify URL</label>
+      <div>
+        <div class='label-wrapper'>
+          <label for='spotify'>Spotify URL</label>
+        </div>
         <input id='spotify-input' type="text" name="spotify" value='#(artist.spotify)'>
       </div>
       
-      <div class='input-appleMusic'>
-        <label for='appleMusic'>Apple Music URL</label>
+      <div>
+        <div class='label-wrapper'>
+          <label for='appleMusic'>Apple Music URL</label>
+        </div>
         <input id='appleMusic-input' type="text" name="appleMusic" value='#(artist.appleMusic)'>
       </div>
       
-      <div class='input-instagram'>
-        <label for='instagram'>Instagram URL</label>
+      <div>
+        <div class='label-wrapper'>
+          <label for='instagram'>Instagram URL</label>
+        </div>
         <input id='instagram-input' type="text" name='instagram' value='#(artist.instagram)'>
       </div>
       
-      <div class='input-facebook'>
-        <label for='facebook'>Facebook URL</label>
+      <div>
+        <div class='label-wrapper'>
+          <label for='facebook'>Facebook URL</label>
+        </div>
         <input id='facebook-input' type="text" name='facebook' value='#(artist.facebook)'>
       </div>
       
-      <div class='input-website'>
-        <label for='website'>Website URL</label>
+      <div>
+        <div class='label-wrapper'>
+          <label for='website'>Website URL</label>
+        </div>
         <input id='website-input' type="text" name='website' value='#(artist.website)'>
       </div>
     </div>
   
-    <input id='form-create-button' type='button' value='Update' onclick='updateArtist(this)'>
-    
+    <input class='form-create-button' type='button' value='Update' onclick='updateArtist(this)'>
     <br><br>
-    <input id='artist-delete-button' type='button' value='Delete Artist' onclick='deleteArtist("#(artist.id)")'>
+    <input class='delete-button' type='button' value='Delete' onclick='deleteArtist("#(artist.id)")'>
   </form>
 }
 #embed("base")
