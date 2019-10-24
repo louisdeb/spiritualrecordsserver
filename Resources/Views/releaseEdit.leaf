@@ -62,6 +62,13 @@
         <input id='appleMusic-input' type="text" name="appleMusic" value='#(releaseResponse.release.appleMusic)' optional>
       </div>
 
+      <div>
+        <div class='label-wrapper'>
+          <label for='googlePlay'>Google Play URL</label>
+        </div>
+        <input id='googlePlay-input' type="text" name="googlePlay" value='#(releaseResponse.release.googlePlay)' optional>
+      </div>
+
     </div>
 
     <div id='error' style='display:none'></div>

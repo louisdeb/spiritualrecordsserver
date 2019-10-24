@@ -52,13 +52,15 @@ struct ReleaseController: RouteCollection {
     let imageURL = json["imageURL"] as? String ?? ""
     let spotify = json["spotify"] as? String
     let appleMusic = json["appleMusic"] as? String
+    let googlePlay = json["googlePlay"] as? String
     
     let release = Release(name: name,
                           date: date,
                           description: description,
                           imageURL: imageURL,
                           spotify: spotify,
-                          appleMusic: appleMusic)
+                          appleMusic: appleMusic,
+                          googlePlay: googlePlay)
     
     let artists = Artist.query(on: req).all()
     let artistName = json["artist"] as? String
@@ -93,6 +95,7 @@ struct ReleaseController: RouteCollection {
       release!.imageURL = updatedRelease.imageURL
       release!.spotify = updatedRelease.spotify
       release!.appleMusic = updatedRelease.appleMusic
+      release!.googlePlay = updatedRelease.googlePlay
       
       return flatMap(release!.artists.detachAll(on: req), release!.save(on: req), { (_, event) -> EventLoopFuture<View> in
         let _ = release!.artists.attach(artist, on: req)

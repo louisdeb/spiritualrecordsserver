@@ -17,14 +17,17 @@ final class Release: Codable {
   var imageURL: String
   var spotify: String
   var appleMusic: String
+  var googlePlay: String
   
-  init(name: String, date: Date, description: String?, imageURL: String, spotify: String?, appleMusic: String?) {
+  init(name: String, date: Date, description: String?, imageURL: String,
+       spotify: String?, appleMusic: String?, googlePlay: String?) {
     self.name = name
     self.date = date
     self.description = description ?? ""
     self.imageURL = imageURL
     self.spotify = spotify ?? ""
     self.appleMusic = appleMusic ?? ""
+    self.googlePlay = googlePlay ?? ""
   }
   
 }

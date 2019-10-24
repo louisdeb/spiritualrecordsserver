@@ -39,6 +39,9 @@ function parseReleaseForm(form) {
     
   var appleMusicInput = document.getElementById("appleMusic-input")
   var appleMusic = appleMusicInput.value
+
+  var googlePlayInput = document.getElementById("googlePlay-input")
+  var googlePlay = googlePlayInput.value
   
   var json = {}
   json["name"] = name
@@ -47,6 +50,7 @@ function parseReleaseForm(form) {
   json["imageURL"] = image
   json["spotify"] = spotify
   json["appleMusic"] = appleMusic
+  json["googlePlay"] = googlePlay
 
   json["artist"] = artist
   

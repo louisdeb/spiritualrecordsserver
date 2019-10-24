@@ -17,12 +17,13 @@ final class Artist: Codable {
   var imageURLs: [String]
   var spotify: String
   var appleMusic: String
+  var googlePlay: String
   var instagram: String
   var facebook: String
   var website: String
   
   init(name: String, shortDescription: String?, description: String?,
-       imageURLs: [String], spotify: String?, appleMusic: String?,
+       imageURLs: [String], spotify: String?, appleMusic: String?, googlePlay: String?,
        instagram: String?, facebook: String?, website: String?) {
     self.name = name
     self.shortDescription = shortDescription ?? ""
@@ -30,6 +31,7 @@ final class Artist: Codable {
     self.imageURLs = imageURLs
     self.spotify = spotify ?? ""
     self.appleMusic = appleMusic ?? ""
+    self.googlePlay = googlePlay ?? ""
     self.instagram = instagram ?? ""
     self.facebook = facebook ?? ""
     self.website = website ?? ""

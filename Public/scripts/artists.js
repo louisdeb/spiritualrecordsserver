@@ -28,6 +28,9 @@ function parseArtistForm(form) {
     
   var appleMusicInput = document.getElementById("appleMusic-input")
   var appleMusic = appleMusicInput.value
+
+  var googlePlayInput = document.getElementById("googlePlay-input")
+  var googlePlay = googlePlayInput.value
   
   var instagramInput = document.getElementById("instagram-input")
   var instagram = instagramInput.value
@@ -45,6 +48,7 @@ function parseArtistForm(form) {
   json["imageURLs"] = images
   json["spotify"] = spotify
   json["appleMusic"] = appleMusic
+  json["googlePlay"] = googlePlay
   json["instagram"] = instagram
   json["facebook"] = facebook
   json["website"] = website
