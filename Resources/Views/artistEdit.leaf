@@ -79,7 +79,7 @@
   
     <input class='form-create-button' type='button' value='Update' onclick='updateArtist(this)'>
     <br><br>
-    <input class='delete-button' type='button' value='Delete' onclick='deleteArtist("#(artist.id)")'>
+    <input class='delete-button' type='button' value='Delete' onclick='deleteObject("artist", "#(artist.id)", "/app/artists")'>
   </form>
 }
 #embed("base")

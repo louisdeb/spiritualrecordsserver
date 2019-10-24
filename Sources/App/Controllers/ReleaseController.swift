@@ -15,12 +15,7 @@ struct ReleaseController: RouteCollection {
     route.post(use: create)
     route.post(Release.parameter, "delete", use: delete)
   }
-  
-  // We aren't populating a release with [ArtistResponse]. This saves lookup time, and stops
-  // returning duplicate data. Instead on the mobile side we can lookup an ArtistResponse using
-  // the Artist model.
-  // Equally we aren't populating ArtistResponse with [Release].
-  // TODO: We should apply this reduction across the board.
+
   func get(_ req: Request) throws -> Future<[ReleaseResponse]> {
     let releases = Release.query(on: req).sort(\Release.date, .ascending).all()
     

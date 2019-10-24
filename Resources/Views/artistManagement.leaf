@@ -3,7 +3,7 @@
 
   <h2 class='create-content-title' onclick='toggleShowCreateForm()'>Create A New Artist</h2>
 
-  <form class='create-form' method='post' action='/api/artist' style='display:none'>
+  <form class='create-form' method='post' action='/api/artist/' style='display:none'>
     <div class='input-group create-form-inner'>
       
       <div>

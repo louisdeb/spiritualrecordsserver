@@ -68,7 +68,7 @@
 
     <input class='form-create-button' type='button' value='Update' onclick='updateRelease(this)'>
     <br><br>
-    <input class='delete-button' type='button' value='Delete' onclick='deleteRelease("#(releaseResponse.release.id)")'>
+    <input class='delete-button' type='button' value='Delete' onclick='deleteObject("release", "#(releaseResponse.release.id)", "/app/releases")'>
   </form>
 
   <script>

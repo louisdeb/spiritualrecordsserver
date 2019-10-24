@@ -68,7 +68,7 @@
 
     <input class='form-create-button' type='button' value='Update' onclick='updateEvent(this)'>
     <br><br>
-    <input class='delete-button' type='button' value='Delete' onclick='deleteEvent("#(eventResponse.event.id)")'>
+    <input class='delete-button' type='button' value='Delete' onclick='deleteObject("event", "#(eventResponse.event.id)", "/app/events")'>
   </form>
 
   <script>
