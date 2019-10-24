@@ -27,7 +27,7 @@ function addArtistToSelect(e, value) {
       input.setAttribute("class", "delete-input-button")
       input.setAttribute("type", "button")
       input.setAttribute("value", "-")
-      input.setAttribute("onclick", "deleteArtistInSelection(this)")
+      input.setAttribute("onclick", "deleteObjectInSelection(this)")
       
       div.appendChild(select)
       div.appendChild(input)
@@ -37,11 +37,6 @@ function addArtistToSelect(e, value) {
   }
   
   httpreq.send(null)
-}
-
-function deleteArtistInSelection(e) {
-  var parent = e.parentElement
-  parent.parentElement.removeChild(parent)
 }
 
 function addUnsignedArtist(e) {
@@ -58,7 +53,7 @@ function addUnsignedArtist(e) {
   deleteInputButton.setAttribute("class", "delete-input-button")
   deleteInputButton.setAttribute("type", "button")
   deleteInputButton.setAttribute("value", "-")
-  deleteInputButton.setAttribute("onclick", "deleteArtistInSelection(this)")
+  deleteInputButton.setAttribute("onclick", "deleteObjectInSelection(this)")
 
   div.appendChild(unsignedArtistInput)
   div.appendChild(deleteInputButton)

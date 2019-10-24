@@ -3,6 +3,11 @@ function toggleShowCreateForm() {
   form.style.display = form.style.display == "none" ? "block" : "none"
 }
 
+function deleteObjectInSelection(e) {
+  var parent = e.parentElement
+  parent.parentElement.removeChild(parent)
+}
+
 function deleteObject(objectRoute, id, redirect) {
   var really = confirm("Really want to delete this?")
   if (!really) { return }

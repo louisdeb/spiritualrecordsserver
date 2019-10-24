@@ -64,7 +64,7 @@ function submitArtist(e) {
   } else {
     error.style.display = 'none'
   }
-    
+  
   console.log("Submitting artist creation with JSON:")
   console.log(json)
   
@@ -105,13 +105,8 @@ function addImageToArtist(e) {
   
   var div = document.createElement("div")
   div.setAttribute('class', 'additional-field-input-wrapper')
-  var html = "<input class='image-input' type='text'><input class='delete-input-button' type='button' value='-' onclick='deleteArtistInSelection(this)'>"
+  var html = "<input class='image-input' type='text'><input class='delete-input-button' type='button' value='-' onclick='deleteObjectInSelection(this)'>"
   div.innerHTML = html
   
   parent.appendChild(div)
-}
-
-function deleteImageInSelection(e) {
-  var parent = e.parentElement
-  parent.parentElement.removeChild(parent)
 }

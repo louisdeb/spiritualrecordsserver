@@ -36,7 +36,7 @@
         #for(imageURL in artist.imageURLs) {
           <div class='additional-field-input-wrapper'>
             <input class='image-input' type="text" name="imageURL" value='#(imageURL)'>
-            <input class='delete-input-button' type='button' value='-' onclick='deleteImageInSelection(this)'>
+            <input class='delete-input-button' type='button' value='-' onclick='deleteObjectInSelection(this)'>
           </div>
         }
       </div>

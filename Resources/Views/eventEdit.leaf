@@ -50,7 +50,7 @@
         #for(unsignedArtist in eventResponse.event.unsignedArtists) {
           <div>
             <input class='unsigned-artist-input' type='text' value='#(unsignedArtist)'>
-            <input type='button' value='-' onclick='deleteArtistInSelection(this)'>
+            <input type='button' value='-' onclick='deleteObjectInSelection(this)'>
           </div>
         }
       </div>
