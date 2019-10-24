@@ -16,7 +16,7 @@
 
       <div class='select-artists'>
         <div class='label-wrapper'>
-          <label for='artists'>Select Signed Artists</label>
+          <label for='artists'>Select Artists</label>
           <input type='button' value='+' onclick='addArtistToSelect(this)'>
         </div>
 

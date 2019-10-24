@@ -7,10 +7,11 @@ function parseReleaseForm(form) {
     }
   }
   
-  // Extend here for multiple artists per release
+  var artists = []
   var artistInputs = document.getElementsByClassName("artists-select")
-  var artist = artistInputs[0].value
-  if (artist.trim() == "") {
+  for (let input of artistInputs)
+    artists.push(input.value)
+  if (artists.length == 0) {
     return {
       "error": "Release must have an artist"
     }
@@ -52,7 +53,7 @@ function parseReleaseForm(form) {
   json["appleMusic"] = appleMusic
   json["googlePlay"] = googlePlay
 
-  json["artist"] = artist
+  json["artists"] = artists
   
   return json
 }
@@ -139,8 +140,15 @@ function populateArtistSelector(e) {
       if (value != null) {
         select.value = value
       }
+
+      var input = document.createElement("input")
+      input.setAttribute("class", "delete-input-button")
+      input.setAttribute("type", "button")
+      input.setAttribute("value", "-")
+      input.setAttribute("onclick", "deleteObjectInSelection(this)")
       
       div.appendChild(select)
+      div.appendChild(input)
       
       e.appendChild(div)
     }

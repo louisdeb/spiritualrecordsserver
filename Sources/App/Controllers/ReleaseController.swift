@@ -31,7 +31,7 @@ struct ReleaseController: RouteCollection {
     }
   }
   
-  func create(_ req: Request) throws -> Future<View> {
+  func create(_ req: Request) throws -> Future<Release> {
     let body = req.http.body.description
 
     guard let data = body.data(using: .utf8) else {
@@ -63,45 +63,49 @@ struct ReleaseController: RouteCollection {
                           googlePlay: googlePlay)
     
     let artists = Artist.query(on: req).all()
-    let artistName = json["artist"] as? String
+    let artistNames = json["artists"] as! [String]
 
     if json["id"] != nil {
       let id = UUID(uuidString: json["id"] as! String)!
-      return artists.flatMap { artists -> EventLoopFuture<View> in
-        let artist = artists.filter { artistName == $0.name }.first
-        return try self.update(req, id: id, updatedRelease: release, artist: artist!)
+      return artists.flatMap { artists -> EventLoopFuture<Release> in
+        let artists = artists.filter { artistNames.contains($0.name) }
+        return try self.update(req, id: id, updatedRelease: release, artists: artists)
       }
     }
     
-    return flatMap(artists, release.save(on: req), { (allArtists, release) -> EventLoopFuture<View> in
-      let _artist = allArtists.filter { artistName == $0.name }.first
-
-      if let artist = _artist {
-        let _ = release.artists.attach(artist, on: req)
-      }
+    return flatMap(artists, release.save(on: req), { (allArtists, release) -> EventLoopFuture<Release> in
+      let artists = allArtists.filter { artistNames.contains($0.name) }
       
-      let data = ["releases": Release.query(on: req).sort(\Release.date, .ascending).all()]
-      return try req.view().render("releaseManagement", data)
+      return artists.map { artist in
+        return release.artists.attach(artist, on: req)
+      }
+      .flatten(on: req)
+      .transform(to: release)
     })
   }
 
-  func update(_ req: Request, id: UUID, updatedRelease: Release, artist: Artist) throws -> Future<View> {
+  func update(_ req: Request, id: UUID, updatedRelease: Release, artists: [Artist]) throws -> Future<Release> {
     let releaseFuture = Release.find(id, on: req)
     
-    return releaseFuture.flatMap { release -> EventLoopFuture<View> in
-      release!.name = updatedRelease.name
-      release!.date = updatedRelease.date
-      release!.description = updatedRelease.description
-      release!.imageURL = updatedRelease.imageURL
-      release!.spotify = updatedRelease.spotify
-      release!.appleMusic = updatedRelease.appleMusic
-      release!.googlePlay = updatedRelease.googlePlay
+    return releaseFuture.flatMap { release_ -> EventLoopFuture<Release> in
+      guard let release = release_ else {
+        throw CreateError.runtimeError("Could not find event to update")
+      }
       
-      return flatMap(release!.artists.detachAll(on: req), release!.save(on: req), { (_, event) -> EventLoopFuture<View> in
-        let _ = release!.artists.attach(artist, on: req)
-        
-        let data = ["releases": Release.query(on: req).sort(\Release.date, .ascending).all()]
-        return try req.view().render("releaseManagement", data)
+      release.name = updatedRelease.name
+      release.date = updatedRelease.date
+      release.description = updatedRelease.description
+      release.imageURL = updatedRelease.imageURL
+      release.spotify = updatedRelease.spotify
+      release.appleMusic = updatedRelease.appleMusic
+      release.googlePlay = updatedRelease.googlePlay
+      
+      return flatMap(release.artists.detachAll(on: req), release.save(on: req), { (_, event) -> EventLoopFuture<Release> in
+        return artists.map { artist in
+          return release.artists.attach(artist, on: req)
+        }
+        .flatten(on: req)
+        .transform(to: release)
       })
     }
   }

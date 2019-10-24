@@ -15,7 +15,8 @@
       
       <div>
         <div class='label-wrapper'>
-          <label for='artists'>Select Artist</label>
+          <label for='artists'>Select Artists</label>
+          <input type='button' value='+' onclick='addArtistToSelect(this)'>
         </div>
         <div id='artist-selection'></div>
       </div>
@@ -76,9 +77,11 @@
     #for(response in releaseResponses) {
       <div class="release">
 
+        <h2>#(response.release.name) - <span class='vertical-break'>|</span>
         #for(artist in response.artists) {
-          <h2>#(artist.name) - #(response.release.name)</h2>
+          #(artist.name) <span class='vertical-break'>|</span>
         }
+        </h2>
         
         <div class='date'>#date(response.release.date, "dd-MM-yyyy")</div>
 
