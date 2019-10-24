@@ -72,9 +72,9 @@ function parseEventForm(form) {
   
   var date = form.date.value
   if (date == "") {
-    var dateWarning = document.getElementById("dateWarning")
-    dateWarning.style.display = "block"
-    return {"error": true}
+    return {
+      "error": "Event must have a date"
+    }
   }
   
   var descriptionInput = document.getElementById("description-input")
@@ -92,6 +92,8 @@ function parseEventForm(form) {
   
   var priceInput = document.getElementById("price-input")
   var price = priceInput.value
+  if (price.trim() == "")
+    price = "Free"
   
   var json = {}
   json["name"] = name
@@ -108,8 +110,14 @@ function submitEvent(e) {
   var form = e.parentElement
   var json = parseEventForm(form)
   
-  if (json["error"])
+  var error = document.getElementById('error')
+  if (json["error"]) {
+    error.innerHTML = 'Error: ' + json['error']
+    error.style.display = 'block'
     return
+  } else {
+    error.style.display = 'none'
+  }
   
   console.log("Submitting event creation with JSON:")
   console.log(json)

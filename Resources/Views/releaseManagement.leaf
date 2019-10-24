@@ -10,7 +10,7 @@
         <div class='label-wrapper'>
           <label for='name'>Name</label>
         </div>
-        <input id='name-input' type="text" name="name">
+        <input id='name-input' type="text" name="name" required>
       </div>
       
       <div>
@@ -24,8 +24,7 @@
         <div class='label-wrapper'>
           <label for='date'>Release Date</label>
         </div>
-        <input id='date-select' name='date' type='date' class='form-control'/>
-        <div id='dateWarning' style='color: red; display: none; margin-left: 10px'>A date must be selected</div>
+        <input id='date-select' name='date' type='date' class='form-control' required/>
       </div>
       
       <div>
@@ -39,24 +38,26 @@
         <div class='label-wrapper'>
           <label for='image'>Image URL</label>
         </div>
-        <input id='image-input' type="text" name="imageURL">
+        <input id='image-input' type="text" name="imageURL" required>
       </div>
       
       <div>
         <div class='label-wrapper'>
           <label for='spotify'>Spotify URL</label>
         </div>
-        <input id='spotify-input' type="text" name="spotify">
+        <input id='spotify-input' type="text" name="spotify" optional>
       </div>
       
       <div>
         <div class='label-wrapper'>
           <label for='appleMusic'>Apple Music URL</label>
         </div>
-        <input id='appleMusic-input' type="text" name="appleMusic">
+        <input id='appleMusic-input' type="text" name="appleMusic" optional>
       </div>
       
     </div>
+
+    <div id='error' style='display:none'></div>
     
     <input class='form-create-button' type='button' value='Create' onclick='submitRelease(this)'>
     <hr>

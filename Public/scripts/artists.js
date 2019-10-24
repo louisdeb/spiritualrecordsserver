@@ -1,6 +1,11 @@
 function parseArtistForm(form) {
   var nameInput = document.getElementById("name-input")
   var name = nameInput.value
+  if (name.trim() == "") {
+    return {
+      "error": "Artist must have a name"
+    }
+  }
   
   var shortDescriptionInput = document.getElementById("short-description-input")
   var shortDescription = shortDescriptionInput.value
@@ -12,6 +17,11 @@ function parseArtistForm(form) {
   var imageInputs = document.getElementsByClassName("image-input")
   for (let input of imageInputs)
     images.push(input.value)
+  if (images.length == 0) {
+    return {
+      "error": "Artist must have at least one image"
+    }
+  }
   
   var spotifyInput = document.getElementById("spotify-input")
   var spotify = spotifyInput.value
@@ -46,8 +56,14 @@ function submitArtist(e) {
   var form = e.parentElement
   var json = parseArtistForm(form)
   
-  if (json["error"])
-    return
+  var error = document.getElementById('error');
+  if (json['error']) {
+    error.innerHTML = 'Error: ' + json['error']
+    error.style.display = 'block'
+    return 
+  } else {
+    error.style.display = 'none'
+  }
     
   console.log("Submitting artist creation with JSON:")
   console.log(json)

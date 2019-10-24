@@ -10,14 +10,14 @@
         <div class='label-wrapper'>
           <label for='name'>Name</label>
         </div>
-        <input id='name-input' name='name' type='text'>
+        <input id='name-input' name='name' type='text' required>
       </div>
       
       <div>
         <div class='label-wrapper'>
           <label for='description'>One Line Description</label>
         </div>
-        <input id='short-description-input' type="text" name="short-description">
+        <input id='short-description-input' type="text" name="short-description" optional>
       </div>
       
       <div>
@@ -38,37 +38,39 @@
         <div class='label-wrapper'>
           <label for='spotify'>Spotify URL</label>
         </div>
-        <input id='spotify-input' type="text" name="spotify">
+        <input id='spotify-input' type="text" name="spotify" optional>
       </div>
       
       <div>
         <div class='label-wrapper'>
           <label for='appleMusic'>Apple Music URL</label>
         </div>
-        <input id='appleMusic-input' type="text" name="appleMusic">
+        <input id='appleMusic-input' type="text" name="appleMusic" optional>
       </div>
       
       <div>
         <div class='label-wrapper'>
           <label for='instagram'>Instagram URL</label>
         </div>
-        <input id='instagram-input' type="text" name="instagram">
+        <input id='instagram-input' type="text" name="instagram" optional>
       </div>
       
       <div>
         <div class='label-wrapper'>
           <label for='facebook'>Facebook URL</label>
         </div>
-        <input id='facebook-input' type="text" name="facebook">
+        <input id='facebook-input' type="text" name="facebook" optional>
       </div>
       
       <div>
         <div class='label-wrapper'>
           <label for='website'>Website URL</label>
         </div>
-        <input id='website-input' type="text" name="website">
+        <input id='website-input' type="text" name="website" optional>
       </div>
     </div>
+
+    <div id='error' style='display:none'></div>
     
     <input class='form-create-button' type='button' value='Create' onclick='submitArtist(this)'>
     <hr>

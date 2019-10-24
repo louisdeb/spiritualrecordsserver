@@ -10,15 +10,14 @@
         <div class='label-wrapper'>
           <label for='name'>Name</label>
         </div>
-        <input id='name-input' name='name' type='text'>
+        <input id='name-input' name='name' type='text' optional>
       </div>
       
       <div>
         <div class='label-wrapper'>
           <label for='date'>Select Date</label>
         </div>
-        <input id='date-select' name='date' type='date' class='form-control'/>
-        <div id='dateWarning' style='color: red; display: none; margin-left: 10px'>A date must be selected</div>
+        <input id='date-select' name='date' type='date' class='form-control' required>
       </div>
       
       <div>
@@ -46,10 +45,12 @@
         <div class='label-wrapper'>
           <label for='price'>Price</label>
         </div>
-        <input id='price-input' type='text' placeholder='Free'>
+        <input id='price-input' type='text' placeholder='Free' optional>
       </div>
       
     </div>
+
+    <div id='error' style='display:none'></div>
 
     <input class='form-create-button' type='button' value='Create' onclick='submitEvent(this)'>
     <hr>

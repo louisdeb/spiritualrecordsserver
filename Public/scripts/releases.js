@@ -1,16 +1,26 @@
 function parseReleaseForm(form) {
   var nameInput = document.getElementById("name-input")
   var name = nameInput.value
+  if (name.trim() == "") {
+    return {
+      'error': 'Release must have a name'
+    }
+  }
   
   // Extend here for multiple artists per release
   var artistInputs = document.getElementsByClassName("artists-select")
   var artist = artistInputs[0].value
+  if (artist.trim() == "") {
+    return {
+      "error": "Release must have an artist"
+    }
+  }
   
   var date = form.date.value
   if (date == "") {
-    var dateWarning = document.getElementById("dateWarning")
-    dateWarning.style.display = "block"
-    return {"error": true}
+    return {
+      "error": "Release must have a release date"
+    }
   }
   
   var descriptionInput = document.getElementById("description-input")
@@ -18,6 +28,11 @@ function parseReleaseForm(form) {
 
   var imageInput = document.getElementById("image-input")
   var image = imageInput.value
+  if (image.trim() == "") {
+    return {
+      "error": "Release must have an image"
+    }
+  }
   
   var spotifyInput = document.getElementById("spotify-input")
   var spotify = spotifyInput.value
@@ -42,8 +57,14 @@ function submitRelease(e) {
   var form = e.parentElement
   var json = parseReleaseForm(form)
   
-  if (json["error"])
+  var error = document.getElementById('error')
+  if (json["error"]) {
+    error.innerHTML = 'Error: ' + json['error']
+    error.style.display = 'block'
     return
+  } else {
+    error.style.display = 'none'
+  }
     
   console.log("Submitting release creation with JSON:")
   console.log(json)
