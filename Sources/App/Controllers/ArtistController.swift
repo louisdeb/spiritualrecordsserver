@@ -109,8 +109,26 @@ struct ArtistController: RouteCollection {
     }
   }
   
-  func delete(_ req: Request) throws -> Future<Artist> {
+  func delete(_ req: Request) throws -> EventLoopFuture<[Release]> {
     let artist = try req.parameters.next(Artist.self)
-    return artist.delete(on: req)
+    
+    return artist.flatMap { artist -> EventLoopFuture<[Release]> in
+      let releases = try artist.releases.query(on: req).all()
+      
+      return flatMap(releases, artist.delete(on: req), { (releases, _) -> EventLoopFuture<[Release]> in
+        return try releases.map { release -> EventLoopFuture<Release> in
+          return try release.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<Release> in
+            if (artists.isEmpty) {
+              return release.delete(on: req).transform(to: release)
+            }
+            
+            return Future.map(on: req, { () -> Release in
+              return release
+            })
+          }
+        }
+        .flatten(on: req)
+      })
+    }
   }
 }
