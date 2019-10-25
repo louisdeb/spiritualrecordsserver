@@ -100,13 +100,22 @@ struct EventController: RouteCollection {
     let date = formatter.date(from: json["date"] as! String)!
     let description = json["description"] as? String
     let artistNames = json["artists"] as! [String]
-    let unsignedArtistNames = json["unsignedArtists"] as! [String]
     let price = json["price"] as! String
+    
+    var unsignedArtists: [UnsignedArtist] = []
+    let unsignedArtistsJson = json["unsignedArtists"] as! [Dictionary<String, String>]
+    for (_, unsignedArtistJson) in unsignedArtistsJson.enumerated() {
+      let unsignedArtist = UnsignedArtist(
+        name: unsignedArtistJson["name"] ?? "",
+        link: unsignedArtistJson["link"] ?? ""
+      )
+      unsignedArtists.append(unsignedArtist)
+    }
     
     let event = Event(name: name,
                       date: date,
                       description: description,
-                      unsignedArtists: unsignedArtistNames,
+                      unsignedArtists: unsignedArtists,
                       price: price)
     
     let artists = Artist.query(on: req).all()

@@ -156,3 +156,7 @@ header > #title > h1 {
   color: red;
   font-size: 18px;
 }
+
+.unsigned-artist-link-input {
+  margin-left: 10px;
+}

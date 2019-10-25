@@ -48,6 +48,12 @@ function addUnsignedArtist(e) {
   var unsignedArtistInput = document.createElement("input")
   unsignedArtistInput.setAttribute("class", "unsigned-artist-input")
   unsignedArtistInput.setAttribute("type", "text")
+  unsignedArtistInput.setAttribute("placeholder", "Name")
+
+  var unsignedArtistLinkInput = document.createElement("input")
+  unsignedArtistLinkInput.setAttribute("class", "unsigned-artist-link-input")
+  unsignedArtistLinkInput.setAttribute("type", "text")
+  unsignedArtistLinkInput.setAttribute("placeholder", "Link")
 
   var deleteInputButton = document.createElement("input")
   deleteInputButton.setAttribute("class", "delete-input-button")
@@ -56,6 +62,7 @@ function addUnsignedArtist(e) {
   deleteInputButton.setAttribute("onclick", "deleteObjectInSelection(this)")
 
   div.appendChild(unsignedArtistInput)
+  div.appendChild(unsignedArtistLinkInput)
   div.appendChild(deleteInputButton)
   
   parent.appendChild(div)
@@ -82,8 +89,17 @@ function parseEventForm(form) {
     
   var unsignedArtists = []
   var unsignedArtistSelectors = document.getElementsByClassName("unsigned-artist-input")
-  for (let selector of unsignedArtistSelectors)
-    unsignedArtists.push(selector.value)
+  for (let selector of unsignedArtistSelectors) {
+    var unsignedArtistName = selector.value
+
+    var linkInput = selector.parentElement.getElementsByClassName("unsigned-artist-link-input")[0]
+    var unsignedArtistLink = linkInput.value
+
+    unsignedArtists.push({
+      "name": unsignedArtistName,
+      "link": unsignedArtistLink,
+    })
+  }
   
   var priceInput = document.getElementById("price-input")
   var price = priceInput.value

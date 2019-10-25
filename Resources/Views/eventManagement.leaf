@@ -80,7 +80,7 @@
         <h3>Unsigned Artists</h3>
         <ul>
           #for(unsignedArtist in eventResponse.event.unsignedArtists) {
-            <li>#(unsignedArtist)</li>
+            <a href='#(unsignedArtist.link)'><li>#(unsignedArtist.name)</li>
           }
         </ul>
         
