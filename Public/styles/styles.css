@@ -79,6 +79,7 @@ header > #title > h1 {
 
 .content-details .description {
   max-height: 135px;
+  max-width: 650px;
   width: inherit;
   overflow-y: scroll;
 }
