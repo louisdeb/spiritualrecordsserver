@@ -5,7 +5,7 @@
 //  Created by Louis de Beaumont on 04/09/2019.
 //
 
-import FluentSQLite
+import FluentPostgreSQL
 import Vapor
 import Authentication
 
@@ -21,7 +21,7 @@ final class User: Codable {
 }
 
 extension User: Migration {
-  static func prepare(on connection: SQLiteConnection) -> Future<Void> {
+  static func prepare(on connection: PostgreSQLConnection) -> Future<Void> {
     return Database.create(self, on: connection) { builder in
       try addProperties(to: builder)
       builder.unique(on: \.id)
@@ -29,7 +29,7 @@ extension User: Migration {
   }
 }
 
-extension User: SQLiteUUIDModel {}
+extension User: PostgreSQLUUIDModel {}
 extension User: Content {}
 extension User: Parameter {}
 
@@ -42,9 +42,9 @@ extension User: PasswordAuthenticatable {}
 extension User: SessionAuthenticatable {}
 
 struct AdminUser: Migration {
-  typealias Database = SQLiteDatabase
+  typealias Database = PostgreSQLDatabase
   
-  static func prepare(on connection: SQLiteConnection) -> Future<Void> {
+  static func prepare(on connection: PostgreSQLConnection) -> Future<Void> {
     let email = "debeaumont.louis@gmail.com"
     let password = "shittyplaintextpassword"
     
@@ -57,7 +57,7 @@ struct AdminUser: Migration {
     return user.save(on: connection).transform(to: ())
   }
   
-  static func revert(on connection: SQLiteConnection) -> Future<Void> {
+  static func revert(on connection: PostgreSQLConnection) -> Future<Void> {
     return .done(on: connection)
   }
 }

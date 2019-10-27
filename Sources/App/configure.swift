@@ -1,4 +1,4 @@
-import FluentSQLite
+import FluentPostgreSQL
 import Vapor
 import Authentication
 import Leaf
@@ -6,7 +6,7 @@ import Leaf
 /// Called before your application initializes.
 public func configure(_ config: inout Config, _ env: inout Environment, _ services: inout Services) throws {
   // Register providers first
-  try services.register(FluentSQLiteProvider())
+  try services.register(FluentPostgreSQLProvider())
   try services.register(AuthenticationProvider())
   try services.register(LeafProvider())
   
@@ -22,22 +22,36 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
   middlewares.use(FileMiddleware.self) // Serves files from `Public/` directory
   middlewares.use(ErrorMiddleware.self) // Catches errors and converts to HTTP response
   services.register(middlewares)
+  
+  let psqlDbConfig_local = PostgreSQLDatabaseConfig(
+    hostname: "localhost",
+    port: 5432,
+    username: "vapor",
+    password: "password",
+    transport: .cleartext
+  )
+  
+  let psqlDbConfig_prod = PostgreSQLDatabaseConfig(
+    hostname: "database.v2.vapor.cloud",
+    port: 30001,
+    username: "u05ea553463603193de60b74879e2763",
+    database: "d06638f79d3c10da",
+    password: "pc627f79f8bbedd7e4663a7a9552c1e5"
+  )
 
-  // Configure a SQLite database
-  let sqlite = try SQLiteDatabase(storage: .memory)
+  let psql = PostgreSQLDatabase(config: psqlDbConfig_prod)
 
-  // Register the configured SQLite database to the database config.
   var databases = DatabasesConfig()
-  databases.add(database: sqlite, as: .sqlite)
+  databases.add(database: psql, as: .psql)
   services.register(databases)
 
   // Configure migrations
   var migrations = MigrationConfig()
-  migrations.add(model: User.self, database: .sqlite)
-  migrations.add(model: Artist.self, database: .sqlite)
-  migrations.add(model: Event.self, database: .sqlite)
-  migrations.add(model: Release.self, database: .sqlite)
-  migrations.add(model: ArtistEventPivot.self, database: .sqlite)
-  migrations.add(model: ArtistReleasePivot.self, database: .sqlite)
+  migrations.add(model: User.self, database: .psql)
+  migrations.add(model: Artist.self, database: .psql)
+  migrations.add(model: Event.self, database: .psql)
+  migrations.add(model: Release.self, database: .psql)
+  migrations.add(model: ArtistEventPivot.self, database: .psql)
+  migrations.add(model: ArtistReleasePivot.self, database: .psql)
   services.register(migrations)
 }

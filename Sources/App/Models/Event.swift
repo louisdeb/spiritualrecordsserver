@@ -5,7 +5,7 @@
 //  Created by Louis de Beaumont on 01/09/2019.
 //
 
-import FluentSQLite
+import FluentPostgreSQL
 import Vapor
 
 final class Event: Codable {
@@ -76,7 +76,7 @@ extension Event {
 }
 
 extension Event: Migration {
-  static func prepare(on connection: SQLiteConnection) -> Future<Void> {
+  static func prepare(on connection: PostgreSQLConnection) -> Future<Void> {
     return Database.create(self, on: connection) { builder in
       try addProperties(to: builder)
       builder.unique(on: \.id)
@@ -84,6 +84,6 @@ extension Event: Migration {
   }
 }
 
-extension Event: SQLiteUUIDModel {}
+extension Event: PostgreSQLUUIDModel {}
 extension Event: Content {}
 extension Event: Parameter {}

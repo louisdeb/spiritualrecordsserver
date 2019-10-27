@@ -6,9 +6,9 @@
 //
 
 import Foundation
-import FluentSQLite
+import FluentPostgreSQL
 
-final class ArtistReleasePivot: SQLiteUUIDPivot, ModifiablePivot {
+final class ArtistReleasePivot: PostgreSQLUUIDPivot, ModifiablePivot {
   var id: UUID?
   var artistId: Artist.ID
   var releaseId: Release.ID
@@ -32,7 +32,7 @@ final class ArtistReleasePivot: SQLiteUUIDPivot, ModifiablePivot {
 }
 
 extension ArtistReleasePivot: Migration {
-  static func prepare(on conn: SQLiteConnection) -> Future<Void> {
+  static func prepare(on conn: PostgreSQLConnection) -> Future<Void> {
     return Database.create(self, on: conn) { (builder) in
       try addProperties(to: builder)
       builder.reference(from: \.artistId, to: \Artist.id, onDelete: .cascade)
