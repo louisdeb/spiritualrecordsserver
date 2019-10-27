@@ -96,7 +96,10 @@
             <li><a href="#(response.release.spotify)">Spotify</a></li>
           }
           #if(response.release.appleMusic != "") {
-            <li><a href="#(response.artists.first.appleMusic)">Apple Music</a></li>
+            <li><a href="#(response.release.appleMusic)">Apple Music</a></li>
+          }
+          #if(response.release.googlePlay != "") {
+            <li><a href="#(response.release.googlePlay)">Google Play</a></li>
           }
         </ul>
 
