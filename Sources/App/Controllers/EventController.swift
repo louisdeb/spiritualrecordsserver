@@ -12,7 +12,6 @@ struct EventController: RouteCollection {
   func boot(router: Router) throws {
     let route = router.grouped("api", "event")
     route.get(use: get)
-    route.get("currentweek", use: getCurrentWeek)
     route.post(use: create)
     route.post(Event.parameter, "delete", use: delete)
   }
@@ -20,7 +19,9 @@ struct EventController: RouteCollection {
   func get(_ req: Request) throws -> Future<[EventResponse]> {
     let events = Event.query(on: req).all()
     
-    return events.flatMap { events -> EventLoopFuture<[EventResponse]> in
+    return events.flatMap { _events -> EventLoopFuture<[EventResponse]> in
+      let events = _events.filter { $0.isUpcomingOrThisWeek() }
+      
       return try events.map { event -> Future<EventResponse> in
         return try event.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<EventResponse> in
           return Future.map(on: req, { () -> EventResponse in
@@ -29,55 +30,6 @@ struct EventController: RouteCollection {
         }
       }
       .flatten(on: req)
-    }
-  }
-  
-  func getCurrentWeek(_ req: Request) throws -> Future<[EventResponse]> {
-    let lastMonday = Date().previous(.monday)
-    let nextSunday = Date().next(.sunday)
-    
-    let eventsFuture = Event.query(on: req).all()
-    
-    return eventsFuture.flatMap { events -> EventLoopFuture<[EventResponse]> in
-      let eventsThisWeek = events.filter { $0.date >= lastMonday && $0.date < nextSunday }
-      
-      var missingDays: [Weekday] = [.tuesday, .wednesday, .thursday, .friday, .saturday, .sunday]
-      let calendar = Calendar(identifier: .gregorian)
-      
-      let eventResponses = try eventsThisWeek.map { event -> Future<EventResponse> in
-        let day = calendar.component(.weekday, from: event.date)
-        for (index, missingDay) in missingDays.enumerated() {
-          if day == missingDay.rawValue {
-            missingDays.remove(at: index)
-          }
-        }
-        
-        return try event.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<EventResponse> in
-          return Future.map(on: req, { () -> EventResponse in
-            return EventResponse(event: event, artists: artists)
-          })
-        }
-      }
-      .flatten(on: req)
-      
-      return eventResponses.flatMap { eventResponses_ -> EventLoopFuture<[EventResponse]> in
-        var eventResponses = eventResponses_
-        
-        for day in missingDays {
-          let date = lastMonday.next(day)
-          let event = Event(name: nil, date: date, description: nil, unsignedArtists: [], price: "", noEvent: true)
-          let eventResponse = EventResponse(event: event, artists: [])
-          eventResponses.append(eventResponse)
-        }
-        
-        eventResponses.sort { (e1, e2) -> Bool in
-          e1.event.date < e2.event.date
-        }
-        
-        return EventLoopFuture.map(on: req, { () -> [EventResponse] in
-          return eventResponses
-        })
-      }
     }
   }
   

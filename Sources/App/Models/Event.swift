@@ -60,6 +60,26 @@ extension Event {
     return self.date >= today
   }
   
+  func isUpcomingOrThisWeek() -> Bool {
+    let monday = Date().previous(.monday)
+    
+    let calendar = Calendar(identifier: .gregorian)
+    let year = calendar.component(.year, from: monday)
+    let month = calendar.component(.month, from: monday)
+    let day = calendar.component(.day, from: monday)
+    
+    var dateComponents = DateComponents()
+    dateComponents.year = year
+    dateComponents.month = month
+    dateComponents.day = day
+    dateComponents.minute = 0
+    dateComponents.second = 0
+    
+    let mondayZero = calendar.date(from: dateComponents)!
+    
+    return self.date >= mondayZero
+  }
+  
   static func generateName(date: Date) -> String {
     let calendar = Calendar(identifier: .gregorian)
     let weekday = calendar.component(.weekday, from: date)
