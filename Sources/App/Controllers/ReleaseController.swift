@@ -17,7 +17,7 @@ struct ReleaseController: RouteCollection {
   }
 
   func get(_ req: Request) throws -> Future<[ReleaseResponse]> {
-    let releases = Release.query(on: req).sort(\Release.date, .ascending).all()
+    let releases = Release.query(on: req).sort(\Release.date, .descending).all()
     
     return releases.flatMap { releases -> EventLoopFuture<[ReleaseResponse]> in
       return try releases.map { release -> Future<ReleaseResponse> in

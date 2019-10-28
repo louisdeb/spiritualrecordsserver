@@ -80,7 +80,7 @@ struct AppController: RouteCollection {
   }
   
   func releaseManagement(_ req: Request) throws -> Future<View> {
-    let releases = Release.query(on: req).sort(\Release.date, .ascending).all()
+    let releases = Release.query(on: req).sort(\Release.date, .descending).all()
     
     return releases.flatMap { releases -> EventLoopFuture<View> in
       let releaseResponses = try releases.map { release -> Future<ReleaseResponse> in
