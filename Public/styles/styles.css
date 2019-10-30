@@ -161,3 +161,7 @@ header > #title > h1 {
 .unsigned-artist-link-input {
   margin-left: 10px;
 }
+
+#login-form > input {
+  margin-bottom: 10px;
+}

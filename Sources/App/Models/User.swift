@@ -11,11 +11,11 @@ import Authentication
 
 final class User: Codable {
   var id: UUID?
-  var email: String
+  var username: String
   var password: String
   
-  init(email: String, password: String) {
-    self.email = email
+  init(username: String, password: String) {
+    self.username = username
     self.password = password
   }
 }
@@ -34,30 +34,9 @@ extension User: Content {}
 extension User: Parameter {}
 
 extension User: BasicAuthenticatable {
-  static let usernameKey: UsernameKey = \User.email
+  static let usernameKey: UsernameKey = \User.username
   static let passwordKey: PasswordKey = \User.password
 }
 
 extension User: PasswordAuthenticatable {}
 extension User: SessionAuthenticatable {}
-
-struct AdminUser: Migration {
-  typealias Database = PostgreSQLDatabase
-  
-  static func prepare(on connection: PostgreSQLConnection) -> Future<Void> {
-    let email = "debeaumont.louis@gmail.com"
-    let password = "shittyplaintextpassword"
-    
-    let passwordHash = try? BCrypt.hash(password)
-    guard let hashedPassword = passwordHash else {
-      fatalError("Failed to create admin user")
-    }
-    
-    let user = User(email: email, password: hashedPassword)
-    return user.save(on: connection).transform(to: ())
-  }
-  
-  static func revert(on connection: PostgreSQLConnection) -> Future<Void> {
-    return .done(on: connection)
-  }
-}
