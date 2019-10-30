@@ -7,6 +7,8 @@
     <input id='password-input' name='password' type='password' placeholder='Password' required> <br>
     <input id='login-submit' type='submit' value='Sign In' onclick='login()'>
   </div>
+  
+  <div id='login-error'></div>
 </div>
 }
 #embed("base")

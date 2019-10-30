@@ -165,3 +165,7 @@ header > #title > h1 {
 #login-form > input {
   margin-bottom: 10px;
 }
+
+#login-error {
+  color: red;
+}

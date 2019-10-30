@@ -11,9 +11,15 @@ import Authentication
 struct EventController: RouteCollection {
   func boot(router: Router) throws {
     let route = router.grouped("api", "event")
+    
     route.get(use: get)
-    route.post(use: create)
-    route.post(Event.parameter, "delete", use: delete)
+    
+    let sessionMiddleware = User.authSessionsMiddleware()
+    let redirectMiddleware = RedirectMiddleware(A: User.self, path: "/login")
+    let auth = route.grouped(sessionMiddleware, redirectMiddleware)
+    
+    auth.post(use: create)
+    auth.post(Event.parameter, "delete", use: delete)
   }
   
   func get(_ req: Request) throws -> Future<[EventResponse]> {

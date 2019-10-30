@@ -11,6 +11,7 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
   try services.register(LeafProvider())
   
   config.prefer(LeafRenderer.self, for: ViewRenderer.self)
+  config.prefer(MemoryKeyedCache.self, for: KeyedCache.self)
 
   // Register routes to the router
   let router = EngineRouter.default()
@@ -21,6 +22,7 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
   var middlewares = MiddlewareConfig() // Create _empty_ middleware config
   middlewares.use(FileMiddleware.self) // Serves files from `Public/` directory
   middlewares.use(ErrorMiddleware.self) // Catches errors and converts to HTTP response
+  middlewares.use(SessionsMiddleware.self) // Provides cookies for persistent web authentication
   services.register(middlewares)
   
   let psqlDbConfig_local = PostgreSQLDatabaseConfig(

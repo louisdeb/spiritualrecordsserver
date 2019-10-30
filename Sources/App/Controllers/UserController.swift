@@ -7,18 +7,28 @@
 
 import Vapor
 import Crypto
+import Authentication
 
 class UserController: RouteCollection {
   func boot(router: Router) throws {
     let usersRoute = router.grouped("api", "user")
-    usersRoute.post(use: login)
+    
+    let basicAuthMiddleware = User.basicAuthMiddleware(using: BCryptDigest())
+    let sessionMiddleware = User.authSessionsMiddleware()
+    let guardMiddleware = User.guardAuthMiddleware()
+    let auth = usersRoute.grouped(basicAuthMiddleware, sessionMiddleware, guardMiddleware)
+    
+    auth.post(use: login)
   }
 
-  func login(_ req: Request) throws -> Future<User> {
+  func login(_ req: Request) throws -> String {
     let user = try req.requireAuthenticated(User.self)
-    print("user authenticated")
-    return Future.map(on: req) { () -> User in
-      return user
-    }
+    try req.authenticateSession(user)
+    return "Logged in"
   }
+  
+//  func changePassword(_ req: Request) throws -> Future<User> {
+//    let user = try req.requireAuthenticated(User.self)
+//    return user.save(on: req)
+//  }
 }

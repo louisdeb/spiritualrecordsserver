@@ -10,21 +10,27 @@ import Authentication
 
 struct AppController: RouteCollection {
   func boot(router: Router) throws {
-    let route = router.grouped("app")
-    route.get(use: index)
-    route.get("login", use: login)
+    router.get("login", use: login)
     
-    let artistRoute = route.grouped("artists")
-    artistRoute.get(use: artistManagement)
-    artistRoute.get(Artist.parameter, "edit", use: artistEdit)
+    let app = router.grouped("app")
     
-    let eventRoute = route.grouped("events")
-    eventRoute.get(use: eventManagement)
-    eventRoute.get(Event.parameter, "edit", use: eventEdit)
+    let sessionMiddleware = User.authSessionsMiddleware()
+    let redirectMiddleware = RedirectMiddleware(A: User.self, path: "/login")
+    let auth = app.grouped(sessionMiddleware, redirectMiddleware)
     
-    let releaseRoute = route.grouped("releases")
-    releaseRoute.get(use: releaseManagement)
-    releaseRoute.get(Release.parameter, "edit", use: releaseEdit)
+    auth.get(use: index)
+    
+    let artists = auth.grouped("artists")
+    artists.get(use: artistManagement)
+    artists.get(Artist.parameter, "edit", use: artistEdit)
+    
+    let events = auth.grouped("events")
+    events.get(use: eventManagement)
+    events.get(Event.parameter, "edit", use: eventEdit)
+    
+    let releases = auth.grouped("releases")
+    releases.get(use: releaseManagement)
+    releases.get(Release.parameter, "edit", use: releaseEdit)
   }
   
   func index(_ req: Request) throws -> Future<View> {
