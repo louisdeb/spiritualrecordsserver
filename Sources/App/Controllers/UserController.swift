@@ -46,6 +46,10 @@ class UserController: RouteCollection {
       throw CreateError.runtimeError("New password is not a valid string")
     }
     
+    guard newPassword.count >= 8 else {
+      throw CreateError.runtimeError("Password must be at least 8 characters long")
+    }
+    
     let newPasswordHash = try BCrypt.hash(newPassword)
 
     user.password = newPasswordHash
@@ -84,6 +88,10 @@ class UserController: RouteCollection {
       
       guard let password = json["password"] as? String else {
         throw CreateError.runtimeError("Password not a valid string")
+      }
+      
+      guard password.count >= 8 else {
+        throw CreateError.runtimeError("Password must be at least 8 characters long")
       }
       
       let passwordHash = try BCrypt.hash(password)
