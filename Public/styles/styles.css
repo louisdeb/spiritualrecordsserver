@@ -169,3 +169,13 @@ header > #title > h1 {
 #login-error {
   color: red;
 }
+
+.account-management > input {
+  margin-bottom: 10px;
+  margin-left: 20px;
+}
+
+#change-password-success, #create-account-success {
+  color: green;
+  margin-left: 20px;
+}

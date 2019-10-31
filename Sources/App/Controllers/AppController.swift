@@ -31,6 +31,9 @@ struct AppController: RouteCollection {
     let releases = auth.grouped("releases")
     releases.get(use: releaseManagement)
     releases.get(Release.parameter, "edit", use: releaseEdit)
+    
+    let account = auth.grouped("account")
+    account.get(use: accountManagement)
   }
   
   func index(_ req: Request) throws -> Future<View> {
@@ -115,5 +118,9 @@ struct AppController: RouteCollection {
         return try req.view().render("releaseEdit", data)
       }
     }
+  }
+  
+  func accountManagement(_ req: Request) throws -> Future<View> {
+    return try req.view().render("accountManagement")
   }
 }

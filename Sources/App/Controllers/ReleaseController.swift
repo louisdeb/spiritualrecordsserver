@@ -45,7 +45,7 @@ struct ReleaseController: RouteCollection {
     }
 
     guard let json = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? Dictionary<String, Any> else {
-      throw CreateError.runtimeError("Could not arse request body as JSON")
+      throw CreateError.runtimeError("Could not parse request body as JSON")
     }
     
     let formatter = DateFormatter()

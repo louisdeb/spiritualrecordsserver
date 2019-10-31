@@ -14,18 +14,12 @@ function login() {
     if (req.readyState != req.DONE)
       return
     
-//    res = JSON.parse(req.response)
-//    console.log(res)
-//    
-//    var error = document.getElementById('login-error');
-//    if (res['error']) {
-//      error.innerHTML = 'Error: ' + res['reason']
-//      return
-//    }
-//    
-//    var id = res['id']
-//    var userId = res['userID']
-//    var token = res['token']
+    if (req.status != 200) {
+      var error = document.getElementById('login-error')
+      error.innerHTML = "Failed to log in"
+      error.display = 'block'
+      return
+    }
     
     location.replace('/app')
   }

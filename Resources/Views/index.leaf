@@ -4,5 +4,6 @@
   <h2><a href="/app/releases">Releases</a></h2>
   <h2><a href="/app/interviews">Interviews</a></h2>
   <h2><a href="/app/news">News</a></h2>
+  <h2><a href="/app/account">Account</a></h2>
 }
 #embed("base")

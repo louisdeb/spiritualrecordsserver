@@ -1,0 +1,23 @@
+#set("content") {
+
+<div class='content-wrapper account-management'>
+  <h2>Change Password</h2>
+
+  <input id='new-password1' type='password' placeholder='New Password' required> <br>
+  <input id='new-password2' type='password' placeholder='Confirm New Password' required> <br>
+  <input id='change-password-submit' type='submit' value='Change' onclick='changePassword()'>
+  
+  <div id='change-password-error' style='display: none; color: red; margin-left: 20px'></div>
+  <div id='change-password-success' style='display: none;'></div>
+  
+  <h2>Create New Account</h2>
+  
+  <input id='username-input' type='text' placeholder='Username' required> <br>
+  <input id='password-input' type='password' placeholder='Password' required> <br>
+  <input id='create-account-submit' type='submit' value='Create' onclick='createAccount()'>
+  
+  <div id='create-account-error' style='display: none; color: red; margin-left: 20px'></div>
+  <div id='create-account-success' style='display: none;'></div>
+</div>
+}
+#embed("base")
