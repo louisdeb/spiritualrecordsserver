@@ -32,6 +32,10 @@ struct AppController: RouteCollection {
     releases.get(use: releaseManagement)
     releases.get(Release.parameter, "edit", use: releaseEdit)
     
+    let interviews = auth.grouped("interviews")
+    interviews.get(use: interviewManagement)
+    interviews.get(Interview.parameter, "edit", use: interviewEdit)
+    
     let account = auth.grouped("account")
     account.get(use: accountManagement)
   }
@@ -116,6 +120,38 @@ struct AppController: RouteCollection {
         let releaseResponse = ReleaseResponse(release: release, artists: artists)
         let data = ["releaseResponse": releaseResponse]
         return try req.view().render("releaseEdit", data)
+      }
+    }
+  }
+  
+  func interviewManagement(_ req: Request) throws -> Future<View> {
+    let interviews = Interview.query(on: req).sort(\Interview.date, .descending).all()
+    
+    return interviews.flatMap { interviews -> EventLoopFuture<View> in
+      let interviewResponses = try interviews.map { interview -> Future<InterviewResponse> in
+        return try interview.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<InterviewResponse> in
+          return Future.map(on: req, { () -> InterviewResponse in
+            return InterviewResponse(interview: interview, artists: artists)
+          })
+        }
+      }
+      .flatten(on: req)
+      
+      return interviewResponses.flatMap { interviewResponses -> EventLoopFuture<View> in
+        let data = ["interviewResponses": interviewResponses]
+        return try req.view().render("interviewManagement", data)
+      }
+    }
+  }
+  
+  func interviewEdit(_ req: Request) throws -> Future<View> {
+    let interview = try req.parameters.next(Interview.self)
+    
+    return interview.flatMap { interview -> EventLoopFuture<View> in
+      return try interview.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<View> in
+        let interviewResponse = InterviewResponse(interview: interview, artists: artists)
+        let data = ["interviewResponse": interviewResponse]
+        return try req.view().render("interviewEdit", data)
       }
     }
   }

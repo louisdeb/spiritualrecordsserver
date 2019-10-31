@@ -1,0 +1,96 @@
+#set("content") {
+  <h1>Interviews Management</h1>
+
+  <h2 class='create-content-title' onclick='toggleShowCreateForm()'>Create A New Interview</h2>
+
+  <form class="create-form" method="post" action="/api/interview/" style='display:none'>
+    <div class='input-group create-form-inner'>
+      
+      <div>
+        <div class='label-wrapper'>
+          <label for='name'>Name</label>
+        </div>
+        <input id='name-input' type="text" name="name" required>
+      </div>
+      
+      <div>
+        <div class='label-wrapper'>
+          <label for='artists'>Select Artists</label>
+          <input type='button' value='+' onclick='addArtistToSelect(this)'>
+        </div>
+        <div id='artist-selection'></div>
+      </div>
+      
+      <div>
+        <div class='label-wrapper'>
+          <label for='date'>Date</label>
+        </div>
+        <input id='date-select' name='date' type='date' class='form-control' required/>
+      </div>
+      
+      <div>
+        <div class='label-wrapper'>
+          <label for='description'>Short Description</label>
+        </div>
+        <input id='short-description-input' type="text" name="short-description" optional>
+      </div>
+      
+      <div>
+        <div class='label-wrapper'>
+          <label for='description'>Description</label>
+        </div>
+        <textarea id='description-input' type="text" name="description"></textarea>
+      </div>
+      
+      <div>
+        <div class='label-wrapper'>
+          <label for='video'>Video URL</label>
+        </div>
+        <input id='video-input' type="text" name="videoURL" required>
+      </div>
+      
+    </div>
+
+    <div id='error' style='display:none'></div>
+    
+    <input class='form-create-button' type='button' value='Create' onclick='submitInterview(this)'>
+    <hr>
+  </form>
+
+  <div class='content-wrapper'>
+    <h2>Interviews</h2>
+    
+    #for(response in interviewResponses) {
+      <div class="interview">
+
+        <h2>#(response.interview.name)</h2>
+        
+        <div class='date'>#date(response.interview.date, "dd-MM-yyyy")</div>
+        
+        <div class="short-description">#(response.interview.shortDescription)</div>
+        
+        <div class="description">
+          <pre style="font-family:Helvetica">#(response.interview.description)</pre>
+        </div>
+        
+        <a href="#(response.interview.videoURL)">#(response.interview.videoURL)</a>
+        
+        <p>Associated Artists:</p>
+        <ul>
+          #for(artist in response.artists) {
+            <li>#(artist.name)</li>
+          }
+        </ul>
+
+        <a class="edit-profile" href="/app/interviews/#(response.interview.id)/edit">Edit Interview</a>
+      </div>
+
+      <hr/>
+    }
+  </div>
+  
+  <script>
+    populateArtistSelector(document.getElementById("artist-selection"))
+  </script>
+}
+#embed("base")

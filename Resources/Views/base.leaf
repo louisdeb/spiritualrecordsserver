@@ -11,6 +11,7 @@
     <script src='/scripts/artists.js' type='text/javascript'></script>
     <script src='/scripts/events.js' type='text/javascript'></script>
     <script src='/scripts/releases.js' type='text/javascript'></script>
+    <script src='/scripts/interviews.js' type='text/javascript'></script>
     <script src='/scripts/accounts.js' type='text/javascript'></script>
   </head>
 

@@ -15,12 +15,14 @@ final class Interview: Codable {
   var date: Date
   var shortDescription: String
   var description: String
+  var videoURL: String
   
-  init(name: String, date: Date, shortDescription: String?, description: String?) {
+  init(name: String, date: Date, shortDescription: String?, description: String?, videoURL: String?) {
     self.name = name
     self.date = date
     self.shortDescription = shortDescription ?? ""
     self.description = description ?? ""
+    self.videoURL = videoURL ?? ""
   }
 }
 

@@ -56,8 +56,13 @@ struct InterviewController: RouteCollection {
     let date = formatter.date(from: json["date"] as! String)!
     let shortDescription = json["short-description"] as? String
     let description = json["description"] as? String
+    let videoURL = json["videoURL"] as? String
     
-    let interview = Interview(name: name, date: date, shortDescription: shortDescription, description: description)
+    let interview = Interview(name: name,
+                              date: date,
+                              shortDescription: shortDescription,
+                              description: description,
+                              videoURL: videoURL)
     
     let artists = Artist.query(on: req).all()
     let artistNames = json["artists"] as! [String]
