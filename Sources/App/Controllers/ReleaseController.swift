@@ -95,7 +95,7 @@ struct ReleaseController: RouteCollection {
     
     return releaseFuture.flatMap { release_ -> EventLoopFuture<Release> in
       guard let release = release_ else {
-        throw CreateError.runtimeError("Could not find event to update")
+        throw CreateError.runtimeError("Could not find release to update")
       }
       
       release.name = updatedRelease.name
@@ -106,7 +106,7 @@ struct ReleaseController: RouteCollection {
       release.appleMusic = updatedRelease.appleMusic
       release.googlePlay = updatedRelease.googlePlay
       
-      return flatMap(release.artists.detachAll(on: req), release.save(on: req), { (_, event) -> EventLoopFuture<Release> in
+      return flatMap(release.artists.detachAll(on: req), release.save(on: req), { (_, release) -> EventLoopFuture<Release> in
         return artists.map { artist in
           return release.artists.attach(artist, on: req)
         }

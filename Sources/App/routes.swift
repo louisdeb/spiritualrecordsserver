@@ -16,4 +16,7 @@ public func routes(_ router: Router) throws {
   
   let releaseController = ReleaseController()
   try router.register(collection: releaseController)
+  
+  let interviewController = InterviewController()
+  try router.register(collection: interviewController)
 }
