@@ -18,14 +18,14 @@ final class Event: Codable {
   var price: String
   var noEvent: Bool
   
-  init(name: String?, date: Date, description: String?, unsignedArtists: [UnsignedArtist], price: String, noEvent: Bool = false) {
+  init(name: String?, date: Date, description: String?, unsignedArtists: [UnsignedArtist], price: String?, noEvent: Bool = false) {
 //    The following line creates a name for all events.
 //    self.name = (name == nil || name == "") ? Event.generateName(date: date) : name!
     self.name = name ?? ""
     self.date = date
     self.description = description ?? ""
     self.unsignedArtists = unsignedArtists
-    self.price = price
+    self.price = price ?? ""
     
     self.noEvent = noEvent
     if (noEvent) {

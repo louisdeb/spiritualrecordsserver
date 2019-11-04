@@ -52,10 +52,21 @@ struct ArtistController: RouteCollection {
       throw CreateError.runtimeError("Could not parse request body as JSON")
     }
     
-    let name = json["name"] as! String
+    guard let name = json["name"] as? String else {
+      throw CreateError.runtimeError("Invalid artist name")
+    }
+    
     let shortDescription = json["shortDescription"] as? String
     let description = json["description"] as? String
-    let imageURLs = json["imageURLs"] as! [String]
+    
+    guard let imageURLs = json["imageURLs"] as? [String] else {
+      throw CreateError.runtimeError("Invalid [imageURL]")
+    }
+    
+    guard !imageURLs.isEmpty else {
+      throw CreateError.runtimeError("No image URLs were provided")
+    }
+    
     let spotify = json["spotify"] as? String
     let appleMusic = json["appleMusic"] as? String
     let googlePlay = json["googlePlay"] as? String
@@ -75,7 +86,14 @@ struct ArtistController: RouteCollection {
                         website: website)
     
     if json["id"] != nil {
-      let id = UUID(uuidString: json["id"] as! String)!
+      guard let _id = json["id"] as? String else {
+        throw CreateError.runtimeError("Bad id value")
+      }
+      
+      guard let id = UUID(uuidString: _id) else {
+        throw CreateError.runtimeError("Id was not a valid UUID")
+      }
+      
       return try update(req, id: id, updatedArtist: artist)
     }
     
@@ -88,19 +106,23 @@ struct ArtistController: RouteCollection {
   func update(_ req: Request, id: UUID, updatedArtist: Artist) throws -> Future<View> {
     let artistFuture = Artist.find(id, on: req)
     
-    return artistFuture.flatMap { artist -> EventLoopFuture<View> in
-      artist!.name = updatedArtist.name
-      artist!.shortDescription = updatedArtist.shortDescription
-      artist!.description = updatedArtist.description
-      artist!.imageURLs = updatedArtist.imageURLs
-      artist!.website = updatedArtist.website
-      artist!.spotify = updatedArtist.spotify
-      artist!.appleMusic = updatedArtist.appleMusic
-      artist!.googlePlay = updatedArtist.googlePlay
-      artist!.instagram = updatedArtist.instagram
-      artist!.facebook = updatedArtist.facebook
+    return artistFuture.flatMap { artist_ -> EventLoopFuture<View> in
+      guard let artist = artist_ else {
+        throw CreateError.runtimeError("Could not find artist to update")
+      }
       
-      return artist!.save(on: req).flatMap { artist -> EventLoopFuture<View> in
+      artist.name = updatedArtist.name
+      artist.shortDescription = updatedArtist.shortDescription
+      artist.description = updatedArtist.description
+      artist.imageURLs = updatedArtist.imageURLs
+      artist.website = updatedArtist.website
+      artist.spotify = updatedArtist.spotify
+      artist.appleMusic = updatedArtist.appleMusic
+      artist.googlePlay = updatedArtist.googlePlay
+      artist.instagram = updatedArtist.instagram
+      artist.facebook = updatedArtist.facebook
+      
+      return artist.save(on: req).flatMap { artist -> EventLoopFuture<View> in
         let data = ["artists": Artist.query(on: req).sort(\Artist.name, .ascending).all()]
         return try req.view().render("artistManagement", data)
       }

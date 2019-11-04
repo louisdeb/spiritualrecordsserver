@@ -55,13 +55,28 @@ struct EventController: RouteCollection {
     formatter.timeZone = TimeZone(secondsFromGMT: 0)
     
     let name = json["name"] as? String
-    let date = formatter.date(from: json["date"] as! String)!
+    
+    guard let dateJSON = json["date"] as? String else {
+      throw CreateError.runtimeError("Bad date value")
+    }
+    
+    guard let date = formatter.date(from: dateJSON) else {
+      throw CreateError.runtimeError("Date value could not be converted to DateTime obejct")
+    }
+    
     let description = json["description"] as? String
-    let artistNames = json["artists"] as! [String]
-    let price = json["price"] as! String
+    
+    guard let artistNames = json["artists"] as? [String] else {
+      throw CreateError.runtimeError("Bad value for artists")
+    }
+    
+    let price = json["price"] as? String
     
     var unsignedArtists: [UnsignedArtist] = []
-    let unsignedArtistsJson = json["unsignedArtists"] as! [Dictionary<String, String>]
+    guard let unsignedArtistsJson = json["unsignedArtists"] as? [Dictionary<String, String>] else {
+      throw CreateError.runtimeError("Bad value for unsignedArtists")
+    }
+    
     for (_, unsignedArtistJson) in unsignedArtistsJson.enumerated() {
       let unsignedArtist = UnsignedArtist(
         name: unsignedArtistJson["name"] ?? "",
@@ -79,7 +94,14 @@ struct EventController: RouteCollection {
     let artists = Artist.query(on: req).all()
     
     if json["id"] != nil {
-      let id = UUID(uuidString: json["id"] as! String)!
+      guard let _id = json["id"] as? String else {
+        throw CreateError.runtimeError("Bad id value")
+      }
+      
+      guard let id = UUID(uuidString: _id) else {
+        throw CreateError.runtimeError("Id was not a valid UUID")
+      }
+      
       return artists.flatMap { allArtists -> EventLoopFuture<Event> in
         let artists = allArtists.filter { artistNames.contains($0.name) }
         return try self.update(req, id: id, updatedEvent: event, artists: artists)
