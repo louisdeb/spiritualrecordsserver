@@ -47,8 +47,9 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
   databases.add(database: psql, as: .psql)
   services.register(databases)
 
-  // Configure migrations
   var migrations = MigrationConfig()
+  
+  // Models
   migrations.add(model: User.self, database: .psql)
   migrations.add(model: Artist.self, database: .psql)
   migrations.add(model: Event.self, database: .psql)
@@ -57,5 +58,9 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
   migrations.add(model: ArtistEventPivot.self, database: .psql)
   migrations.add(model: ArtistReleasePivot.self, database: .psql)
   migrations.add(model: ArtistInterviewPivot.self, database: .psql)
+  
+  // Migrations
+  migrations.add(migration: AddImageToInterview.self, database: .psql)
+  
   services.register(migrations)
 }
