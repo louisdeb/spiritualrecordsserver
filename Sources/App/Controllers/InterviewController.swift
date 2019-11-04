@@ -56,12 +56,14 @@ struct InterviewController: RouteCollection {
     let date = formatter.date(from: json["date"] as! String)!
     let shortDescription = json["short-description"] as? String
     let description = json["description"] as? String
+    let imageURL = json["imageURL"] as? String
     let videoURL = json["videoURL"] as? String
     
     let interview = Interview(name: name,
                               date: date,
                               shortDescription: shortDescription,
                               description: description,
+                              imageURL: imageURL,
                               videoURL: videoURL)
     
     let artists = Artist.query(on: req).all()
@@ -98,6 +100,8 @@ struct InterviewController: RouteCollection {
       interview.date = updatedInterview.date
       interview.shortDescription = updatedInterview.shortDescription
       interview.description = updatedInterview.description
+      interview.imageURL = updatedInterview.imageURL
+      interview.videoURL = updatedInterview.videoURL
       
       return flatMap(interview.artists.detachAll(on: req), interview.save(on: req), { (_, interview) -> EventLoopFuture<Interview> in
         return artists.map { artist in

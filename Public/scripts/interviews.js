@@ -25,6 +25,9 @@ function parseInterviewForm(form) {
   var descriptionInput = document.getElementById("description-input")
   var description = descriptionInput.value
   
+  var imageURLInput = document.getElementById("image-input")
+  var imageURL = imageURLInput.value
+  
   var videoURLInput = document.getElementById("video-input")
   var videoURL = videoURLInput.value
   
@@ -33,6 +36,7 @@ function parseInterviewForm(form) {
   json["date"] = date
   json["short-description"] = shortDescription
   json["description"] = description
+  json["imageURL"] = imageURL
   json["videoURL"] = videoURL
 
   json["artists"] = artists

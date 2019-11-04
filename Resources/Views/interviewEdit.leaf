@@ -47,6 +47,13 @@
         </div>
         <textarea id='description-input' type="text" name="description">#(interviewResponse.interview.description)</textarea>
       </div>
+      
+      <div>
+        <div class='label-wrapper'>
+          <label for='image'>Image URL</label>
+        </div>
+        <input id='image-input' type='text' name='imageURL' value='#(interviewResponse.interview.imageURL)' required>
+      </div>
 
       <div>
         <div class='label-wrapper'>

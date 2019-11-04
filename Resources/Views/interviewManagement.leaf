@@ -44,6 +44,13 @@
       
       <div>
         <div class='label-wrapper'>
+          <label for='image'>Image URL</label>
+        </div>
+        <input id='image-input' type='text' name='imageURL' required>
+      </div>
+      
+      <div>
+        <div class='label-wrapper'>
           <label for='video'>Video URL</label>
         </div>
         <input id='video-input' type="text" name="videoURL" required>
@@ -72,6 +79,8 @@
         <div class="description">
           <pre style="font-family:Helvetica">#(response.interview.description)</pre>
         </div>
+        
+        <img src='#(response.interview.imageURL)' width='100px;' height='100px'> <br>
         
         <a href="#(response.interview.videoURL)">#(response.interview.videoURL)</a>
         
