@@ -1,0 +1,77 @@
+#set("content") {
+  <h1>News Management</h1>
+
+  <h2 class='create-content-title' onclick='toggleShowCreateForm()'>Create A New Article</h2>
+
+  <form class="create-form" method="post" action="/api/article/" style='display:none'>
+    <div class='input-group create-form-inner'>
+      
+      <div>
+        <div class='label-wrapper'>
+          <label for='title'>Title</label>
+        </div>
+        <input id='title-input' type="text" name="title" required>
+      </div>
+    
+      <div>
+        <div class='label-wrapper'>
+          <label for='date'>Date</label>
+        </div>
+        <input id='date-select' name='date' type='date' class='form-control' required/>
+      </div>
+
+      <div>
+        <div class='label-wrapper'>
+          <label for='title'>Author</label>
+        </div>
+        <input id='author-input' type="text" name="author" required>
+      </div>
+
+      <div>
+        <div class='label-wrapper'>
+          <label for='title'>Author Link</label>
+        </div>
+        <input id='author-link-input' type="text" name="author-link" optional>
+      </div>
+      
+      <div>
+        <div class='label-wrapper'>
+          <label for='content'>Content</label>
+        </div>
+        <textarea id='content-input' type="text" name="content"></textarea>
+      </div>
+
+    </div>
+
+    <div id='error' style='display:none'></div>
+    
+    <input class='form-create-button' type='button' value='Create' onclick='submitArticle(this)'>
+    <hr>
+  </form>
+
+  <div class='content-wrapper'>
+    <h2>News</h2>
+    
+    #for(article in news) {
+      <div class="article">
+
+        <h2>#(article.title)</h2>
+        
+        <div class='date'>#date(article.date, "dd-MM-yyyy")</div>
+        
+        <div class="author">#(article.author)</div>
+
+        <div class="author-link">#(article.authorLink)</div>
+        
+        <div class="article-content">
+          <pre style="font-family:Helvetica">#(article.content)</pre>
+        </div>
+
+        <a class="edit-article" href="/app/news/#(article.id)/edit">Edit Article</a>
+      </div>
+
+      <hr/>
+    }
+  </div>
+}
+#embed("base")

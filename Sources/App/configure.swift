@@ -55,6 +55,7 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
   migrations.add(model: Event.self, database: .psql)
   migrations.add(model: Release.self, database: .psql)
   migrations.add(model: Interview.self, database: .psql)
+  migrations.add(model: Article.self, database: .psql)
   migrations.add(model: ArtistEventPivot.self, database: .psql)
   migrations.add(model: ArtistReleasePivot.self, database: .psql)
   migrations.add(model: ArtistInterviewPivot.self, database: .psql)

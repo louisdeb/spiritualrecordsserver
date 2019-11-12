@@ -19,4 +19,7 @@ public func routes(_ router: Router) throws {
   
   let interviewController = InterviewController()
   try router.register(collection: interviewController)
+  
+  let articleController = ArticleController()
+  try router.register(collection: articleController)
 }

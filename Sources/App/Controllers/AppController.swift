@@ -36,6 +36,10 @@ struct AppController: RouteCollection {
     interviews.get(use: interviewManagement)
     interviews.get(Interview.parameter, "edit", use: interviewEdit)
     
+    let news = auth.grouped("news")
+    news.get(use: newsManagement)
+    news.get(Article.parameter, "edit", use: newsEdit)
+    
     let account = auth.grouped("account")
     account.get(use: accountManagement)
   }
@@ -154,6 +158,18 @@ struct AppController: RouteCollection {
         return try req.view().render("interviewEdit", data)
       }
     }
+  }
+  
+  func newsManagement(_ req: Request) throws -> Future<View> {
+    let news = Article.query(on: req).sort(\Article.date, .descending).all()
+    let data = ["news": news]
+    return try req.view().render("newsManagement", data)
+  }
+  
+  func newsEdit(_ req: Request) throws -> Future<View> {
+    let article = try req.parameters.next(Article.self)
+    let data = ["article": article]
+    return try req.view().render("newsEdit", data)
   }
   
   func accountManagement(_ req: Request) throws -> Future<View> {

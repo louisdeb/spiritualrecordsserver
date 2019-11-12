@@ -70,7 +70,7 @@ function submitRelease(e) {
   } else {
     error.style.display = 'none'
   }
-    
+
   console.log("Submitting release creation with JSON:")
   console.log(json)
   
@@ -81,7 +81,7 @@ function submitRelease(e) {
     console.log("... Submitted. Reloading page")
     location.reload(true)
   }
-  
+
   formreq.send(JSON.stringify(json))
 }
 
@@ -104,16 +104,6 @@ function updateRelease(e) {
   }
   
   formreq.send(JSON.stringify(json))
-}
-
-function deleteRelease(id) {
-  let delreq = new XMLHttpRequest()
-  delreq.open("POST", "/api/release/" + id + "/delete", true)
-  delreq.onreadystatechange = function () {
-    location.replace("/app/releases")
-  }
-  
-  delreq.send()
 }
 
 function populateArtistSelector(e) {

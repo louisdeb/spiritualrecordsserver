@@ -103,7 +103,7 @@
           }
         </ul>
 
-        <a class="edit-profile" href="/app/releases/#(response.release.id)/edit">Edit Release</a>
+        <a class="edit-release" href="/app/releases/#(response.release.id)/edit">Edit Release</a>
       </div>
 
       <hr/>
