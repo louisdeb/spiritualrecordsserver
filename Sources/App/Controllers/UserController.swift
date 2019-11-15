@@ -96,11 +96,7 @@ class UserController: RouteCollection {
       
       let passwordHash = try BCrypt.hash(password)
       
-      print("Create: password = \(password)")
-      print("Create: hash = \(passwordHash)")
-      
       let user = User(username: username, password: passwordHash)
-
       return user.save(on: req)
     }
   }

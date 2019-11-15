@@ -59,6 +59,8 @@
   <div class='content-wrapper'>
     <h2>Events</h2>
     
+    <i>Showing events from this week onwards</i>
+    
     #for(eventResponse in eventResponses) {
       <div class='event'>
 

@@ -179,3 +179,10 @@ header > #title > h1 {
   color: green;
   margin-left: 20px;
 }
+
+.article-content {
+  max-height: 300px;
+  overflow-y: scroll;
+  margin-top: 30px;
+  margin-bottom: 30px;
+}

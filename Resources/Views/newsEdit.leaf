@@ -34,6 +34,10 @@
         </div>
         <input id='author-link-input' type="text" name="authorLink" value='#(article.authorLink)' optional>
       </div>
+      
+      <p style='margin-top:0; margin-bottom:3px'>Use <tt>[image](image_url)</tt> to embed an image (replace <tt>image_url</tt> with the url of the image).</p>
+      <p style='margin-top:0; margin-bottom:3px'>Use <tt>[video](video_url)</tt> to embed a video (replace <tt>video_url</tt> with the url of the video).</p>
+      <p style='margin-top:0;'>Use <tt>[whatever text you want](url)</tt> to create a link (replace <tt>url</tt> with the link).</p>
 
       <div>
         <div class='label-wrapper'>
