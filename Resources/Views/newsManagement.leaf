@@ -35,7 +35,7 @@
       </div>
       
       <p style='margin-top:0; margin-bottom:3px'><i>Use <tt>[image](image_url)</tt> to embed an image (replace <tt>image_url</tt> with the url of the image).</i></p>
-      <p style='margin-top:0; margin-bottom:3px'><i>Use <tt>[video](video_url)</tt> to embed a video (replace <tt>video_url</tt> with the url of the video).</i></p>
+      <del><p style='margin-top:0; margin-bottom:3px'><i>Use <tt>[video](video_url)</tt> to embed a video (replace <tt>video_url</tt> with the url of the video).</i></p></del>
       <p style='margin-top:0;'><i>Use <tt>[whatever text you want](url)</tt> to create a link (replace <tt>url</tt> with the link).</i></p>
       
       <div>
