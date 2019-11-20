@@ -13,6 +13,7 @@ struct ReleaseController: RouteCollection {
     let route = router.grouped("api", "release")
     
     route.get(use: get)
+    route.get("latest", use: getLatest)
     
     let sessionMiddleware = User.authSessionsMiddleware()
     let redirectMiddleware = RedirectMiddleware(A: User.self, path: "/login")
@@ -34,6 +35,22 @@ struct ReleaseController: RouteCollection {
         }
       }
       .flatten(on: req)
+    }
+  }
+  
+  func getLatest(_ req: Request) throws -> Future<ReleaseResponse> {
+    let release = Release.query(on: req).sort(\Release.date, .descending).first()
+    
+    return release.flatMap { release_ -> EventLoopFuture<ReleaseResponse> in
+      guard let release = release_ else {
+        throw GetError.runtimeError("No releases")
+      }
+      
+      return try release.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<ReleaseResponse> in
+        return Future.map(on: req, { () -> ReleaseResponse in
+          return ReleaseResponse(release: release, artists: artists)
+        })
+      }
     }
   }
   

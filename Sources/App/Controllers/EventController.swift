@@ -148,7 +148,3 @@ struct EventController: RouteCollection {
     return event.delete(on: req)
   }
 }
-
-enum CreateError: Error {
-  case runtimeError(String)
-}
