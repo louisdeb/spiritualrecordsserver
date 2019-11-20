@@ -13,6 +13,7 @@ struct ArtistController: RouteCollection {
     let route = router.grouped("api", "artist")
     
     route.get(use: get)
+    route.get(Artist.parameter, use: getResponse)
     
     let sessionMiddleware = User.authSessionsMiddleware()
     let redirectMiddleware = RedirectMiddleware(A: User.self, path: "/login")
@@ -22,22 +23,23 @@ struct ArtistController: RouteCollection {
     auth.post(Artist.parameter, "delete", use: delete)
   }
   
-  func get(_ req: Request) throws -> Future<[ArtistResponse]> {
-    let artists = Artist.query(on: req).sort(\Artist.name, .ascending).all()
+  func get(_ req: Request) throws -> Future<[Artist]> {
+    return Artist.query(on: req).sort(\Artist.name, .ascending).all()
+  }
+  
+  func getResponse(_ req: Request) throws -> Future<ArtistResponse> {
+    let artist = try req.parameters.next(Artist.self)
     
-    return artists.flatMap { artists -> EventLoopFuture<[ArtistResponse]> in
-      return try artists.map { artist -> Future<ArtistResponse> in
-        return try artist.events.query(on: req).all().flatMap { allEvents -> EventLoopFuture<ArtistResponse> in
-          let events = allEvents.filter { $0.isUpcoming() }
-          
-          return try artist.releases.query(on: req).all().flatMap { releases -> EventLoopFuture<ArtistResponse> in
-            return Future.map(on: req, { () -> ArtistResponse in
-              return ArtistResponse(artist: artist, events: events, releases: releases)
-            })
-          }
+    return artist.flatMap { artist -> EventLoopFuture<ArtistResponse> in
+      return try artist.events.query(on: req).all().flatMap { allEvents -> EventLoopFuture<ArtistResponse> in
+        let events = allEvents.filter { $0.isUpcoming() }
+        
+        return try artist.releases.query(on: req).all().flatMap { releases -> EventLoopFuture<ArtistResponse> in
+          return Future.map(on: req, { () -> ArtistResponse in
+            return ArtistResponse(artist: artist, events: events, releases: releases)
+          })
         }
       }
-      .flatten(on: req)
     }
   }
   
