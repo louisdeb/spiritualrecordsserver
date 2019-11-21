@@ -23,8 +23,16 @@ struct ArtistController: RouteCollection {
     auth.post(Artist.parameter, "delete", use: delete)
   }
   
-  func get(_ req: Request) throws -> Future<[Artist]> {
-    return Artist.query(on: req).sort(\Artist.name, .ascending).all()
+  func get(_ req: Request) throws -> Future<[Artist.Preview]> {
+    let artists = Artist.query(on: req).sort(\Artist.name, .ascending).all()
+    return artists.flatMap { artists -> EventLoopFuture<[Artist.Preview]> in
+      return artists.map { artist -> EventLoopFuture<Artist.Preview> in
+        return Future.map(on: req, { () -> Artist.Preview in
+          return artist.getPreview()
+        })
+      }
+      .flatten(on: req)
+    }
   }
   
   func getResponse(_ req: Request) throws -> Future<ArtistResponse> {

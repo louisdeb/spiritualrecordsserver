@@ -36,6 +36,20 @@ final class Artist: Codable {
     self.facebook = facebook ?? ""
     self.website = website ?? ""
   }
+  
+  final class Preview: Codable {
+    var id: UUID?
+    var name: String
+    var shortDescription: String
+    var imageURL: String
+    
+    init(id: UUID?, name: String, shortDescription: String, imageURL: String) {
+      self.id = id
+      self.name = name
+      self.shortDescription = shortDescription
+      self.imageURL = imageURL
+    }
+  }
 }
 
 extension Artist {
@@ -62,3 +76,11 @@ extension Artist: Migration {
 extension Artist: PostgreSQLUUIDModel {}
 extension Artist: Content {}
 extension Artist: Parameter {}
+
+extension Artist.Preview: Content {}
+
+extension Artist {
+  func getPreview() -> Artist.Preview {
+    return Artist.Preview(id: self.id, name: self.name, shortDescription: self.shortDescription, imageURL: self.imageURLs.first!)
+  }
+}

@@ -74,7 +74,7 @@
         
         <h3>Signed Artists</h3>
         <ul>
-          #for(artist in eventResponse.artists) {
+          #for(artist in eventResponse.artistPreviews) {
             <li>#(artist.name)</li>
           }
         </ul>

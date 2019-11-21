@@ -86,7 +86,7 @@
         
         <p>Associated Artists:</p>
         <ul>
-          #for(artist in response.artists) {
+          #for(artist in response.artistPreviews) {
             <li>#(artist.name)</li>
           }
         </ul>

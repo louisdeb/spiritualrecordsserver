@@ -9,10 +9,10 @@ import Vapor
 
 struct ReleaseResponse: Content {
   var release: Release
-  var artists: [Artist]
+  var artistPreviews: [Artist.Preview]
   
-  init(release: Release, artists: [Artist]) {
+  init(release: Release, artists: [Artist.Preview]) {
     self.release = release
-    self.artists = artists
+    self.artistPreviews = artists
   }
 }

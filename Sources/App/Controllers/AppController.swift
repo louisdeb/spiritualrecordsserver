@@ -71,8 +71,11 @@ struct AppController: RouteCollection {
       let events = _events.filter { $0.isUpcomingOrThisWeek() }
       let eventResponses = try events.map { event -> Future<EventResponse> in
         return try event.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<EventResponse> in
+          let artistPreviews = artists.map { artist -> Artist.Preview in
+            return artist.getPreview()
+          }
           return Future.map(on: req, { () -> EventResponse in
-            return EventResponse(event: event, artists: artists)
+            return EventResponse(event: event, artists: artistPreviews)
           })
         }
       }
@@ -89,7 +92,10 @@ struct AppController: RouteCollection {
     let event = try req.parameters.next(Event.self)
     return event.flatMap { event -> EventLoopFuture<View> in
       return try event.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<View> in
-        let eventResponse = EventResponse(event: event, artists: artists)
+        let artistPreviews = artists.map { artist -> Artist.Preview in
+          return artist.getPreview()
+        }
+        let eventResponse = EventResponse(event: event, artists: artistPreviews)
         let data = ["eventResponse": eventResponse]
         return try req.view().render("eventEdit", data)
       }
@@ -102,8 +108,11 @@ struct AppController: RouteCollection {
     return releases.flatMap { releases -> EventLoopFuture<View> in
       let releaseResponses = try releases.map { release -> Future<ReleaseResponse> in
         return try release.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<ReleaseResponse> in
+          let artistPreviews = artists.map { artist -> Artist.Preview in
+            return artist.getPreview()
+          }
           return Future.map(on: req, { () -> ReleaseResponse in
-            return ReleaseResponse(release: release, artists: artists)
+            return ReleaseResponse(release: release, artists: artistPreviews)
           })
         }
       }
@@ -121,7 +130,10 @@ struct AppController: RouteCollection {
     
     return release.flatMap { release -> EventLoopFuture<View> in
       return try release.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<View> in
-        let releaseResponse = ReleaseResponse(release: release, artists: artists)
+        let artistPreviews = artists.map { artist -> Artist.Preview in
+          return artist.getPreview()
+        }
+        let releaseResponse = ReleaseResponse(release: release, artists: artistPreviews)
         let data = ["releaseResponse": releaseResponse]
         return try req.view().render("releaseEdit", data)
       }
@@ -134,8 +146,11 @@ struct AppController: RouteCollection {
     return interviews.flatMap { interviews -> EventLoopFuture<View> in
       let interviewResponses = try interviews.map { interview -> Future<InterviewResponse> in
         return try interview.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<InterviewResponse> in
+          let artistPreviews = artists.map { artist -> Artist.Preview in
+            return artist.getPreview()
+          }
           return Future.map(on: req, { () -> InterviewResponse in
-            return InterviewResponse(interview: interview, artists: artists)
+            return InterviewResponse(interview: interview, artists: artistPreviews)
           })
         }
       }
@@ -153,7 +168,10 @@ struct AppController: RouteCollection {
     
     return interview.flatMap { interview -> EventLoopFuture<View> in
       return try interview.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<View> in
-        let interviewResponse = InterviewResponse(interview: interview, artists: artists)
+        let artistPreviews = artists.map { artist -> Artist.Preview in
+          return artist.getPreview()
+        }
+        let interviewResponse = InterviewResponse(interview: interview, artists: artistPreviews)
         let data = ["interviewResponse": interviewResponse]
         return try req.view().render("interviewEdit", data)
       }

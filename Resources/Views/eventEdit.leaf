@@ -34,7 +34,7 @@
           <input type='button' value='+' onclick='addArtistToSelect(this)'>
         </div>
 
-        #for(artist in eventResponse.artists) {
+        #for(artist in eventResponse.artistPreviews) {
           <div class='artist-select'>
             <span class='artist-selection' style='display:none'>#(artist.name)</span>
           </div>

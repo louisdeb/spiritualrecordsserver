@@ -78,7 +78,7 @@
       <div class="release">
 
         <h2>#(response.release.name) - <span class='vertical-break'>|</span>
-        #for(artist in response.artists) {
+        #for(artist in response.artistPreviews) {
           #(artist.name) <span class='vertical-break'>|</span>
         }
         </h2>
