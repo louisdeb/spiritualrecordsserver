@@ -122,6 +122,9 @@ struct ReleaseController: RouteCollection {
       }
     }
     
+    let user = try req.requireAuthenticated(User.self)
+    print("User \(user.username) created Release ID(\(String(describing: release.id))). Name: \(release.name), Date: \(release.date), Description: \(release.description), ImageURL: \(release.imageURL), Spotify: \(release.spotify), AppleMusic: \(release.appleMusic), GooglePlay: \(release.googlePlay)")
+    
     return flatMap(artists, release.save(on: req), { (allArtists, release) -> EventLoopFuture<Release> in
       let artists = allArtists.filter { artistNames.contains($0.name) }
       
@@ -149,6 +152,9 @@ struct ReleaseController: RouteCollection {
       release.appleMusic = updatedRelease.appleMusic
       release.googlePlay = updatedRelease.googlePlay
       
+      let user = try req.requireAuthenticated(User.self)
+      print("User \(user.username) update Release ID(\(String(describing: release.id))). Name: \(release.name), Date: \(release.date), Description: \(release.description), ImageURL: \(release.imageURL), Spotify: \(release.spotify), AppleMusic: \(release.appleMusic), GooglePlay: \(release.googlePlay)")
+      
       return flatMap(release.artists.detachAll(on: req), release.save(on: req), { (_, release) -> EventLoopFuture<Release> in
         return artists.map { artist in
           return release.artists.attach(artist, on: req)
@@ -161,6 +167,16 @@ struct ReleaseController: RouteCollection {
   
   func delete(_ req: Request) throws -> Future<Release> {
     let release = try req.parameters.next(Release.self)
+    
+    let _ = release.flatMap { (release) -> EventLoopFuture<Release> in
+      let user = try req.requireAuthenticated(User.self)
+      print("User \(user.username) deleted Release ID(\(String(describing: release.id))). Name: \(release.name), Date: \(release.date), Description: \(release.description), ImageURL: \(release.imageURL), Spotify: \(release.spotify), AppleMusic: \(release.appleMusic), GooglePlay: \(release.googlePlay)")
+      
+      return Future.map(on: req, { () -> Release in
+        return release
+      })
+    }
+    
     return release.delete(on: req)
   }
 }

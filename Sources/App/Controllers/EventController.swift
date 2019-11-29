@@ -111,6 +111,9 @@ struct EventController: RouteCollection {
       }
     }
     
+    let user = try req.requireAuthenticated(User.self)
+    print("User \(user.username) created Event ID(\(String(describing: event.id))). Name: \(event.name), Date: \(event.date), Description: \(event.description), UnsignedArtists: \(event.unsignedArtists), Price: \(event.price)")
+    
     return flatMap(artists, event.save(on: req), { (allArtists, event) -> EventLoopFuture<Event> in
       let artists = allArtists.filter { artistNames.contains($0.name) }
       
@@ -136,6 +139,9 @@ struct EventController: RouteCollection {
       event.unsignedArtists = updatedEvent.unsignedArtists
       event.price = updatedEvent.price
       
+      let user = try req.requireAuthenticated(User.self)
+      print("User \(user.username) updated Event ID(\(String(describing: event.id))). Name: \(event.name), Date: \(event.date), Description: \(event.description), UnsignedArtists: \(event.unsignedArtists), Price: \(event.price)")
+      
       return flatMap(event.artists.detachAll(on: req), event.save(on: req), { (_, event) in
         return artists.map { artist in
           return event.artists.attach(artist, on: req)
@@ -148,6 +154,16 @@ struct EventController: RouteCollection {
   
   func delete(_ req: Request) throws -> Future<Event> {
     let event = try req.parameters.next(Event.self)
+    
+    let _ = event.flatMap { (event) -> EventLoopFuture<Event> in
+      let user = try req.requireAuthenticated(User.self)
+      print("User \(user.username) deleted Event ID(\(String(describing: event.id))). Name: \(event.name), Date: \(event.date), Description: \(event.description), UnsignedArtists: \(event.unsignedArtists), Price: \(event.price)")
+      
+      return Future.map(on: req, { () -> Event in
+        return event
+      })
+    }
+    
     return event.delete(on: req)
   }
 }

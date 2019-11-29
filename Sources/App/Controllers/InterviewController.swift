@@ -100,6 +100,9 @@ struct InterviewController: RouteCollection {
       }
     }
     
+    let user = try req.requireAuthenticated(User.self)
+    print("User \(user.username) created Interview ID(\(String(describing: interview.id))). Name: \(interview.name), Date: \(interview.date), ShortDescription: \(interview.shortDescription), Description: \(interview.description), ImageURL: \(interview.imageURL), VideoURL: \(interview.videoURL)")
+    
     return flatMap(artists, interview.save(on: req), { (allArtists, interview) -> EventLoopFuture<Interview> in
       let artists = allArtists.filter { artistNames.contains($0.name) }
       
@@ -126,6 +129,9 @@ struct InterviewController: RouteCollection {
       interview.imageURL = updatedInterview.imageURL
       interview.videoURL = updatedInterview.videoURL
       
+      let user = try req.requireAuthenticated(User.self)
+      print("User \(user.username) updated Interview ID(\(String(describing: interview.id))). Name: \(interview.name), Date: \(interview.date), ShortDescription: \(interview.shortDescription), Description: \(interview.description), ImageURL: \(interview.imageURL), VideoURL: \(interview.videoURL)")
+      
       return flatMap(interview.artists.detachAll(on: req), interview.save(on: req), { (_, interview) -> EventLoopFuture<Interview> in
         return artists.map { artist in
           return interview.artists.attach(artist, on: req)
@@ -138,6 +144,16 @@ struct InterviewController: RouteCollection {
   
   func delete(_ req: Request) throws -> Future<Interview> {
     let interview = try req.parameters.next(Interview.self)
+    
+    let _ = interview.flatMap { (interview) -> EventLoopFuture<Interview> in
+      let user = try req.requireAuthenticated(User.self)
+      print("User \(user.username) deleted Interview ID(\(String(describing: interview.id))). Name: \(interview.name), Date: \(interview.date), ShortDescription: \(interview.shortDescription), Description: \(interview.description), ImageURL: \(interview.imageURL), VideoURL: \(interview.videoURL)")
+      
+      return Future.map(on: req, { () -> Interview in
+        return interview
+      })
+    }
+    
     return interview.delete(on: req)
   }
 }
