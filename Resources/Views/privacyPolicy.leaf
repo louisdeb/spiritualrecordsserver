@@ -1,0 +1,25 @@
+#set("content") {
+  <h2>Privacy Policy</h2>
+  
+  <p>The privacy policy applying to the Spiritual Records iOS and Android application.</p>
+  
+  <h3>Personal Data</h3>
+  
+  <p>The Spiritual Records App on iOS and Android does not collect any personal information about its users.</p>
+  <p>This application is your gateway to the label and its musicians, not our gateway to you.</p>
+  
+  <h3>Statistics</h3>
+  
+  <p>The Spiritual Records App on iOS and Android does not collect any statistics on how users use the app.</p>
+  <p>We don't feel like staring at the screen all day long. If you find the app useful, tell us in person!</p>
+  
+  <h3>Google Maps</h3>
+  
+  <p>An instance of Google Maps is embedded in the 'About' tab.</p>
+  <p>Your location is never known within the Spiritual Records app, and is not passed to Google.</p>
+  
+  <h3>Any Questions?</h3>
+  
+  <p>Contact the developer <a href='mailto:debeaumont.louis@gmail.com'>debeaumont.louis@gmail.com</a></p>
+}
+#embed("base")

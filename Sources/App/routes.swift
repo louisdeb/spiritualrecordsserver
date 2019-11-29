@@ -22,4 +22,7 @@ public func routes(_ router: Router) throws {
   
   let articleController = ArticleController()
   try router.register(collection: articleController)
+  
+  let publicController = PublicController()
+  try router.register(collection: publicController)
 }
