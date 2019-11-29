@@ -107,9 +107,6 @@ struct ArtistController: RouteCollection {
       return try update(req, id: id, updatedArtist: artist)
     }
     
-    let user = try req.requireAuthenticated(User.self)
-    print("User \(user.username) created Artist ID(\(String(describing: artist.id))). Name: \(artist.name), ShortDescription: \(artist.shortDescription), Description: \(artist.description), ImageURLs: \(artist.imageURLs), Spotify: \(artist.spotify), AppleMusic: \(artist.appleMusic), GooglePlay: \(artist.googlePlay), Instagram: \(artist.instagram), Facebook: \(artist.facebook), Website: \(artist.website)")
-    
     return artist.save(on: req).flatMap { artist -> EventLoopFuture<View> in
       let data = ["artists": Artist.query(on: req).sort(\Artist.name, .ascending).all()]
       return try req.view().render("artistManagement", data)
@@ -135,9 +132,6 @@ struct ArtistController: RouteCollection {
       artist.instagram = updatedArtist.instagram
       artist.facebook = updatedArtist.facebook
       
-      let user = try req.requireAuthenticated(User.self)
-      print("User \(user.username) updated Artist ID(\(String(describing: artist.id))). Name: \(artist.name), ShortDescription: \(artist.shortDescription), Description: \(artist.description), ImageURLs: \(artist.imageURLs), Spotify: \(artist.spotify), AppleMusic: \(artist.appleMusic), GooglePlay: \(artist.googlePlay), Instagram: \(artist.instagram), Facebook: \(artist.facebook), Website: \(artist.website)")
-      
       return artist.save(on: req).flatMap { artist -> EventLoopFuture<View> in
         let data = ["artists": Artist.query(on: req).sort(\Artist.name, .ascending).all()]
         return try req.view().render("artistManagement", data)
@@ -151,9 +145,6 @@ struct ArtistController: RouteCollection {
     
     
     return artist.flatMap { artist -> EventLoopFuture<[Release]> in
-      let user = try req.requireAuthenticated(User.self)
-      print("User \(user.username) deleted Artist ID(\(String(describing: artist.id))). Name: \(artist.name), ShortDescription: \(artist.shortDescription), Description: \(artist.description), ImageURLs: \(artist.imageURLs), Spotify: \(artist.spotify), AppleMusic: \(artist.appleMusic), GooglePlay: \(artist.googlePlay), Instagram: \(artist.instagram), Facebook: \(artist.facebook), Website: \(artist.website)")
-      
       let releases = try artist.releases.query(on: req).all()
       
       return flatMap(releases, artist.delete(on: req), { (releases, _) -> EventLoopFuture<[Release]> in

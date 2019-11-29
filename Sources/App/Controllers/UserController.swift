@@ -97,10 +97,6 @@ class UserController: RouteCollection {
       let passwordHash = try BCrypt.hash(password)
       
       let user = User(username: username, password: passwordHash)
-      
-      let authenticatedUser = try req.requireAuthenticated(User.self)
-      print("User \(authenticatedUser.username) created User: \(user.username)")
-      
       return user.save(on: req)
     }
   }

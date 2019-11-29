@@ -45,6 +45,7 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
 
   var databases = DatabasesConfig()
   databases.add(database: psql, as: .psql)
+  databases.enableLogging(on: .psql)
   services.register(databases)
 
   var migrations = MigrationConfig()

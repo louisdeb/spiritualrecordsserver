@@ -81,9 +81,6 @@ struct ArticleController: RouteCollection {
       return try self.update(req, id: id, updatedArticle: article)
     }
     
-    let user = try req.requireAuthenticated(User.self)
-    print("User \(user.username) created Article ID(\(String(describing: article.id))). Title: \(article.title), Date: \(article.date), Content: \(article.content), Author: \(article.author), AuthorLink: \(article.authorLink)")
-    
     return article.save(on: req)
   }
 
@@ -101,25 +98,12 @@ struct ArticleController: RouteCollection {
       article.author = updatedArticle.author
       article.authorLink = updatedArticle.authorLink
       
-      let user = try req.requireAuthenticated(User.self)
-      print("User \(user.username) updated Article ID(\(String(describing: article.id))). Title: \(article.title), Date: \(article.date), Content: \(article.content), Author: \(article.author), AuthorLink: \(article.authorLink)")
-      
       return article.save(on: req)
     }
   }
   
   func delete(_ req: Request) throws -> Future<Article> {
     let article = try req.parameters.next(Article.self)
-    
-    let _ = article.flatMap { (article) -> EventLoopFuture<Article> in
-      let user = try req.requireAuthenticated(User.self)
-      print("User \(user.username) deleted Article ID(\(String(describing: article.id))). Title: \(article.title), Date: \(article.date), Content: \(article.content), Author: \(article.author), AuthorLink: \(article.authorLink)")
-      
-      return Future.map(on: req, { () -> Article in
-        return article
-      })
-    }
-    
     return article.delete(on: req)
   }
 }
