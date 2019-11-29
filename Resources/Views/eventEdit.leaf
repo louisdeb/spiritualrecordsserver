@@ -48,11 +48,13 @@
         </div>
 
         #for(unsignedArtist in eventResponse.event.unsignedArtists) {
-          <div class='additional-field-input-wrapper'>
-            <input class='unsigned-artist-input' type='text' value='#(unsignedArtist.name)'>
-            <input class='unsigned-artist-link-input' type='text' value='#(unsignedArtist.link)'>
-            <input type='button' value='-' onclick='deleteObjectInSelection(this)'>
-          </div>
+          #if(unsignedArtist.name != "") {
+            <div class='additional-field-input-wrapper'>
+              <input class='unsigned-artist-input' type='text' value='#(unsignedArtist.name)'>
+              <input class='unsigned-artist-link-input' type='text' value='#(unsignedArtist.link)'>
+              <input type='button' value='-' onclick='deleteObjectInSelection(this)'>
+            </div>
+          }
         }
       </div>
 

@@ -24,7 +24,13 @@ final class Event: Codable {
     self.name = name ?? ""
     self.date = date
     self.description = description ?? ""
-    self.unsignedArtists = unsignedArtists
+    
+    var unsignedArtistsMutable = unsignedArtists
+    if (unsignedArtistsMutable.isEmpty) {
+      unsignedArtistsMutable.append(UnsignedArtist(name: "", link: ""))
+    }
+    
+    self.unsignedArtists = unsignedArtistsMutable
     self.price = price ?? ""
     
     self.noEvent = noEvent
