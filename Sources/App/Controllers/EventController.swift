@@ -23,7 +23,7 @@ struct EventController: RouteCollection {
   }
   
   func get(_ req: Request) throws -> Future<[EventResponse]> {
-    let events = Event.query(on: req).all()
+    let events = Event.query(on: req).sort(\Event.date, .ascending).all()
     
     return events.flatMap { _events -> EventLoopFuture<[EventResponse]> in
       let events = _events.filter { $0.isUpcomingOrThisWeek() }
