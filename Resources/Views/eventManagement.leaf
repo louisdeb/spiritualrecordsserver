@@ -83,7 +83,7 @@
         <ul>
           #for(unsignedArtist in eventResponse.event.unsignedArtists) {
             #if(unsignedArtist.name != "") {
-              <a href='#(unsignedArtist.link)'><li>#(unsignedArtist.name)</li> 
+              <a href='#(unsignedArtist.link)'><li>#(unsignedArtist.name)</li></a>
             }
           }
         </ul>
