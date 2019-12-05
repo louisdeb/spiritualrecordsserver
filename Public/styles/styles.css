@@ -120,6 +120,12 @@ header > #title > h1 {
   margin-left: 20px;
 }
 
+.date-select-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
 .date, .date {
   color: grey;
   margin-bottom: 10px;

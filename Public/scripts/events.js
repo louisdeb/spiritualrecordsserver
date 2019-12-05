@@ -176,3 +176,34 @@ function populateArtistSelectors(selectionElems) {
     addArtistToSelect(selectionElems[0].parentElement, selectedArtist)
   }
 }
+
+function eventDateChanged(e) {
+  var openMicCheckbox = document.getElementById("open-mic-checkbox");
+  var openMicCheckboxLabel = document.getElementById("open-mic-checkbox-label");
+  openMicCheckbox.style.display = e.valueAsDate.getDay() == 2 ? 'block' : 'none';
+  openMicCheckboxLabel.style.display = e.valueAsDate.getDay() == 2 ? 'block' : 'none';
+}
+
+var prevName = "";
+var prevDescription = "";
+var prevPrice = "";
+
+function openMicChecked(e) {
+  var nameInput = document.getElementById("name-input");
+  var descriptionInput = document.getElementById("description-input");
+  var priceInput = document.getElementById("price-input");
+  
+  if (e.checked) {
+    prevName = nameInput.value;
+    prevDescription = descriptionInput.value;
+    prevPrice = priceInput.value;
+    
+    nameInput.value = "Tuesday Open Mic";
+    descriptionInput.value = "Bring your instruments and original music every Tuesday. Sign up from 6pm";
+    priceInput.value = "";
+  } else {
+    nameInput.value = prevName;
+    descriptionInput.value = prevDescription;
+    priceInput.value = prevPrice;
+  }
+}

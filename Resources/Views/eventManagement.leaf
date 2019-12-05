@@ -17,7 +17,11 @@
         <div class='label-wrapper'>
           <label for='date'>Select Date</label>
         </div>
-        <input id='date-select' name='date' type='date' class='form-control' required>
+        <div class='date-select-wrapper'>
+          <input id='date-select' name='date' type='date' class='form-control' onchange="eventDateChanged(this)" required>
+          <input id='open-mic-checkbox' name='is-open-mic' type='checkbox' onchange="openMicChecked(this)" style='display:none'>
+          <label id='open-mic-checkbox-label' for='is-open-mic' style='display:none'>Open Mic</label>
+        </div>
       </div>
       
       <div>
