@@ -16,9 +16,10 @@ final class Event: Codable {
   var description: String
   var unsignedArtists: [UnsignedArtist]
   var price: String
+  var ticketsURL: String
   var noEvent: Bool
   
-  init(name: String?, date: Date, description: String?, unsignedArtists: [UnsignedArtist], price: String?, noEvent: Bool = false) {
+  init(name: String?, date: Date, description: String?, unsignedArtists: [UnsignedArtist], price: String?, ticketsURL: String?, noEvent: Bool = false) {
 //    The following line creates a name for all events.
 //    self.name = (name == nil || name == "") ? Event.generateName(date: date) : name!
     self.name = name ?? ""
@@ -32,6 +33,7 @@ final class Event: Codable {
     
     self.unsignedArtists = unsignedArtistsMutable
     self.price = price ?? ""
+    self.ticketsURL = ticketsURL ?? ""
     
     self.noEvent = noEvent
     if (noEvent) {

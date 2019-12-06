@@ -143,6 +143,10 @@ header > #title > h1 {
   margin-bottom: 20px;
 }
 
+.ticketsURL {
+  margin-bottom: 20px;
+}
+
 .additional-field-input-wrapper {
   margin-top: 5px;
 }

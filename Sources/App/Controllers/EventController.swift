@@ -74,6 +74,7 @@ struct EventController: RouteCollection {
     }
     
     let price = json["price"] as? String
+    let ticketsURL = json["ticketsURL"] as? String
     
     var unsignedArtists: [UnsignedArtist] = []
     guard let unsignedArtistsJson = json["unsignedArtists"] as? [Dictionary<String, String>] else {
@@ -92,7 +93,8 @@ struct EventController: RouteCollection {
                       date: date,
                       description: description,
                       unsignedArtists: unsignedArtists,
-                      price: price)
+                      price: price,
+                      ticketsURL: ticketsURL)
     
     let artists = Artist.query(on: req).all()
     
@@ -135,6 +137,7 @@ struct EventController: RouteCollection {
       event.description = updatedEvent.description
       event.unsignedArtists = updatedEvent.unsignedArtists
       event.price = updatedEvent.price
+      event.ticketsURL = updatedEvent.ticketsURL
       
       return flatMap(event.artists.detachAll(on: req), event.save(on: req), { (_, event) in
         return artists.map { artist in

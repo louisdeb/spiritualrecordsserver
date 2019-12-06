@@ -104,6 +104,9 @@ function parseEventForm(form) {
   var price = priceInput.value
   if (price.trim() == "")
     price = "Free"
+    
+  var ticketsURLInput = document.getElementById("tickets-url-input")
+  var ticketsURL = ticketsURLInput.value
   
   var json = {}
   json["name"] = name
@@ -112,6 +115,7 @@ function parseEventForm(form) {
   json["artists"] = artists
   json["unsignedArtists"] = unsignedArtists
   json["price"] = price
+  json["ticketsURL"] = ticketsURL
   
   return json
 }

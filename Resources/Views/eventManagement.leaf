@@ -52,6 +52,13 @@
         <input id='price-input' type='text' placeholder='Free' optional>
       </div>
       
+      <div>
+        <div class='label-wrapper'>
+          <label for='ticketsURL'>Tickets URL</label>
+        </div>
+        <input id='tickets-url-input' type='text' optional>
+      </div>
+      
     </div>
 
     <div id='error' style='display:none'></div>
@@ -93,6 +100,10 @@
         </ul>
         
         <div class='price'>Price: #(eventResponse.event.price)</div>
+        
+        #if(eventResponse.event.ticketsURL != "") {
+          <div class='ticketsURL'><a href='#(eventResponse.event.ticketsURL)'>Tickets URL</a></div>
+        }
         
         <a class="edit-event" href="/app/events/#(eventResponse.event.id)/edit">Edit Event</a>
 

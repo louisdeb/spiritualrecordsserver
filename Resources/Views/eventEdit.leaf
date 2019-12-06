@@ -69,6 +69,13 @@
         <input id='price-input' type='text' placeholder='Free' value='#(eventResponse.event.price)' optional>
       </div>
       
+      <div>
+        <div class='label-wrapper'>
+          <label for='ticketsURL'>Tickets URL</label>
+        </div>
+        <input id='tickets-url-input' type='text' value='#(eventResponse.event.ticketsURL)' optional>
+      </div>
+      
     </div>
 
     <div id='error' style='display:none'></div>
