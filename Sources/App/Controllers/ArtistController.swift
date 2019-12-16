@@ -39,7 +39,10 @@ struct ArtistController: RouteCollection {
     let artist = try req.parameters.next(Artist.self)
     
     return artist.flatMap { artist -> EventLoopFuture<ArtistResponse> in
-      return try artist.events.query(on: req).all().flatMap { allEvents -> EventLoopFuture<ArtistResponse> in
+      return try artist.events.query(on: req)
+        .sort(\Event.date, .ascending)
+        .all().flatMap { allEvents -> EventLoopFuture<ArtistResponse> in
+          
         let events = allEvents.filter { $0.isUpcoming() }
         
         return try artist.releases.query(on: req).all().flatMap { releases -> EventLoopFuture<ArtistResponse> in
