@@ -24,36 +24,16 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
   middlewares.use(ErrorMiddleware.self) // Catches errors and converts to HTTP response
   middlewares.use(SessionsMiddleware.self) // Provides cookies for persistent web authentication
   services.register(middlewares)
-  
-  /* Database configs
-  
-  let psqlDbConfig_local = PostgreSQLDatabaseConfig(
-    hostname: "localhost",
-    port: 5432,
-    username: "vapor",
-    password: "password",
-    transport: .cleartext
-  )
-  
-  let vaporCloudProductionDbConfig = PostgreSQLDatabaseConfig(
-    hostname: "database.v2.vapor.cloud",
-    port: 30001,
-    username: "u05ea553463603193de60b74879e2763",
-    database: "d06638f79d3c10da",
-    password: "pc627f79f8bbedd7e4663a7a9552c1e5"
-  )
-  
-  */
-  
-  let herokuProductionDbConfig = PostgreSQLDatabaseConfig(
-    hostname: "ec2-46-137-173-221.eu-west-1.compute.amazonaws.com",
-    port: 5432,
-    username: "miglxvpjfulovg",
-    database: "d39tk4qt8fctll",
-    password: "588bfbc3bbd50c4bdc143c8e6f42ab2eb6b2be07b42e2c28c636d0f0b8557c0f"
-  )
 
-  let psql = PostgreSQLDatabase(config: herokuProductionDbConfig)
+  let psqlConfig: PostgreSQLDatabaseConfig
+  
+  if let url = Environment.get("DATABASE_URL") {
+    psqlConfig = PostgreSQLDatabaseConfig(url: url)!
+  } else {
+    psqlConfig = PostgreSQLDatabaseConfig(hostname: "localhost", username: "app_collection")
+  }
+
+  let psql = PostgreSQLDatabase(config: psqlConfig)
 
   var databases = DatabasesConfig()
   databases.add(database: psql, as: .psql)
