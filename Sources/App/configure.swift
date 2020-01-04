@@ -30,7 +30,7 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
   if let url = Environment.get("DATABASE_URL") {
     psqlConfig = PostgreSQLDatabaseConfig(url: url)!
   } else {
-    psqlConfig = PostgreSQLDatabaseConfig(hostname: "localhost", username: "app_collection")
+    psqlConfig = PostgreSQLDatabaseConfig(hostname: "localhost", username: "louis")
   }
 
   let psql = PostgreSQLDatabase(config: psqlConfig)
@@ -54,8 +54,8 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
   migrations.add(model: ArtistInterviewPivot.self, database: .psql)
   
   // Migrations
-  migrations.add(migration: AddImageToInterview.self, database: .psql)
-  migrations.add(migration: AddTicketsURLToEvent.self, database: .psql)
+//  migrations.add(migration: AddImageToInterview.self, database: .psql)
+//  migrations.add(migration: AddTicketsURLToEvent.self, database: .psql)
   
   services.register(migrations)
 }
