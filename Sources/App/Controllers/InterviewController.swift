@@ -28,8 +28,8 @@ struct InterviewController: RouteCollection {
     return interviews.flatMap { interviews -> EventLoopFuture<[InterviewResponse]> in
       return try interviews.map { interview -> Future<InterviewResponse> in
         return try interview.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<InterviewResponse> in
-          let artistPreviews = artists.map { artist -> Artist.Preview in
-            return artist.getPreview()
+          let artistPreviews = try artists.map { artist -> Artist.Preview in
+            return try artist.getPreview(req).wait()
           }
           return Future.map(on: req, { () -> InterviewResponse in
             return InterviewResponse(interview: interview, artists: artistPreviews)

@@ -33,6 +33,9 @@
           <label for='image'>Images</label>
           <input type='button' value='+' onclick='addImageToArtist(this)'>
         </div>
+        
+        <div class='images-row'></div>
+
         #for(imageURL in artist.imageURLs) {
           <div class='additional-field-input-wrapper'>
             <input class='image-input' type="text" name="imageURL" value='#(imageURL)'>

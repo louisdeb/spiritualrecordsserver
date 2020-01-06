@@ -29,8 +29,8 @@ struct ReleaseController: RouteCollection {
     return releases.flatMap { releases -> EventLoopFuture<[ReleaseResponse]> in
       return try releases.map { release -> Future<ReleaseResponse> in
         return try release.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<ReleaseResponse> in
-          let artistPreviews = artists.map { artist -> Artist.Preview in
-            return artist.getPreview()
+          let artistPreviews = try artists.map { artist -> Artist.Preview in
+            return try artist.getPreview(req).wait()
           }
           return Future.map(on: req, { () -> ReleaseResponse in
             return ReleaseResponse(release: release, artists: artistPreviews)
@@ -50,8 +50,8 @@ struct ReleaseController: RouteCollection {
       }
       
       return try release.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<ReleaseResponse> in
-        let artistPreviews = artists.map { artist -> Artist.Preview in
-          return artist.getPreview()
+        let artistPreviews = try artists.map { artist -> Artist.Preview in
+          return try artist.getPreview(req).wait()
         }
         return Future.map(on: req, { () -> ReleaseResponse in
           return ReleaseResponse(release: release, artists: artistPreviews)

@@ -30,8 +30,9 @@
       <div>
         <div class='label-wrapper'>
           <label for='image'>Images</label>
-          <input type='button' value='+' onclick='addImageToArtist(this)'>
+          <input type='button' value='+' onclick='addImageToArtist(this)'/>
         </div>
+        <div class='images-row'></div>
       </div>
       
       <div>
@@ -80,6 +81,8 @@
     <div id='error' style='display:none'></div>
     
     <input class='form-create-button' type='button' value='Create' onclick='submitArtist(this)'>
+    
+    <p><i>If you are uploading images, you may have to wait for the images to upload before the page refreshes</i></p>
     <hr>
   </form>
 

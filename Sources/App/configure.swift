@@ -12,10 +12,12 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
   
   config.prefer(LeafRenderer.self, for: ViewRenderer.self)
   config.prefer(MemoryKeyedCache.self, for: KeyedCache.self)
+  
+  let awsConfig = try AwsConfiguration().setup(services: &services)
 
   // Register routes to the router
   let router = EngineRouter.default()
-  try routes(router)
+  try routes(router, awsConfig: awsConfig)
   services.register(router, as: Router.self)
 
   // Register middleware
@@ -27,7 +29,7 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
 
   let psqlConfig: PostgreSQLDatabaseConfig
   
-  if let url = Environment.get("DATABASE_URL") {
+  if let url: String = Environment.get("DATABASE_URL") {
     psqlConfig = PostgreSQLDatabaseConfig(url: url)!
   } else {
     psqlConfig = PostgreSQLDatabaseConfig(hostname: "localhost", username: "louis")
@@ -49,9 +51,11 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
   migrations.add(model: Release.self, database: .psql)
   migrations.add(model: Interview.self, database: .psql)
   migrations.add(model: Article.self, database: .psql)
+  migrations.add(model: Image.self, database: .psql)
   migrations.add(model: ArtistEventPivot.self, database: .psql)
   migrations.add(model: ArtistReleasePivot.self, database: .psql)
   migrations.add(model: ArtistInterviewPivot.self, database: .psql)
+  migrations.add(model: ArtistImagePivot.self, database: .psql)
   
   // Migrations
 //  migrations.add(migration: AddImageToInterview.self, database: .psql)

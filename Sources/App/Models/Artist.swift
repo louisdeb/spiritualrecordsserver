@@ -23,18 +23,19 @@ final class Artist: Codable {
   var website: String
   
   init(name: String, shortDescription: String?, description: String?,
-       imageURLs: [String], spotify: String?, appleMusic: String?, googlePlay: String?,
+       spotify: String?, appleMusic: String?, googlePlay: String?,
        instagram: String?, facebook: String?, website: String?) {
     self.name = name
     self.shortDescription = shortDescription ?? ""
     self.description = description ?? ""
-    self.imageURLs = imageURLs
     self.spotify = spotify ?? ""
     self.appleMusic = appleMusic ?? ""
     self.googlePlay = googlePlay ?? ""
     self.instagram = instagram ?? ""
     self.facebook = facebook ?? ""
     self.website = website ?? ""
+    
+    self.imageURLs = [""]
   }
   
   final class Preview: Codable {
@@ -49,6 +50,12 @@ final class Artist: Codable {
       self.shortDescription = shortDescription
       self.imageURL = imageURL
     }
+  }
+}
+
+extension Artist {
+  var images: Siblings<Artist, Image, ArtistImagePivot> {
+    return siblings()
   }
 }
 
@@ -80,7 +87,12 @@ extension Artist: Parameter {}
 extension Artist.Preview: Content {}
 
 extension Artist {
-  func getPreview() -> Artist.Preview {
-    return Artist.Preview(id: self.id, name: self.name, shortDescription: self.shortDescription, imageURL: self.imageURLs.first!)
+  func getPreview(_ req: Request) throws -> Future<Artist.Preview> {
+    return try images.query(on: req).first().flatMap { image -> EventLoopFuture<Artist.Preview> in
+      let imageURL = image?.url ?? self.imageURLs.first!
+      return Future.map(on: req, { () -> Artist.Preview in
+        return Artist.Preview(id: self.id, name: self.name, shortDescription: self.shortDescription, imageURL: imageURL)
+      })
+    }
   }
 }

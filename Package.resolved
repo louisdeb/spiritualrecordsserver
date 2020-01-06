@@ -24,8 +24,8 @@
         "repositoryURL": "https://github.com/vapor/core.git",
         "state": {
           "branch": null,
-          "revision": "18f2436bf7a6bc2224372c0885db2e0159af1649",
-          "version": "3.9.2"
+          "revision": "10d33362a47fab03a067e78fb0791341d9c634fa",
+          "version": "3.9.3"
         }
       },
       {
@@ -116,6 +116,15 @@
           "branch": null,
           "revision": "d76f339c9716785e5079af9d7075d28ff7da3d92",
           "version": "3.1.0"
+        }
+      },
+      {
+        "package": "S3",
+        "repositoryURL": "https://github.com/mlubgan/S3.git",
+        "state": {
+          "branch": null,
+          "revision": "589ae7fea85bfb7f8ec23eb55664df67db289c49",
+          "version": null
         }
       },
       {
@@ -218,12 +227,39 @@
         }
       },
       {
+        "package": "VaporExt",
+        "repositoryURL": "https://github.com/vapor-community/vapor-ext.git",
+        "state": {
+          "branch": null,
+          "revision": "8e3ddf8b78c8436038d14712ac44f10aca78fe87",
+          "version": "0.3.4"
+        }
+      },
+      {
+        "package": "VaporTestTools",
+        "repositoryURL": "https://github.com/LiveUI/VaporTestTools.git",
+        "state": {
+          "branch": null,
+          "revision": "135d02e2e2a632c134567754d65ce2afe262bab3",
+          "version": "0.1.7"
+        }
+      },
+      {
         "package": "WebSocket",
         "repositoryURL": "https://github.com/vapor/websocket.git",
         "state": {
           "branch": null,
           "revision": "d85e5b6dce4d04065865f77385fc3324f98178f6",
           "version": "1.1.2"
+        }
+      },
+      {
+        "package": "XMLCoding",
+        "repositoryURL": "https://github.com/LiveUI/XMLCoding.git",
+        "state": {
+          "branch": null,
+          "revision": "f0fbfe17e73f329e13a6133ff5437f7b174049fd",
+          "version": "0.4.1"
         }
       }
     ]
