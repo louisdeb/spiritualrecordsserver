@@ -48,3 +48,9 @@ struct ImageUploadFuture {
   var creditText: String?
   var creditLink: String?
 }
+
+struct ImageUpdateInformation {
+  var id: UUID
+  var creditText: String?
+  var creditLink: String?
+}

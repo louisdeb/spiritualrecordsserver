@@ -102,17 +102,22 @@ struct ArtistController: RouteCollection {
     }
     
     var imageUploadFutures: [ImageUploadFuture] = []
+    var updatedImages: [ImageUpdateInformation] = []
     
     for (_, imageJson) in uploadedImages.enumerated() {
+      let creditText = imageJson["creditText"] as? String
+      let creditLink = imageJson["creditLink"] as? String
+      
       if imageJson["id"] != nil {
-        guard let _id = json["id"] as? String else {
+        guard let _id = imageJson["id"] as? String else {
           throw CreateError.runtimeError("Bad image id value")
         }
         
-        guard UUID(uuidString: _id) != nil else {
+        guard let uuid = UUID(uuidString: _id) else {
           throw CreateError.runtimeError("Image id was not a valid UUID")
         }
         
+        updatedImages.append(ImageUpdateInformation(id: uuid, creditText: creditText, creditLink: creditLink))
         continue
       }
       
@@ -138,9 +143,6 @@ struct ArtistController: RouteCollection {
       let uploadFuture = try req.client().put(url, headers: headers) { put in
         put.http.body = imageData.convertToHTTPBody()
       }
-      
-      let creditText = imageJson["creditText"] as? String
-      let creditLink = imageJson["creditLink"] as? String
       
       imageUploadFutures.append(ImageUploadFuture(uploadFuture: uploadFuture, getUrl: presignedUrl.get, creditText: creditText, creditLink: creditLink))
     }
@@ -168,7 +170,7 @@ struct ArtistController: RouteCollection {
           throw CreateError.runtimeError("Id was not a valid UUID")
         }
         
-        return try self.update(req, id: id, updatedArtist: artist)
+        return try self.update(req, id: id, updatedArtist: artist, newImages: images, updatedImages: updatedImages)
       }
       
       return artist.save(on: req).flatMap { artist -> EventLoopFuture<View> in
@@ -184,7 +186,7 @@ struct ArtistController: RouteCollection {
     }
   }
   
-  func update(_ req: Request, id: UUID, updatedArtist: Artist) throws -> Future<View> {
+  func update(_ req: Request, id: UUID, updatedArtist: Artist, newImages: [Image], updatedImages: [ImageUpdateInformation]) throws -> Future<View> {
     let artistFuture = Artist.find(id, on: req)
     
     return artistFuture.flatMap { artist_ -> EventLoopFuture<View> in
@@ -203,8 +205,33 @@ struct ArtistController: RouteCollection {
       artist.facebook = updatedArtist.facebook
       
       return artist.save(on: req).flatMap { artist -> EventLoopFuture<View> in
-        let data = ["artists": Artist.query(on: req).sort(\Artist.name, .ascending).all()]
-        return try req.view().render("artistManagement", data)
+        return try artist.images.query(on: req).all().flatMap { images -> EventLoopFuture<View> in
+          return images.map { image in
+            let matches = updatedImages.filter { $0.id == image.id! }
+            if (matches.isEmpty) {
+              return artist.images.detach(image, on: req).flatMap { _ -> EventLoopFuture<Void> in
+                return try image.artists.query(on: req).count().flatMap { numberOfArtists -> EventLoopFuture<Void> in
+                  return numberOfArtists == 0 ? image.delete(on: req) : Future.map(on: req) { () -> Void in }
+                }
+              }
+            }
+            let updatedImage = matches.first!
+            image.creditText = updatedImage.creditText ?? ""
+            image.creditLink = updatedImage.creditLink ?? ""
+            return image.save(on: req).transform(to: ())
+          }
+          .flatten(on: req)
+          .flatMap { _ -> EventLoopFuture<View> in
+            return newImages.map { image in
+              return artist.images.attach(image, on: req)
+            }
+            .flatten(on: req)
+            .flatMap { _ -> EventLoopFuture<View> in
+              let data = ["artists": Artist.query(on: req).sort(\Artist.name, .ascending).all()]
+              return try req.view().render("artistManagement", data)
+            }
+          }
+        }
       }
     }
   }

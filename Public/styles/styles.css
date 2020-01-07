@@ -42,33 +42,6 @@ header > #title > h1 {
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;
-  min-height: 300px;
-}
-
-.content .image-slider {
-  width: 300px;
-  height: 300px;
-  display: flex;
-  overflow: auto;
-  float: left;
-  margin-right: 30px;
-  
-  -webkit-overflow-scrolling: touch;
-  scroll-snap-type: x mandatory;
-  scroll-behaviour: smooth;
-}
-
-.content .image-slide {
-  width: 300px;
-  flex-shrink: 0;
-  height: 100%;
-  scroll-snap-align: start;
-}
-
-.content img {
-  float: left;
-  height: 300px;
-  width: 300px;
 }
 
 .content-details {

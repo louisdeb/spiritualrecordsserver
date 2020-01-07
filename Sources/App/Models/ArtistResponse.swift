@@ -19,4 +19,14 @@ struct ArtistResponse: Content {
     self.events = events
     self.releases = releases
   }
+  
+  final class Profile: Codable {
+    var artist: Artist
+    var images: [Image]
+    
+    init(artist: Artist, images: [Image]) {
+      self.artist = artist
+      self.images = images
+    }
+  }
 }

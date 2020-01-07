@@ -53,8 +53,19 @@ function parseArtistForm(form, callback) {
 
     var creditLinkInput = input.querySelector('.image-credit-link-input')
     imageInputJson["creditLink"] = creditLinkInput.value
+    
+    var idInput = input.querySelector('.image-id')
+    if (idInput != null) {
+      imageInputJson["id"] = idInput.value
+      images.push(imageInputJson)
+      continue
+    }
 
     var fileInput = input.querySelector('.image-file-input')
+    
+    if (fileInput.files[0] === undefined)
+      continue
+    
     var reader = new FileReader()
     reader.onload = function(e) {
       var data = e.target.result
@@ -82,6 +93,13 @@ function parseArtistForm(form, callback) {
     callback({"error": "Artist must have at least one image"})
   
   json["images"] = images
+
+  var allImagesAreUpdates = true
+  for (let image of images) {
+    allImagesAreUpdates = allImagesAreUpdates && image["id"] != null
+  }
+  if (allImagesAreUpdates)
+    callback(json)
 }
 
 function submitArtist(e) {
@@ -89,7 +107,7 @@ function submitArtist(e) {
   createButton.disabled = true
   
   var form = e.parentElement
-  var json = parseArtistForm(form, function(json) {
+  parseArtistForm(form, function(json) {
     var error = document.getElementById('error');
     if (json['error']) {
       error.innerHTML = 'Error: ' + json['error']
@@ -116,24 +134,40 @@ function submitArtist(e) {
 }
 
 function updateArtist(e) {
+  var updateButton = document.getElementsByClassName('form-create-button')[0]
+  var deleteButton = document.getElementsByClassName('delete-button')[0]
+  updateButton.disabled = true
+  deleteButton.disabled = true
+  
   var form = e.parentElement
-  var json = parseArtistForm(form)
-  
-  var idInput = document.getElementById("artist-id")
-  var id = idInput.value
-  json["id"] = id
-  
-  console.log("Updating artist with JSON:")
-  console.log(json)
-  
-  var formreq = new XMLHttpRequest()
-  formreq.open(form.method, form.action, true)
-  formreq.setRequestHeader("Content-Type", "application/json; charset=UTF-8")
-  formreq.onreadystatechange = function () {
-    location.replace("/app/artists")
-  }
-  
-  formreq.send(JSON.stringify(json))
+  parseArtistForm(form, function (json) {
+    var error = document.getElementById('error');
+    if (json['error']) {
+      error.innerHTML = 'Error: ' + json['error']
+      error.style.display = 'block'
+      updateButton.disabled = false
+      deleteButton.disabled = false
+      return
+    } else {
+      error.style.display = 'none'
+    }
+    
+    var idInput = document.getElementById("artist-id")
+    var id = idInput.value
+    json["id"] = id
+
+    console.log("Updating artist with JSON:")
+    console.log(json)
+
+    var formreq = new XMLHttpRequest()
+    formreq.open(form.method, form.action, true)
+    formreq.setRequestHeader("Content-Type", "application/json; charset=UTF-8")
+    formreq.onreadystatechange = function () {
+      location.replace("/app/artists")
+    }
+
+    formreq.send(JSON.stringify(json))
+  })
 }
 
 function addImageToArtist(e) {

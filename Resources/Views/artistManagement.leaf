@@ -89,44 +89,16 @@
   <div class='content-wrapper'>
     <h2>Artists</h2>
     
-    #for(artist in artists) {
+    #for(artist in artistPreviews) {
       <div class="content">
-        <div class="image-slider">
-          #for(imageURL in artist.imageURLs) {
-            <div class="image-slide"><img src="#(imageURL)"/></div>
-          }
+        
+        <div class="artist-image-preview">
+          <img src="#(artist.imageURL)"/>
         </div>
         
         <div class="content-details">
-          <h3>#(artist.name)</h3>
-          
+          <a class="edit" href="/app/artists/#(artist.id)"><h2>#(artist.name)</h2></a>
           <div class="short-description">#(artist.shortDescription)</div>
-          
-          <div class="description">
-            <pre style="font-family:Helvetica">#(artist.description)</pre>
-          </div>
-          
-          <ul>
-            #if(artist.website != "") {
-              <li><a href="#(artist.website)">#(artist.website)</a></li>
-            }
-            #if(artist.spotify != "") {
-              <li><a href="#(artist.spotify)">Spotify</a></li>
-            }
-            #if(artist.appleMusic != "") {
-              <li><a href="#(artist.appleMusic)">Apple Music</a></li>
-            }
-            #if(artist.instagram != "") {
-              <li><a href="#(artist.instagram)">Instagram</a></li>
-            }
-            #if(artist.facebook != "") {
-              <li><a href="#(artist.facebook)">Facebook</a></li>
-            }
-          </ul>
-
-          <div style='flex-grow: 1'></div>
-
-          <a class="edit" href="/app/artists/#(artist.id)/edit">Edit Profile</a>
         </div>
       </div>
       <hr />

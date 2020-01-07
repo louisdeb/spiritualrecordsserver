@@ -1,0 +1,44 @@
+.image-slider {
+  width: 300px;
+  height: 400px;
+  display: flex;
+  overflow: auto;
+  margin-right: 30px;
+  
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+  scroll-behaviour: smooth;
+}
+
+.image-slide {
+  width: 300px;
+  flex-shrink: 0;
+  height: 100%;
+  scroll-snap-align: start;
+}
+
+.image-slide img {
+  width: 300px;
+  height: 300px;
+}
+
+span.label {
+  color: #bbb;
+  font-family: monospace;
+}
+
+.artist-view div {
+  margin-bottom: 10px;
+}
+
+.artist-image-preview {
+  width: 100px;
+  height: 100px;
+  margin-right: 20px;
+}
+
+.artist-image-preview img {
+  width: 100px;
+  height: 100px;
+  clip-path: circle(50px at center);
+}

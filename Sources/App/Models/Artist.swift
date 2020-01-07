@@ -51,6 +51,16 @@ final class Artist: Codable {
       self.imageURL = imageURL
     }
   }
+  
+  final class Profile: Codable {
+    var artist: Artist
+    var images: [Image]
+    
+    init(artist: Artist, images: [Image]) {
+      self.artist = artist
+      self.images = images
+    }
+  }
 }
 
 extension Artist {
@@ -85,6 +95,7 @@ extension Artist: Content {}
 extension Artist: Parameter {}
 
 extension Artist.Preview: Content {}
+extension Artist.Profile: Content {}
 
 extension Artist {
   func getPreview(_ req: Request) throws -> Future<Artist.Preview> {
@@ -92,6 +103,16 @@ extension Artist {
       let imageURL = image?.url ?? self.imageURLs.first!
       return Future.map(on: req, { () -> Artist.Preview in
         return Artist.Preview(id: self.id, name: self.name, shortDescription: self.shortDescription, imageURL: imageURL)
+      })
+    }
+  }
+}
+
+extension Artist {
+  func getProfile(_ req: Request) throws -> Future<Artist.Profile> {
+    return try images.query(on: req).all().flatMap { images -> EventLoopFuture<Artist.Profile> in
+      return Future.map(on: req, { () -> Artist.Profile in
+        return Artist.Profile(artist: self, images: images)
       })
     }
   }

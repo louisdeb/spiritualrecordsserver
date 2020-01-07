@@ -22,6 +22,7 @@ struct AppController: RouteCollection {
     
     let artists = auth.grouped("artists")
     artists.get(use: artistManagement)
+    artists.get(Artist.parameter, use: artistView)
     artists.get(Artist.parameter, "edit", use: artistEdit)
     
     let events = auth.grouped("events")
@@ -52,17 +53,36 @@ struct AppController: RouteCollection {
     return try req.view().render("login")
   }
   
-  // TODO: Need to transform into ArtistResponse
   func artistManagement(_ req: Request) throws -> Future<View> {
     let artists = Artist.query(on: req).sort(\Artist.name, .ascending).all()
-    let data = ["artists": artists]
-    return try req.view().render("artistManagement", data)
+    
+    return artists.flatMap { artists -> EventLoopFuture<View> in
+      let artistPreviews = try artists.map { artist -> Future<Artist.Preview> in
+        return try artist.getPreview(req)
+      }
+      .flatten(on: req)
+      
+      let data = ["artistPreviews": artistPreviews]
+      return try req.view().render("artistManagement", data)
+    }
+  }
+  
+  func artistView(_ req: Request) throws -> Future<View> {
+    let artist = try req.parameters.next(Artist.self)
+    return artist.flatMap { artist -> EventLoopFuture<View> in
+      let artistProfile = try artist.getProfile(req)
+      let data = ["artistProfile": artistProfile]
+      return try req.view().render("artistView", data)
+    }
   }
   
   func artistEdit(_ req: Request) throws -> Future<View> {
     let artist = try req.parameters.next(Artist.self)
-    let data = ["artist": artist]
-    return try req.view().render("artistEdit", data)
+    return artist.flatMap { artist -> EventLoopFuture<View> in
+      let artistProfile = try artist.getProfile(req)
+      let data = ["artistProfile": artistProfile]
+      return try req.view().render("artistEdit", data)
+    }
   }
   
   func eventManagement(_ req: Request) throws -> Future<View> {
