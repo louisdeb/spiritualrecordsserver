@@ -42,7 +42,8 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
   databases.enableLogging(on: .psql)
   services.register(databases)
   
-  services.register(DatabaseConnectionPoolConfig(maxConnections: 2))
+  services.register(NIOServerConfig.default(workerCount: 4))
+  services.register(DatabaseConnectionPoolConfig(maxConnections: 4))
 
   var migrations = MigrationConfig()
   
