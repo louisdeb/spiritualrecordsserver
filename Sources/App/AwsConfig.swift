@@ -34,10 +34,7 @@ class AwsConfiguration {
       throw CreateError.runtimeError("Missing environment value for aws config")
     }
     
-    guard let regionName = Region.RegionName(rawValue: regionString) else {
-      throw CreateError.runtimeError("Incorrect region in aws environment values")
-    }
-    let region = Region(name: regionName)
+    let region = Region(name: Region.Name.init(regionString))
     
     let config = AwsConfig(
       url: url,
