@@ -120,11 +120,11 @@
       },
       {
         "package": "S3",
-        "repositoryURL": "https://github.com/LiveUI/S3.git",
+        "repositoryURL": "https://github.com/skelpo/s3-vapor3",
         "state": {
           "branch": null,
-          "revision": "48367b8256bcc71becf573f427973da5192a6845",
-          "version": "3.0.0"
+          "revision": "a504056ac772aa41f2dd71da6ba1344909049592",
+          "version": null
         }
       },
       {
