@@ -12,7 +12,7 @@ let package = Package(
       .package(url: "https://github.com/vapor/auth.git", from: "2.0.3"),
       .package(url: "https://github.com/vapor/leaf.git", from: "3.0.0"),
       .package(url: "https://github.com/vapor-community/vapor-ext.git", from: "0.3.4"),
-      .package(url: "https://github.com/mlubgan/S3.git", .revision("589ae7fea85bfb7f8ec23eb55664df67db289c49"))
+      .package(url: "https://github.com/LiveUI/S3.git", from: "3.0.0")
     ],
     targets: [
         .target(name: "App", dependencies: ["Leaf", "Authentication", "FluentPostgreSQL", "Vapor", "VaporExt", "S3"]),
