@@ -29,12 +29,15 @@ struct ReleaseController: RouteCollection {
     return releases.flatMap { releases -> EventLoopFuture<[ReleaseResponse]> in
       return try releases.map { release -> Future<ReleaseResponse> in
         return try release.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<ReleaseResponse> in
-          let artistPreviews = try artists.map { artist -> Artist.Preview in
-            return try artist.getPreview(req).wait()
+          return try artists.map { artist -> EventLoopFuture<Artist.Preview> in
+            return try artist.getPreview(req)
           }
-          return Future.map(on: req, { () -> ReleaseResponse in
-            return ReleaseResponse(release: release, artists: artistPreviews)
-          })
+          .flatten(on: req)
+          .flatMap { artistPreviews -> EventLoopFuture<ReleaseResponse> in
+            return Future.map(on: req, { () -> ReleaseResponse in
+              return ReleaseResponse(release: release, artists: artistPreviews)
+            })
+          }
         }
       }
       .flatten(on: req)
@@ -50,12 +53,15 @@ struct ReleaseController: RouteCollection {
       }
       
       return try release.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<ReleaseResponse> in
-        let artistPreviews = try artists.map { artist -> Artist.Preview in
-          return try artist.getPreview(req).wait()
+        return try artists.map { artist -> EventLoopFuture<Artist.Preview> in
+          return try artist.getPreview(req)
         }
-        return Future.map(on: req, { () -> ReleaseResponse in
-          return ReleaseResponse(release: release, artists: artistPreviews)
-        })
+        .flatten(on: req)
+        .flatMap { artistPreviews -> EventLoopFuture<ReleaseResponse> in
+          return Future.map(on: req, { () -> ReleaseResponse in
+            return ReleaseResponse(release: release, artists: artistPreviews)
+          })
+        }
       }
     }
   }

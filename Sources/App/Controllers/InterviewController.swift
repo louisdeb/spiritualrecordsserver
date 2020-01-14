@@ -26,14 +26,17 @@ struct InterviewController: RouteCollection {
     let interviews = Interview.query(on: req).sort(\Interview.date, .descending).all()
     
     return interviews.flatMap { interviews -> EventLoopFuture<[InterviewResponse]> in
-      return try interviews.map { interview -> Future<InterviewResponse> in
+      return try interviews.map { interview -> EventLoopFuture<InterviewResponse> in
         return try interview.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<InterviewResponse> in
-          let artistPreviews = try artists.map { artist -> Artist.Preview in
-            return try artist.getPreview(req).wait()
+          return try artists.map { artist -> EventLoopFuture<Artist.Preview> in
+            return try artist.getPreview(req)
           }
-          return Future.map(on: req, { () -> InterviewResponse in
-            return InterviewResponse(interview: interview, artists: artistPreviews)
-          })
+          .flatten(on: req)
+          .flatMap { artistPreviews -> EventLoopFuture<InterviewResponse> in
+            return Future.map(on: req, { () -> InterviewResponse in
+              return InterviewResponse(interview: interview, artists: artistPreviews)
+            })
+          }
         }
       }
       .flatten(on: req)

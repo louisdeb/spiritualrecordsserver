@@ -92,12 +92,15 @@ struct AppController: RouteCollection {
       let events = _events.filter { $0.isUpcomingOrThisWeek() }
       let eventResponses = try events.map { event -> Future<EventResponse> in
         return try event.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<EventResponse> in
-          let artistPreviews = try artists.map { artist -> Artist.Preview in
-            return try artist.getPreview(req).wait()
+          return try artists.map { artist -> EventLoopFuture<Artist.Preview> in
+            return try artist.getPreview(req)
           }
-          return Future.map(on: req, { () -> EventResponse in
-            return EventResponse(event: event, artists: artistPreviews)
-          })
+          .flatten(on: req)
+          .flatMap { artistPreviews -> EventLoopFuture<EventResponse> in
+            return Future.map(on: req, { () -> EventResponse in
+              return EventResponse(event: event, artists: artistPreviews)
+            })
+          }
         }
       }
       .flatten(on: req)
@@ -113,12 +116,15 @@ struct AppController: RouteCollection {
     let event = try req.parameters.next(Event.self)
     return event.flatMap { event -> EventLoopFuture<View> in
       return try event.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<View> in
-        let artistPreviews = try artists.map { artist -> Artist.Preview in
-          return try artist.getPreview(req).wait()
+        return try artists.map { artist -> EventLoopFuture<Artist.Preview> in
+          return try artist.getPreview(req)
         }
-        let eventResponse = EventResponse(event: event, artists: artistPreviews)
-        let data = ["eventResponse": eventResponse]
-        return try req.view().render("eventEdit", data)
+        .flatten(on: req)
+        .flatMap { artistPreviews -> EventLoopFuture<View> in
+          let eventResponse = EventResponse(event: event, artists: artistPreviews)
+          let data = ["eventResponse": eventResponse]
+          return try req.view().render("eventEdit", data)
+        }
       }
     }
   }
@@ -127,14 +133,17 @@ struct AppController: RouteCollection {
     let releases = Release.query(on: req).sort(\Release.date, .descending).all()
     
     return releases.flatMap { releases -> EventLoopFuture<View> in
-      let releaseResponses = try releases.map { release -> Future<ReleaseResponse> in
+      let releaseResponses = try releases.map { release -> EventLoopFuture<ReleaseResponse> in
         return try release.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<ReleaseResponse> in
-          let artistPreviews = try artists.map { artist -> Artist.Preview in
-            return try artist.getPreview(req).wait()
+          return try artists.map { artist -> EventLoopFuture<Artist.Preview> in
+            return try artist.getPreview(req)
           }
-          return Future.map(on: req, { () -> ReleaseResponse in
-            return ReleaseResponse(release: release, artists: artistPreviews)
-          })
+          .flatten(on: req)
+          .flatMap { artistPreviews -> EventLoopFuture<ReleaseResponse> in
+            return Future.map(on: req, { () -> ReleaseResponse in
+              return ReleaseResponse(release: release, artists: artistPreviews)
+            })
+          }
         }
       }
       .flatten(on: req)
@@ -151,12 +160,15 @@ struct AppController: RouteCollection {
     
     return release.flatMap { release -> EventLoopFuture<View> in
       return try release.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<View> in
-        let artistPreviews = try artists.map { artist -> Artist.Preview in
-          return try artist.getPreview(req).wait()
+        return try artists.map { artist -> EventLoopFuture<Artist.Preview> in
+          return try artist.getPreview(req)
         }
-        let releaseResponse = ReleaseResponse(release: release, artists: artistPreviews)
-        let data = ["releaseResponse": releaseResponse]
-        return try req.view().render("releaseEdit", data)
+        .flatten(on: req)
+        .flatMap { artistPreviews -> EventLoopFuture<View> in
+          let releaseResponse = ReleaseResponse(release: release, artists: artistPreviews)
+          let data = ["releaseResponse": releaseResponse]
+          return try req.view().render("releaseEdit", data)
+        }
       }
     }
   }
@@ -165,14 +177,17 @@ struct AppController: RouteCollection {
     let interviews = Interview.query(on: req).sort(\Interview.date, .descending).all()
     
     return interviews.flatMap { interviews -> EventLoopFuture<View> in
-      let interviewResponses = try interviews.map { interview -> Future<InterviewResponse> in
+      let interviewResponses = try interviews.map { interview -> EventLoopFuture<InterviewResponse> in
         return try interview.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<InterviewResponse> in
-          let artistPreviews = try artists.map { artist -> Artist.Preview in
-            return try artist.getPreview(req).wait()
+          return try artists.map { artist -> EventLoopFuture<Artist.Preview> in
+            return try artist.getPreview(req)
           }
-          return Future.map(on: req, { () -> InterviewResponse in
-            return InterviewResponse(interview: interview, artists: artistPreviews)
-          })
+          .flatten(on: req)
+          .flatMap { artistPreviews -> EventLoopFuture<InterviewResponse> in
+            return Future.map(on: req, { () -> InterviewResponse in
+              return InterviewResponse(interview: interview, artists: artistPreviews)
+            })
+          }
         }
       }
       .flatten(on: req)
@@ -189,12 +204,15 @@ struct AppController: RouteCollection {
     
     return interview.flatMap { interview -> EventLoopFuture<View> in
       return try interview.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<View> in
-        let artistPreviews = try artists.map { artist -> Artist.Preview in
-          return try artist.getPreview(req).wait()
+        return try artists.map { artist -> EventLoopFuture<Artist.Preview> in
+          return try artist.getPreview(req)
         }
-        let interviewResponse = InterviewResponse(interview: interview, artists: artistPreviews)
-        let data = ["interviewResponse": interviewResponse]
-        return try req.view().render("interviewEdit", data)
+        .flatten(on: req)
+        .flatMap { artistPreviews -> EventLoopFuture<View> in
+          let interviewResponse = InterviewResponse(interview: interview, artists: artistPreviews)
+          let data = ["interviewResponse": interviewResponse]
+          return try req.view().render("interviewEdit", data)
+        }
       }
     }
   }

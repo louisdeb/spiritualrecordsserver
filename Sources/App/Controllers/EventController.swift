@@ -30,12 +30,15 @@ struct EventController: RouteCollection {
       
       return try events.map { event -> Future<EventResponse> in
         return try event.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<EventResponse> in
-          let artistPreviews = try artists.map { artist -> Artist.Preview in
-            return try artist.getPreview(req).wait()
+          return try artists.map { artist -> EventLoopFuture<Artist.Preview> in
+            return try artist.getPreview(req)
           }
-          return Future.map(on: req, { () -> EventResponse in
-            return EventResponse(event: event, artists: artistPreviews)
-          })
+          .flatten(on: req)
+          .flatMap { artistPreviews -> EventLoopFuture<EventResponse> in
+            return Future.map(on: req, { () -> EventResponse in
+              return EventResponse(event: event, artists: artistPreviews)
+            })
+          }
         }
       }
       .flatten(on: req)
