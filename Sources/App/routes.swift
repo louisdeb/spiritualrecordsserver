@@ -17,7 +17,7 @@ public func routes(_ router: Router, awsConfig: AwsConfig) throws {
   let eventController = EventController()
   try router.register(collection: eventController)
   
-  let releaseController = ReleaseController()
+  let releaseController = ReleaseController(awsController: awsController)
   try router.register(collection: releaseController)
   
   let interviewController = InterviewController()

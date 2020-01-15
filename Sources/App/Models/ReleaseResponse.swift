@@ -10,9 +10,11 @@ import Vapor
 struct ReleaseResponse: Content {
   var release: Release
   var artistPreviews: [Artist.Preview]
+  var image: Image
   
-  init(release: Release, artists: [Artist.Preview]) {
+  init(release: Release, artists: [Artist.Preview], image: Image) {
     self.release = release
     self.artistPreviews = artists
+    self.image = image
   }
 }

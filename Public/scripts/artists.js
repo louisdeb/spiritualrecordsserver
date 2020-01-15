@@ -46,7 +46,7 @@ function parseArtistForm(form, callback) {
   var imageUploadStates = {}
   var imageInputs = document.getElementsByClassName("image-preview-wrapper")
   for (let input of imageInputs) {
-    var imageInputJson = {};
+    var imageInputJson = {}
 
     var creditTextInput = input.querySelector('.image-credit-text-input')
     imageInputJson["creditText"] = creditTextInput.value

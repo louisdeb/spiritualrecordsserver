@@ -1,19 +1,9 @@
-function parseReleaseForm(form) {
+function parseReleaseForm(form, callback) {
   var nameInput = document.getElementById("name-input")
   var name = nameInput.value
   if (name.trim() == "") {
     return {
       'error': 'Release must have a name'
-    }
-  }
-  
-  var artists = []
-  var artistInputs = document.getElementsByClassName("artists-select")
-  for (let input of artistInputs)
-    artists.push(input.value)
-  if (artists.length == 0) {
-    return {
-      "error": "Release must have an artist"
     }
   }
   
@@ -26,14 +16,6 @@ function parseReleaseForm(form) {
   
   var descriptionInput = document.getElementById("description-input")
   var description = descriptionInput.value
-
-  var imageInput = document.getElementById("image-input")
-  var image = imageInput.value
-  if (image.trim() == "") {
-    return {
-      "error": "Release must have an image"
-    }
-  }
   
   var spotifyInput = document.getElementById("spotify-input")
   var spotify = spotifyInput.value
@@ -48,62 +30,97 @@ function parseReleaseForm(form) {
   json["name"] = name
   json["date"] = date
   json["description"] = description
-  json["imageURL"] = image
   json["spotify"] = spotify
   json["appleMusic"] = appleMusic
   json["googlePlay"] = googlePlay
+  
+  var artists = []
+  var artistInputs = document.getElementsByClassName("artists-select")
+  for (let input of artistInputs)
+    artists.push(input.value)
+  if (artists.length == 0) {
+    return {
+      "error": "Release must have an artist"
+    }
+  }
 
   json["artists"] = artists
   
-  return json
+  /* Parse image */
+  
+  var imageInputJson = {}
+  var imageInput = document.getElementsByClassName("image-preview-wrapper")[0]
+  var fileInput = imageInput.querySelector('.image-file-input')
+  var reader = new FileReader()
+  reader.onload = function(e) {
+    var data = e.target.result
+    imageInputJson["image"] = data
+    callback(json)
+  }
+  
+  var idInput = imageInput.querySelector('.image-id')
+  if (idInput != null) {
+    if (fileInput.files[0] !== undefined) {
+      reader.readAsDataURL(fileInput.files[0])
+    } else {
+      imageInputJson["id"] = idInput.value
+      callback(json)
+    }
+  } else {
+    if (fileInput.files[0] === undefined)
+      return
+    reader.readAsDataURL(fileInput.files[0])
+  }
+  
+  json["image"] = imageInputJson
 }
 
 function submitRelease(e) {
   var form = e.parentElement
-  var json = parseReleaseForm(form)
-  
-  var error = document.getElementById('error')
-  if (json["error"]) {
-    error.innerHTML = 'Error: ' + json['error']
-    error.style.display = 'block'
-    return
-  } else {
-    error.style.display = 'none'
-  }
+  var json = parseReleaseForm(form, function (json) {
+    var error = document.getElementById('error')
+    if (json["error"]) {
+      error.innerHTML = 'Error: ' + json['error']
+      error.style.display = 'block'
+      return
+    } else {
+      error.style.display = 'none'
+    }
 
-  console.log("Submitting release creation with JSON:")
-  console.log(json)
-  
-  var formreq = new XMLHttpRequest()
-  formreq.open(form.method, form.action, true)
-  formreq.setRequestHeader("Content-Type", "application/json; charset=UTF-8")
-  formreq.onreadystatechange = function() {
-    console.log("... Submitted. Reloading page")
-    location.reload(true)
-  }
+    console.log("Submitting release creation with JSON:")
+    console.log(json)
+    
+    var formreq = new XMLHttpRequest()
+    formreq.open(form.method, form.action, true)
+    formreq.setRequestHeader("Content-Type", "application/json; charset=UTF-8")
+    formreq.onreadystatechange = function() {
+      console.log("... Submitted. Reloading page")
+      location.reload(true)
+    }
 
-  formreq.send(JSON.stringify(json))
+    formreq.send(JSON.stringify(json))
+  })
 }
 
 function updateRelease(e) {
   var form = e.parentElement
-  var json = parseReleaseForm(form)
-  
-  var idInput = document.getElementById("release-id")
-  var id = idInput.value
-  json["id"] = id
-  
-  console.log("Updating release with JSON:")
-  console.log(json)
-  
-  var formreq = new XMLHttpRequest()
-  formreq.open(form.method, form.action, true)
-  formreq.setRequestHeader("Content-Type", "application/json; charset=UTF-8")
-  formreq.onreadystatechange = function () {
-    location.replace("/app/releases")
-  }
-  
-  formreq.send(JSON.stringify(json))
+  var json = parseReleaseForm(form, function (json) {
+    var idInput = document.getElementById("release-id")
+    var id = idInput.value
+    json["id"] = id
+    
+    console.log("Updating release with JSON:")
+    console.log(json)
+    
+    var formreq = new XMLHttpRequest()
+    formreq.open(form.method, form.action, true)
+    formreq.setRequestHeader("Content-Type", "application/json; charset=UTF-8")
+    formreq.onreadystatechange = function () {
+      location.replace("/app/releases")
+    }
+    
+    formreq.send(JSON.stringify(json))
+  })
 }
 
 function populateArtistSelector(e) {

@@ -37,9 +37,18 @@
       
       <div>
         <div class='label-wrapper'>
-          <label for='image'>Image URL</label>
+          <label for='image'>Image</label>
         </div>
-        <input id='image-input' type="text" name="imageURL" required>
+        
+        <div class="additional-field-input-wrapper">
+          <div class="image-preview-wrapper">
+            <img class="image"/>
+            
+            <div class="buttons-wrapper">
+              <input class="image-file-input" type="file">
+            </div>
+          </div>
+        </div>
       </div>
       
       <div>
@@ -85,7 +94,7 @@
         
         <div class='date'>#date(response.release.date, "dd-MM-yyyy")</div>
 
-        <img src="#(response.release.imageURL)"/>
+        <img src="#(response.image.url)"/>
         
         <div class="description">
           <pre style="font-family:Helvetica">#(response.release.description)</pre>

@@ -43,9 +43,19 @@
 
       <div>
         <div class='label-wrapper'>
-          <label for='image'>Image URL</label>
+          <label for='image'>Image</label>
         </div>
-        <input id='image-input' type="text" name="imageURL" value='#(releaseResponse.release.imageURL)' required>
+        
+        <div class="additional-field-input-wrapper">
+          <div class="image-preview-wrapper">
+            <img class="image" src="#(releaseResponse.image.url)">
+            <input class="image-id" type="text" name="id" value='#(releaseResponse.image.id)' style="display:none" readonly>
+            
+            <div class='buttons-wrapper'>
+              <input class="image-file-input" type="file">
+            </div>
+          </div>
+        </div>
       </div>
 
       <div>

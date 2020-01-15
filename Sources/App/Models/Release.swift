@@ -19,21 +19,27 @@ final class Release: Codable {
   var appleMusic: String
   var googlePlay: String
   
-  init(name: String, date: Date, description: String?, imageURL: String,
-       spotify: String?, appleMusic: String?, googlePlay: String?) {
+  init(name: String, date: Date, description: String?, spotify: String?, appleMusic: String?, googlePlay: String?) {
     self.name = name
     self.date = date
     self.description = description ?? ""
-    self.imageURL = imageURL
     self.spotify = spotify ?? ""
     self.appleMusic = appleMusic ?? ""
     self.googlePlay = googlePlay ?? ""
+    
+    self.imageURL = ""
   }
   
 }
 
 extension Release {
   var artists: Siblings<Release, Artist, ArtistReleasePivot> {
+    return siblings()
+  }
+}
+
+extension Release {
+  var images: Siblings<Release, Image, ReleaseImagePivot> {
     return siblings()
   }
 }

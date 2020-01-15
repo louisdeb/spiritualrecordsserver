@@ -1,40 +1,40 @@
 //
-//  ArtistImagePivot.swift
+//  ReleaseImagePivot.swift
 //  App
 //
-//  Created by Louis de Beaumont on 21/12/2019.
+//  Created by Louis de Beaumont on 14/01/2020.
 //
 
 import Foundation
 import FluentPostgreSQL
 
-final class ArtistImagePivot: PostgreSQLUUIDPivot, ModifiablePivot {
+final class ReleaseImagePivot: PostgreSQLUUIDPivot, ModifiablePivot {
   var id: UUID?
-  var artistId: Artist.ID
+  var releaseId: Release.ID
   var imageId: Image.ID
   
-  typealias Left = Artist
+  typealias Left = Release
   typealias Right = Image
   
   static var leftIDKey: LeftIDKey {
-    return \.artistId
+    return \.releaseId
   }
   
   static var rightIDKey: RightIDKey {
     return \.imageId
   }
   
-  init(_ artist: Artist, _ image: Image) throws {
-    self.artistId = try artist.requireID()
+  init(_ release: Release, _ image: Image) throws {
+    self.releaseId = try release.requireID()
     self.imageId = try image.requireID()
   }
 }
 
-extension ArtistImagePivot: Migration {
+extension ReleaseImagePivot: Migration {
   static func prepare(on conn: PostgreSQLConnection) -> Future<Void> {
     return Database.create(self, on: conn) { (builder) in
       try addProperties(to: builder)
-      builder.reference(from: \.artistId, to: \Artist.id, onDelete: .cascade)
+      builder.reference(from: \.releaseId, to: \Release.id, onDelete: .cascade)
       builder.reference(from: \.imageId, to: \Image.id, onDelete: .cascade)
     }
   }
