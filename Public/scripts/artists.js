@@ -54,6 +54,9 @@ function parseArtistForm(form, callback) {
     var creditLinkInput = input.querySelector('.image-credit-link-input')
     imageInputJson["creditLink"] = creditLinkInput.value
     
+    var indexInput = input.querySelector('.image-index-input')
+    imageInputJson["index"] = indexInput.value
+    
     var idInput = input.querySelector('.image-id')
     if (idInput != null) {
       imageInputJson["id"] = idInput.value
@@ -190,6 +193,17 @@ function addImageToArtist(e) {
   var creditsInputLink = document.createElement('input')
   creditsInputLink.setAttribute('class', 'image-credit-link-input')
   creditsInputLink.setAttribute('placeholder', 'Image Credit URL')
+  
+  var indexInputWrapper = document.createElement('div')
+  
+  var indexInputLabel = document.createElement('span')
+  indexInputLabel.setAttribute('class', 'label')
+  indexInputLabel.setAttribute('innerHTML', 'Index:')
+  
+  var indexInput = document.createElement('input')
+  indexInput.setAttribute('class', 'image-index-input')
+  indexInput.setAttribute('type', 'number')
+  indexInput.setAttribute('value', 0)
 
   var buttonsWrapper = document.createElement('div')
   buttonsWrapper.setAttribute('class', 'buttons-wrapper')
@@ -206,10 +220,14 @@ function addImageToArtist(e) {
 
   buttonsWrapper.appendChild(browse)
   buttonsWrapper.appendChild(deleteButton)
+  
+  indexInputWrapper.appendChild(indexInputLabel)
+  indexInputWrapper.appendChild(indexInput)
 
   previewWrapper.appendChild(imagePreview)
   previewWrapper.appendChild(creditsInputText)
   previewWrapper.appendChild(creditsInputLink)
+  previewWrapper.appendChild(indexInputWrapper)
   previewWrapper.appendChild(buttonsWrapper)
 
   div.appendChild(previewWrapper)

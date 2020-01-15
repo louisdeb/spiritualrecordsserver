@@ -35,7 +35,7 @@ struct ReleaseController: RouteCollection {
     return releases.flatMap { releases -> EventLoopFuture<[ReleaseResponse]> in
       return try releases.map { release -> Future<ReleaseResponse> in
         return try release.images.query(on: req).first().flatMap { image_ -> EventLoopFuture<ReleaseResponse> in
-          let image = image_ ?? Image(url: release.imageURL, creditText: "", creditLink: "")
+          let image = image_ ?? Image(url: release.imageURL, creditText: "", creditLink: "", index: 0)
           
           return try release.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<ReleaseResponse> in
             return try artists.map { artist -> EventLoopFuture<Artist.Preview> in
@@ -63,7 +63,7 @@ struct ReleaseController: RouteCollection {
       }
       
       return try release.images.query(on: req).first().flatMap { image_ -> EventLoopFuture<ReleaseResponse> in
-        let image = image_ ?? Image(url: release.imageURL, creditText: "", creditLink: "")
+        let image = image_ ?? Image(url: release.imageURL, creditText: "", creditLink: "", index: 0)
         
         return try release.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<ReleaseResponse> in
           return try artists.map { artist -> EventLoopFuture<Artist.Preview> in
@@ -156,12 +156,12 @@ struct ReleaseController: RouteCollection {
         put.http.body = imageData.convertToHTTPBody()
       }
       
-      imageUploadFuture = ImageUploadFuture(uploadFuture: uploadFuture, getUrl: presignedUrl.get, creditText: "", creditLink: "")
+      imageUploadFuture = ImageUploadFuture(uploadFuture: uploadFuture, getUrl: presignedUrl.get, creditText: "", creditLink: "", index: 0)
     }
     
     let uploadFuture = imageUploadFuture != nil ? imageUploadFuture!.uploadFuture.flatMap { r -> EventLoopFuture<Void> in
       if (r.http.status == .ok) {
-        image = Image(url: imageUploadFuture!.getUrl, creditText: imageUploadFuture!.creditText, creditLink: imageUploadFuture!.creditLink)
+        image = Image(url: imageUploadFuture!.getUrl, creditText: imageUploadFuture!.creditText, creditLink: imageUploadFuture!.creditLink, index: imageUploadFuture!.index)
         return image!.save(on: req).transform(to: ())
       }
       return Future.map(on: req, { () -> Void in return })

@@ -15,11 +15,13 @@ final class Image: Codable {
   var url: String
   var creditText: String
   var creditLink: String
+  var index: Int
   
-  init(url: String, creditText: String?, creditLink: String?) {
+  init(url: String, creditText: String?, creditLink: String?, index: Int) {
     self.url = url
     self.creditText = creditText ?? ""
     self.creditLink = creditLink ?? ""
+    self.index = index
   }
 }
 
@@ -47,10 +49,12 @@ struct ImageUploadFuture {
   var getUrl: String
   var creditText: String?
   var creditLink: String?
+  var index: Int
 }
 
 struct ImageUpdateInformation {
   var id: UUID
   var creditText: String?
   var creditLink: String?
+  var index: Int
 }

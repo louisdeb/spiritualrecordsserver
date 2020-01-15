@@ -45,7 +45,7 @@ struct ArtistController: RouteCollection {
     let artist = try req.parameters.next(Artist.self)
     
     return artist.flatMap { artist -> EventLoopFuture<ArtistResponse> in
-      return try artist.images.query(on: req).all().flatMap { images -> EventLoopFuture<ArtistResponse> in
+      return try artist.images.query(on: req).sort(\Image.index, .ascending).all().flatMap { images -> EventLoopFuture<ArtistResponse> in
         return try artist.events.query(on: req).sort(\Event.date, .ascending).all().flatMap { allEvents -> EventLoopFuture<ArtistResponse> in
           let events = allEvents.filter { $0.isUpcoming() }
           return try artist.releases.query(on: req).all().flatMap { releases -> EventLoopFuture<ArtistResponse> in
@@ -108,6 +108,12 @@ struct ArtistController: RouteCollection {
       let creditText = imageJson["creditText"] as? String
       let creditLink = imageJson["creditLink"] as? String
       
+      let indexString = imageJson["index"] as? String
+      var index = 0
+      if indexString != nil, let indexInt = Int(indexString!) {
+        index = indexInt
+      }
+      
       if imageJson["id"] != nil {
         guard let _id = imageJson["id"] as? String else {
           throw CreateError.runtimeError("Bad image id value")
@@ -117,7 +123,7 @@ struct ArtistController: RouteCollection {
           throw CreateError.runtimeError("Image id was not a valid UUID")
         }
         
-        updatedImages.append(ImageUpdateInformation(id: uuid, creditText: creditText, creditLink: creditLink))
+        updatedImages.append(ImageUpdateInformation(id: uuid, creditText: creditText, creditLink: creditLink, index: index))
         continue
       }
       
@@ -144,7 +150,7 @@ struct ArtistController: RouteCollection {
         put.http.body = imageData.convertToHTTPBody()
       }
       
-      imageUploadFutures.append(ImageUploadFuture(uploadFuture: uploadFuture, getUrl: presignedUrl.get, creditText: creditText, creditLink: creditLink))
+      imageUploadFutures.append(ImageUploadFuture(uploadFuture: uploadFuture, getUrl: presignedUrl.get, creditText: creditText, creditLink: creditLink, index: index))
     }
     
     var images: [Image] = []
@@ -152,7 +158,7 @@ struct ArtistController: RouteCollection {
     let allImagesUploadFuture: EventLoopFuture<Void> = imageUploadFutures.map { imageUploadFuture -> EventLoopFuture<Void> in
       return imageUploadFuture.uploadFuture.flatMap { r -> EventLoopFuture<Void> in
         if (r.http.status == .ok) {
-          let image = Image(url: imageUploadFuture.getUrl, creditText: imageUploadFuture.creditText, creditLink: imageUploadFuture.creditLink)
+          let image = Image(url: imageUploadFuture.getUrl, creditText: imageUploadFuture.creditText, creditLink: imageUploadFuture.creditLink, index: imageUploadFuture.index)
           images.append(image)
           return image.save(on: req).transform(to: ())
         }
@@ -218,6 +224,7 @@ struct ArtistController: RouteCollection {
             let updatedImage = matches.first!
             image.creditText = updatedImage.creditText ?? ""
             image.creditLink = updatedImage.creditLink ?? ""
+            image.index = updatedImage.index
             return image.save(on: req).transform(to: ())
           }
           .flatten(on: req)

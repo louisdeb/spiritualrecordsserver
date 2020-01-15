@@ -99,7 +99,7 @@ extension Artist.Profile: Content {}
 
 extension Artist {
   func getPreview(_ req: Request) throws -> Future<Artist.Preview> {
-    return try images.query(on: req).first().flatMap { image -> EventLoopFuture<Artist.Preview> in
+    return try images.query(on: req).sort(\Image.index, .ascending).first().flatMap { image -> EventLoopFuture<Artist.Preview> in
       let imageURL = image?.url ?? self.imageURLs.first!
       return Future.map(on: req, { () -> Artist.Preview in
         return Artist.Preview(id: self.id, name: self.name, shortDescription: self.shortDescription, imageURL: imageURL)
@@ -110,7 +110,7 @@ extension Artist {
 
 extension Artist {
   func getProfile(_ req: Request) throws -> Future<Artist.Profile> {
-    return try images.query(on: req).all().flatMap { images -> EventLoopFuture<Artist.Profile> in
+    return try images.query(on: req).sort(\Image.index, .ascending).all().flatMap { images -> EventLoopFuture<Artist.Profile> in
       return Future.map(on: req, { () -> Artist.Profile in
         return Artist.Profile(artist: self, images: images)
       })

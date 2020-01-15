@@ -135,7 +135,7 @@ struct AppController: RouteCollection {
     return releases.flatMap { releases -> EventLoopFuture<View> in
       let releaseResponses = try releases.map { release -> EventLoopFuture<ReleaseResponse> in
         return try release.images.query(on: req).first().flatMap { image_ -> EventLoopFuture<ReleaseResponse> in
-          let image = image_ ?? Image(url: release.imageURL, creditText: "", creditLink: "")
+          let image = image_ ?? Image(url: release.imageURL, creditText: "", creditLink: "", index: 0)
           
           return try release.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<ReleaseResponse> in
             return try artists.map { artist -> EventLoopFuture<Artist.Preview> in
@@ -164,7 +164,7 @@ struct AppController: RouteCollection {
     
     return release.flatMap { release -> EventLoopFuture<View> in
       return try release.images.query(on: req).first().flatMap { image_ -> EventLoopFuture<View> in
-        let image = image_ ?? Image(url: release.imageURL, creditText: "", creditLink: "")
+        let image = image_ ?? Image(url: release.imageURL, creditText: "", creditLink: "", index: 0)
         
         return try release.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<View> in
           return try artists.map { artist -> EventLoopFuture<Artist.Preview> in

@@ -42,7 +42,10 @@
               <input class='image-id' type='text' name='id' value='#(image.id)' style='display:none' readonly>
               <input class="image-credit-text-input" placeholder="Image Credit Text" value="#(image.creditText)">
               <input class="image-credit-link-input" placeholder="Image Credit URL" value="#(image.creditLink)">
-              
+              <div>
+                <span class='label'>Index:</span>
+                <input class='image-index-input' type='number' value="#(image.index)">
+              </div>
               <div class="buttons-wrapper">
                 <input style='margin-left:0px' class="delete-input-button" type="button" value="-" onclick="deleteObjectInSelection(this.parentElement.parentElement)">
               </div>
