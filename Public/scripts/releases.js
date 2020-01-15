@@ -76,12 +76,16 @@ function parseReleaseForm(form, callback) {
 }
 
 function submitRelease(e) {
+  var createButton = document.getElementsByClassName('form-create-button')[0]
+  createButton.disabled = true
+  
   var form = e.parentElement
   var json = parseReleaseForm(form, function (json) {
     var error = document.getElementById('error')
     if (json["error"]) {
       error.innerHTML = 'Error: ' + json['error']
       error.style.display = 'block'
+      createButton.disabled = false
       return
     } else {
       error.style.display = 'none'
@@ -103,8 +107,24 @@ function submitRelease(e) {
 }
 
 function updateRelease(e) {
+  var updateButton = document.getElementsByClassName('form-create-button')[0]
+  var deleteButton = document.getElementsByClassName('delete-button')[0]
+  updateButton.disabled = true
+  deleteButton.disabled = true
+  
   var form = e.parentElement
   var json = parseReleaseForm(form, function (json) {
+    var error = document.getElementById('error')
+    if (json["error"]) {
+      error.innerHTML = 'Error: ' + json['error']
+      error.style.display = 'block'
+      updateButton.disabled = false
+      deleteButton.disabled = false
+      return
+    } else {
+      error.style.display = 'none'
+    }
+                              
     var idInput = document.getElementById("release-id")
     var id = idInput.value
     json["id"] = id
