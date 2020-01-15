@@ -13,7 +13,7 @@ struct RemoveImageURLFromRelease: Migration {
 
   static func prepare(on conn: PostgreSQLConnection) -> EventLoopFuture<Void> {
     return Database.update(Release.self, on: conn) { builder in
-      builder.deleteField(for: \Release.imageURL)
+//      builder.deleteField(for: \Release.imageURL)
     }
   }
 

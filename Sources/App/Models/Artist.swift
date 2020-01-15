@@ -14,7 +14,6 @@ final class Artist: Codable {
   var name: String
   var shortDescription: String
   var description: String
-  var imageURLs: [String]
   var spotify: String
   var appleMusic: String
   var googlePlay: String
@@ -34,8 +33,6 @@ final class Artist: Codable {
     self.instagram = instagram ?? ""
     self.facebook = facebook ?? ""
     self.website = website ?? ""
-    
-    self.imageURLs = [""]
   }
   
   final class Preview: Codable {
@@ -100,7 +97,7 @@ extension Artist.Profile: Content {}
 extension Artist {
   func getPreview(_ req: Request) throws -> Future<Artist.Preview> {
     return try images.query(on: req).sort(\Image.index, .ascending).first().flatMap { image -> EventLoopFuture<Artist.Preview> in
-      let imageURL = image?.url ?? self.imageURLs.first!
+      let imageURL = image?.url ?? ""
       return Future.map(on: req, { () -> Artist.Preview in
         return Artist.Preview(id: self.id, name: self.name, shortDescription: self.shortDescription, imageURL: imageURL)
       })

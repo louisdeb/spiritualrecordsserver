@@ -65,8 +65,8 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
 //  migrations.add(migration: AddImageToInterview.self, database: .psql)
 //  migrations.add(migration: AddTicketsURLToEvent.self, database: .psql)
   migrations.add(migration: AddIndexToImage.self, database: .psql)
-  migrations.add(migration: RemoveImageURLsFromArtist.self, database: .psql)
-  migrations.add(migration: RemoveImageURLFromRelease.self, database: .psql)
+//  migrations.add(migration: RemoveImageURLsFromArtist.self, database: .psql)
+//  migrations.add(migration: RemoveImageURLFromRelease.self, database: .psql)
   
   services.register(migrations)
 }

@@ -14,7 +14,6 @@ final class Release: Codable {
   var name: String
   var date: Date
   var description: String
-  var imageURL: String
   var spotify: String
   var appleMusic: String
   var googlePlay: String
@@ -26,8 +25,6 @@ final class Release: Codable {
     self.spotify = spotify ?? ""
     self.appleMusic = appleMusic ?? ""
     self.googlePlay = googlePlay ?? ""
-    
-    self.imageURL = ""
   }
   
 }

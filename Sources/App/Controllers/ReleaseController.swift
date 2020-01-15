@@ -35,7 +35,7 @@ struct ReleaseController: RouteCollection {
     return releases.flatMap { releases -> EventLoopFuture<[ReleaseResponse]> in
       return try releases.map { release -> Future<ReleaseResponse> in
         return try release.images.query(on: req).first().flatMap { image_ -> EventLoopFuture<ReleaseResponse> in
-          let image = image_ ?? Image(url: release.imageURL, creditText: "", creditLink: "", index: 0)
+          let image = image_ ?? Image(url: "", creditText: "", creditLink: "", index: 0)
           
           return try release.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<ReleaseResponse> in
             return try artists.map { artist -> EventLoopFuture<Artist.Preview> in
@@ -63,7 +63,7 @@ struct ReleaseController: RouteCollection {
       }
       
       return try release.images.query(on: req).first().flatMap { image_ -> EventLoopFuture<ReleaseResponse> in
-        let image = image_ ?? Image(url: release.imageURL, creditText: "", creditLink: "", index: 0)
+        let image = image_ ?? Image(url: "", creditText: "", creditLink: "", index: 0)
         
         return try release.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<ReleaseResponse> in
           return try artists.map { artist -> EventLoopFuture<Artist.Preview> in
@@ -213,7 +213,6 @@ struct ReleaseController: RouteCollection {
       release.name = updatedRelease.name
       release.date = updatedRelease.date
       release.description = updatedRelease.description
-      release.imageURL = updatedRelease.imageURL
       release.spotify = updatedRelease.spotify
       release.appleMusic = updatedRelease.appleMusic
       release.googlePlay = updatedRelease.googlePlay
