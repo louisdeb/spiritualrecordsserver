@@ -182,10 +182,19 @@ function populateArtistSelectors(selectionElems) {
 }
 
 function eventDateChanged(e) {
-  var openMicCheckbox = document.getElementById("open-mic-checkbox");
-  var openMicCheckboxLabel = document.getElementById("open-mic-checkbox-label");
-  openMicCheckbox.style.display = e.valueAsDate.getDay() == 2 ? 'block' : 'none';
-  openMicCheckboxLabel.style.display = e.valueAsDate.getDay() == 2 ? 'block' : 'none';
+  var day = e.valueAsDate.getDay()
+  
+  var openMicCheckbox = document.getElementById("open-mic-checkbox")
+  var openMicCheckboxLabel = document.getElementById("open-mic-checkbox-label")
+  openMicCheckbox.style.display = day == 2 ? 'block' : 'none'
+  openMicCheckboxLabel.style.display = day == 2 ? 'block' : 'none'
+  
+  var priceInput = document.getElementById("price-input")
+  if ((day == 5 || day == 6) && priceInput.value == "") {
+    priceInput.value = "£3 after 9:30pm"
+  } else if (priceInput.value == "£3 after 9:30pm") {
+    priceInput.value = ""
+  }
 }
 
 var prevName = "";
