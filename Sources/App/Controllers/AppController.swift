@@ -27,6 +27,7 @@ struct AppController: RouteCollection {
     
     let events = auth.grouped("events")
     events.get(use: eventManagement)
+    events.get("all", use: eventViewAll)
     events.get(Event.parameter, "edit", use: eventEdit)
     
     let releases = auth.grouped("releases")
@@ -85,11 +86,12 @@ struct AppController: RouteCollection {
     }
   }
   
-  func eventManagement(_ req: Request) throws -> Future<View> {
+  func getEventsView(_ req: Request, viewAll: Bool) throws -> Future<View> {
     let events = Event.query(on: req).sort(\Event.date, .ascending).all()
     
     return events.flatMap { _events -> EventLoopFuture<View> in
-      let events = _events.filter { $0.isUpcomingOrThisWeek() }
+      let events = viewAll ? _events : _events.filter { $0.isUpcomingOrThisWeek() }
+      
       let eventResponses = try events.map { event -> Future<EventResponse> in
         return try event.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<EventResponse> in
           return try artists.map { artist -> EventLoopFuture<Artist.Preview> in
@@ -107,9 +109,17 @@ struct AppController: RouteCollection {
       
       return eventResponses.flatMap { eventResponses -> EventLoopFuture<View> in
         let data = ["eventResponses": eventResponses]
-        return try req.view().render("eventManagement", data)
+        return viewAll ? try req.view().render("eventViewAll", data) : try req.view().render("eventManagement", data)
       }
     }
+  }
+  
+  func eventManagement(_ req: Request) throws -> Future<View> {
+    return try getEventsView(req, viewAll: false)
+  }
+  
+  func eventViewAll(_ req: Request) throws -> Future<View> {
+    return try getEventsView(req, viewAll: true)
   }
   
   func eventEdit(_ req: Request) throws -> Future<View> {

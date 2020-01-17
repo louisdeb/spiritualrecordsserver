@@ -70,7 +70,7 @@
   <div class='content-wrapper'>
     <h2>Events</h2>
     
-    <i>Showing events from this week onwards. <a href='/app/events/all'>Click here to view all events</a></i>
+    <i>Showing all events. <a href='/app/events'>Click here to view events from this week onwards</a></i>
     
     #for(eventResponse in eventResponses) {
       <div class='event'>
