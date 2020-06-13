@@ -22,7 +22,7 @@ final class AwsController: RouteCollection {
     
     let auth = route.grouped([
       User.sessionAuthenticator(),
-      // redirect middleware
+      RedirectMiddleware(),
     ])
 
     auth.get(use: preparePresignedUrlForImage)

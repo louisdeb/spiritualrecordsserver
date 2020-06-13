@@ -17,7 +17,7 @@ struct ArticleController: RouteCollection {
     
     let auth = route.grouped([
       User.sessionAuthenticator(),
-      // redirect middleware
+      RedirectMiddleware(),
     ])
     
     auth.post(use: create)

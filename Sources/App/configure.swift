@@ -16,7 +16,7 @@ public func configure(_ app: Application) throws {
   app.middleware.use(app.sessions.middleware)
   
   app.views.use(.leaf)
-  app.leaf.cache.isEnabled = false // app.environment.isRelease
+  app.leaf.cache.isEnabled = app.environment.isRelease
   
   if let url: String = Environment.get("DATABASE_URL") {
     try app.databases.use(.postgres(url: url), as: .psql)
