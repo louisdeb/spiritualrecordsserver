@@ -1,58 +1,59 @@
-#set("content") {
-  <h1>Editing Article</h1>
-  <h2>#(article.title)</h2>
+#extend("base"):
+  #export("body"):
+    <h1>Editing Article</h1>
+    <h2>#(article.title)</h2>
 
-  <form class='create-form' method='post' action='/api/article'>
-    <div class='input-group create-form-inner'>
-      
-      <input id='article-id' type='text' name='id' value='#(article.id)' style='display:none' readonly>
+    <form class='create-form' method='post' action='/api/article'>
+      <div class='input-group create-form-inner'>
+        
+        <input id='article-id' type='text' name='id' value='#(article.id)' style='display:none' readonly>
 
-      <div>
-        <div class='label-wrapper'>
-          <label for='title'>Title</label>
+        <div>
+          <div class='label-wrapper'>
+            <label for='title'>Title</label>
+          </div>
+          <input id='title-input' type="text" name="title" value='#(article.title)' required>
         </div>
-        <input id='title-input' type="text" name="title" value='#(article.title)' required>
+
+        <div>
+          <div class='label-wrapper'>
+            <label for='date'>Date</label>
+          </div>
+          <input id='date-select' name='date' type='date' class='form-control' value='#date(article.date, "yyyy-MM-dd")' required/>
+        </div>
+
+        <div>
+          <div class='label-wrapper'>
+            <label for='author'>Author</label>
+          </div>
+          <input id='author-input' type="text" name="author" value='#(article.author)' required>
+        </div>
+
+        <div>
+          <div class='label-wrapper'>
+            <label for='authorLink'>Author Link</label>
+          </div>
+          <input id='author-link-input' type="text" name="authorLink" value='#(article.authorLink)' optional>
+        </div>
+        
+        <p style='margin-top:0; margin-bottom:3px'><i>Use <tt>[image](image_url)</tt> to embed an image (replace <tt>image_url</tt> with the url of the image).</i></p>
+        <del><p style='margin-top:0; margin-bottom:3px'><i>Use <tt>[video](video_url)</tt> to embed a video (replace <tt>video_url</tt> with the url of the video).</i></p></del>
+        <p style='margin-top:0;'><i>Use <tt>[whatever text you want](url)</tt> to create a link (replace <tt>url</tt> with the link).</i></p>
+
+        <div>
+          <div class='label-wrapper'>
+            <label for='content'>Content</label>
+          </div>
+          <textarea id='content-input' type="text" name="content">#(article.content)</textarea>
+        </div>
+
       </div>
 
-      <div>
-        <div class='label-wrapper'>
-          <label for='date'>Date</label>
-        </div>
-        <input id='date-select' name='date' type='date' class='form-control' value='#date(article.date, "yyyy-MM-dd")' required/>
-      </div>
+      <div id='error' style='display:none'></div>
 
-      <div>
-        <div class='label-wrapper'>
-          <label for='author'>Author</label>
-        </div>
-        <input id='author-input' type="text" name="author" value='#(article.author)' required>
-      </div>
-
-      <div>
-        <div class='label-wrapper'>
-          <label for='authorLink'>Author Link</label>
-        </div>
-        <input id='author-link-input' type="text" name="authorLink" value='#(article.authorLink)' optional>
-      </div>
-      
-      <p style='margin-top:0; margin-bottom:3px'><i>Use <tt>[image](image_url)</tt> to embed an image (replace <tt>image_url</tt> with the url of the image).</i></p>
-      <del><p style='margin-top:0; margin-bottom:3px'><i>Use <tt>[video](video_url)</tt> to embed a video (replace <tt>video_url</tt> with the url of the video).</i></p></del>
-      <p style='margin-top:0;'><i>Use <tt>[whatever text you want](url)</tt> to create a link (replace <tt>url</tt> with the link).</i></p>
-
-      <div>
-        <div class='label-wrapper'>
-          <label for='content'>Content</label>
-        </div>
-        <textarea id='content-input' type="text" name="content">#(article.content)</textarea>
-      </div>
-
-    </div>
-
-    <div id='error' style='display:none'></div>
-
-    <input class='form-create-button' type='button' value='Update' onclick='updateArticle(this)'>
-    <br><br>
-    <input class='delete-button' type='button' value='Delete' onclick='deleteObject("article", "#(article.id)", "/app/news")'>
-  </form>
-}
-#embed("base")
+      <input class='form-create-button' type='button' value='Update' onclick='updateArticle(this)'>
+      <br><br>
+      <input class='delete-button' type='button' value='Delete' onclick='deleteObject("article", "#(article.id)", "/app/news")'>
+    </form>
+  #endexport
+#endextend

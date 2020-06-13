@@ -1,33 +1,34 @@
-#set("content") {
-  <h1>#(artistProfile.artist.name)</h1>
+#extend("base"):
+  #export("body"):
+    <h1>#(artistProfile.artist.name)</h1>
 
-  <div class='content-wrapper'>
-    <div class="artist-view">
-      
-      <p><i>Scroll horizontally to look through images</i></p>
-      <div class="image-slider">
-        #for(image in artistProfile.images) {
-          <div class='image-slide'>
-            <img src="#(image.url)"/>
-            <p><span class='label'>Credit:</span> #(image.creditText)</p>
-            <p><span class='label'>Link:</span> #(image.creditLink)</p>
-          </div>
-        }
+    <div class='content-wrapper'>
+      <div class="artist-view">
+        
+        <p><i>Scroll horizontally to look through images</i></p>
+        <div class="image-slider">
+          #for(image in artistProfile.images) {
+            <div class='image-slide'>
+              <img src="#(image.url)"/>
+              <p><span class='label'>Credit:</span> #(image.creditText)</p>
+              <p><span class='label'>Link:</span> #(image.creditLink)</p>
+            </div>
+          }
+        </div>
+        
+        <div><span class='label'>Short Description:</span> #(artistProfile.artist.shortDescription)</div>
+        <div><span class='label'>Description:</span></div>
+        <div>#(artistProfile.artist.description)</div>
+        
+        <div><span class='label'>Spotify:</span> <a href="#(artistProfile.artist.spotify)">#(artistProfile.artist.spotify)</a></div>
+        <div><span class='label'>Apple Music:</span> <a href="#(artistProfile.artist.appleMusic)">#(artistProfile.artist.appleMusic)</a></div>
+        <div><span class='label'>Google Play:</span> <a href="#(artistProfile.artist.googlePlay)">#(artistProfile.artist.googlePlay)</a></div>
+        <div><span class='label'>Instagram:</span> <a href="#(artistProfile.artist.instagram)">#(artistProfile.artist.instagram)</a></div>
+        <div><span class='label'>Facebook:</span> <a href="#(artistProfile.artist.facebook)">#(artistProfile.artist.facebook)</a></div>
+        <div><span class='label'>Website:</span> <a href="#(artistProfile.artist.website)">#(artistProfile.artist.website)</a></div>
+        
+        <div style='margin-top:33px'><a class="edit" href="/app/artists/#(artistProfile.artist.id)/edit">Edit Profile</a></div>
       </div>
-      
-      <div><span class='label'>Short Description:</span> #(artistProfile.artist.shortDescription)</div>
-      <div><span class='label'>Description:</span></div>
-      <div>#(artistProfile.artist.description)</div>
-      
-      <div><span class='label'>Spotify:</span> <a href="#(artistProfile.artist.spotify)">#(artistProfile.artist.spotify)</a></div>
-      <div><span class='label'>Apple Music:</span> <a href="#(artistProfile.artist.appleMusic)">#(artistProfile.artist.appleMusic)</a></div>
-      <div><span class='label'>Google Play:</span> <a href="#(artistProfile.artist.googlePlay)">#(artistProfile.artist.googlePlay)</a></div>
-      <div><span class='label'>Instagram:</span> <a href="#(artistProfile.artist.instagram)">#(artistProfile.artist.instagram)</a></div>
-      <div><span class='label'>Facebook:</span> <a href="#(artistProfile.artist.facebook)">#(artistProfile.artist.facebook)</a></div>
-      <div><span class='label'>Website:</span> <a href="#(artistProfile.artist.website)">#(artistProfile.artist.website)</a></div>
-      
-      <div style='margin-top:33px'><a class="edit" href="/app/artists/#(artistProfile.artist.id)/edit">Edit Profile</a></div>
     </div>
-  </div>
-}
-#embed("base")
+  #endexport
+#endextend

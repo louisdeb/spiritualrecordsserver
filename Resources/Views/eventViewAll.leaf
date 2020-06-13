@@ -1,115 +1,116 @@
-#set("content") {
-  <h1>Event Management</h1>
+#extend("base"):
+  #export("body"):
+    <h1>Event Management</h1>
 
-  <h2 class='create-content-title' onclick='toggleShowCreateForm()'>Create A New Event</h2>
+    <h2 class='create-content-title' onclick='toggleShowCreateForm()'>Create A New Event</h2>
 
-  <form class='create-form' method='post' action='/api/event/' style='display:none'>
-    <div class='input-group create-form-inner'>
-      
-      <div>
-        <div class='label-wrapper'>
-          <label for='name'>Name</label>
-        </div>
-        <input id='name-input' name='name' type='text' optional>
-      </div>
-      
-      <div>
-        <div class='label-wrapper'>
-          <label for='date'>Select Date</label>
-        </div>
-        <div class='date-select-wrapper'>
-          <input id='date-select' name='date' type='date' class='form-control' onchange="eventDateChanged(this)" required>
-          <input id='open-mic-checkbox' name='is-open-mic' type='checkbox' onchange="openMicChecked(this)" style='display:none'>
-          <label id='open-mic-checkbox-label' for='is-open-mic' style='display:none'>Open Mic</label>
-        </div>
-      </div>
-      
-      <div>
-        <div class='label-wrapper'>
-          <label for='description'>Description</label>
-        </div>
-        <textarea id='description-input' name='description' type='text'></textarea>
-      </div>
-
-      <div>
-        <div class='label-wrapper'>
-          <label for='artists'>Select Signed Artists</label>
-          <input type='button' value='+' onclick='addArtistToSelect(this)'>
-        </div>
-      </div>
-      
-      <div>
-        <div class='label-wrapper'>
-          <label for='unsigned-artists'>Select Unsigned Artists</label>
-          <input type='button' value='+' onclick='addUnsignedArtist(this)'>
-        </div>
-      </div>
-      
-      <div>
-        <div class='label-wrapper'>
-          <label for='price'>Price</label>
-        </div>
-        <input id='price-input' type='text' placeholder='Free' optional>
-      </div>
-      
-      <div>
-        <div class='label-wrapper'>
-          <label for='ticketsURL'>Tickets URL</label>
-        </div>
-        <input id='tickets-url-input' type='text' optional>
-      </div>
-      
-    </div>
-
-    <div id='error' style='display:none'></div>
-
-    <input class='form-create-button' type='button' value='Create' onclick='submitEvent(this)'>
-    <hr>
-  </form>
-
-  <div class='content-wrapper'>
-    <h2>Events</h2>
-    
-    <i>Showing all events. <a href='/app/events'>Click here to view events from this week onwards</a></i>
-    
-    #for(eventResponse in eventResponses) {
-      <div class='event'>
-
-        <div><h2>#(eventResponse.event.name)</h2></div>
+    <form class='create-form' method='post' action='/api/event/' style='display:none'>
+      <div class='input-group create-form-inner'>
         
-        <div class='date'>#date(eventResponse.event.date, "dd-MM-yyyy")</div>
-        
-        <div class='description'>
-          <pre style='font-family:Helvetica'>#(eventResponse.event.description)</pre>
+        <div>
+          <div class='label-wrapper'>
+            <label for='name'>Name</label>
+          </div>
+          <input id='name-input' name='name' type='text' optional>
         </div>
         
-        <h3>Signed Artists</h3>
-        <ul>
-          #for(artist in eventResponse.artistPreviews) {
-            <li>#(artist.name)</li>
-          }
-        </ul>
+        <div>
+          <div class='label-wrapper'>
+            <label for='date'>Select Date</label>
+          </div>
+          <div class='date-select-wrapper'>
+            <input id='date-select' name='date' type='date' class='form-control' onchange="eventDateChanged(this)" required>
+            <input id='open-mic-checkbox' name='is-open-mic' type='checkbox' onchange="openMicChecked(this)" style='display:none'>
+            <label id='open-mic-checkbox-label' for='is-open-mic' style='display:none'>Open Mic</label>
+          </div>
+        </div>
         
-        <h3>Unsigned Artists</h3>
-        <ul>
-          #for(unsignedArtist in eventResponse.event.unsignedArtists) {
-            #if(unsignedArtist.name != "") {
-              <a href='#(unsignedArtist.link)'><li>#(unsignedArtist.name)</li></a>
+        <div>
+          <div class='label-wrapper'>
+            <label for='description'>Description</label>
+          </div>
+          <textarea id='description-input' name='description' type='text'></textarea>
+        </div>
+
+        <div>
+          <div class='label-wrapper'>
+            <label for='artists'>Select Signed Artists</label>
+            <input type='button' value='+' onclick='addArtistToSelect(this)'>
+          </div>
+        </div>
+        
+        <div>
+          <div class='label-wrapper'>
+            <label for='unsigned-artists'>Select Unsigned Artists</label>
+            <input type='button' value='+' onclick='addUnsignedArtist(this)'>
+          </div>
+        </div>
+        
+        <div>
+          <div class='label-wrapper'>
+            <label for='price'>Price</label>
+          </div>
+          <input id='price-input' type='text' placeholder='Free' optional>
+        </div>
+        
+        <div>
+          <div class='label-wrapper'>
+            <label for='ticketsURL'>Tickets URL</label>
+          </div>
+          <input id='tickets-url-input' type='text' optional>
+        </div>
+        
+      </div>
+
+      <div id='error' style='display:none'></div>
+
+      <input class='form-create-button' type='button' value='Create' onclick='submitEvent(this)'>
+      <hr>
+    </form>
+
+    <div class='content-wrapper'>
+      <h2>Events</h2>
+      
+      <i>Showing all events. <a href='/app/events'>Click here to view events from this week onwards</a></i>
+      
+      #for(eventResponse in eventResponses) {
+        <div class='event'>
+
+          <div><h2>#(eventResponse.event.name)</h2></div>
+          
+          <div class='date'>#date(eventResponse.event.date, "dd-MM-yyyy")</div>
+          
+          <div class='description'>
+            <pre style='font-family:Helvetica'>#(eventResponse.event.description)</pre>
+          </div>
+          
+          <h3>Signed Artists</h3>
+          <ul>
+            #for(artist in eventResponse.artistPreviews) {
+              <li>#(artist.name)</li>
             }
+          </ul>
+          
+          <h3>Unsigned Artists</h3>
+          <ul>
+            #for(unsignedArtist in eventResponse.event.unsignedArtists) {
+              #if(unsignedArtist.name != "") {
+                <a href='#(unsignedArtist.link)'><li>#(unsignedArtist.name)</li></a>
+              }
+            }
+          </ul>
+          
+          <div class='price'>Price: #(eventResponse.event.price)</div>
+          
+          #if(eventResponse.event.ticketsURL != "") {
+            <div class='ticketsURL'><a href='#(eventResponse.event.ticketsURL)'>Tickets URL</a></div>
           }
-        </ul>
-        
-        <div class='price'>Price: #(eventResponse.event.price)</div>
-        
-        #if(eventResponse.event.ticketsURL != "") {
-          <div class='ticketsURL'><a href='#(eventResponse.event.ticketsURL)'>Tickets URL</a></div>
-        }
-        
-        <a class="edit-event" href="/app/events/#(eventResponse.event.id)/edit">Edit Event</a>
+          
+          <a class="edit-event" href="/app/events/#(eventResponse.event.id)/edit">Edit Event</a>
 
-        <hr>
-      </div>
-    }
-  </div>
-}
-#embed("base")
+          <hr>
+        </div>
+      }
+    </div>
+  #endexport
+#endextend

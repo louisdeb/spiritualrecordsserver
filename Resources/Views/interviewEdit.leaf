@@ -1,78 +1,79 @@
-#set("content") {
-  <h1>Editing Interview</h1>
-  <h2>#(interviewResponse.interview.name)</h2>
+#extend("base"):
+  #export("body"):
+    <h1>Editing Interview</h1>
+    <h2>#(interviewResponse.interview.name)</h2>
 
-  <form class='create-form' method='post' action='/api/interview'>
-    <div class='input-group create-form-inner'>
-      
-      <input id='interview-id' type='text' name='id' value='#(interviewResponse.interview.id)' style='display:none' readonly>
+    <form class='create-form' method='post' action='/api/interview'>
+      <div class='input-group create-form-inner'>
+        
+        <input id='interview-id' type='text' name='id' value='#(interviewResponse.interview.id)' style='display:none' readonly>
 
-      <div>
-        <div class='label-wrapper'>
-          <label for='name'>Name</label>
-        </div>
-        <input id='name-input' type="text" name="name" value='#(interviewResponse.interview.name)' required>
-      </div>
-
-      <div class='select-artists'>
-        <div class='label-wrapper'>
-          <label for='artists'>Select Artists</label>
-          <input type='button' value='+' onclick='addArtistToSelect(this)'>
-        </div>
-
-        #for(artist in interviewResponse.artistPreviews) {
-          <div class='artist-select'>
-            <span class='artist-selection' style='display:none'>#(artist.name)</span>
+        <div>
+          <div class='label-wrapper'>
+            <label for='name'>Name</label>
           </div>
-        }
-      </div>
-
-      <div>
-        <div class='label-wrapper'>
-          <label for='date'>Date</label>
+          <input id='name-input' type="text" name="name" value='#(interviewResponse.interview.name)' required>
         </div>
-        <input id='date-select' name='date' type='date' class='form-control' value='#date(interviewResponse.interview.date, "yyyy-MM-dd")' required/>
-      </div>
-      
-      <div>
-        <div class='label-wrapper'>
-          <label for='description'>Short Description</label>
+
+        <div class='select-artists'>
+          <div class='label-wrapper'>
+            <label for='artists'>Select Artists</label>
+            <input type='button' value='+' onclick='addArtistToSelect(this)'>
+          </div>
+
+          #for(artist in interviewResponse.artistPreviews) {
+            <div class='artist-select'>
+              <span class='artist-selection' style='display:none'>#(artist.name)</span>
+            </div>
+          }
         </div>
-        <input id='short-description-input' type="text" name="short-description" value='#(interviewResponse.interview.shortDescription)' optional>
-      </div>
 
-      <div>
-        <div class='label-wrapper'>
-          <label for='description'>Description</label>
+        <div>
+          <div class='label-wrapper'>
+            <label for='date'>Date</label>
+          </div>
+          <input id='date-select' name='date' type='date' class='form-control' value='#date(interviewResponse.interview.date, "yyyy-MM-dd")' required/>
         </div>
-        <textarea id='description-input' type="text" name="description">#(interviewResponse.interview.description)</textarea>
-      </div>
-      
-      <div>
-        <div class='label-wrapper'>
-          <label for='image'>Image URL</label>
+        
+        <div>
+          <div class='label-wrapper'>
+            <label for='description'>Short Description</label>
+          </div>
+          <input id='short-description-input' type="text" name="short-description" value='#(interviewResponse.interview.shortDescription)' optional>
         </div>
-        <input id='image-input' type='text' name='imageURL' value='#(interviewResponse.interview.imageURL)' required>
-      </div>
 
-      <div>
-        <div class='label-wrapper'>
-          <label for='video'>Video URL</label>
+        <div>
+          <div class='label-wrapper'>
+            <label for='description'>Description</label>
+          </div>
+          <textarea id='description-input' type="text" name="description">#(interviewResponse.interview.description)</textarea>
         </div>
-        <input id='video-input' type="text" name="videoURL" value='#(interviewResponse.interview.videoURL)' required>
+        
+        <div>
+          <div class='label-wrapper'>
+            <label for='image'>Image URL</label>
+          </div>
+          <input id='image-input' type='text' name='imageURL' value='#(interviewResponse.interview.imageURL)' required>
+        </div>
+
+        <div>
+          <div class='label-wrapper'>
+            <label for='video'>Video URL</label>
+          </div>
+          <input id='video-input' type="text" name="videoURL" value='#(interviewResponse.interview.videoURL)' required>
+        </div>
+
       </div>
 
-    </div>
+      <div id='error' style='display:none'></div>
 
-    <div id='error' style='display:none'></div>
+      <input class='form-create-button' type='button' value='Update' onclick='updateInterview(this)'>
+      <br><br>
+      <input class='delete-button' type='button' value='Delete' onclick='deleteObject("interview", "#(interviewResponse.interview.id)", "/app/interviews")'>
+    </form>
 
-    <input class='form-create-button' type='button' value='Update' onclick='updateInterview(this)'>
-    <br><br>
-    <input class='delete-button' type='button' value='Delete' onclick='deleteObject("interview", "#(interviewResponse.interview.id)", "/app/interviews")'>
-  </form>
-
-  <script>
-    populateArtistSelectors(document.getElementsByClassName("artist-selection"))
-  </script>
-}
-#embed("base")
+    <script>
+      populateArtistSelectors(document.getElementsByClassName("artist-selection"))
+    </script>
+  #endexport
+#endextend

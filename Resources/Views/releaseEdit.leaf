@@ -1,95 +1,96 @@
-#set("content") {
-  <h1>Editing Release</h1>
-  <h2>#(releaseResponse.release.name)</h2>
+#extend("base"):
+  #export("body"):
+    <h1>Editing Release</h1>
+    <h2>#(releaseResponse.release.name)</h2>
 
-  <form class='create-form' method='post' action='/api/release'>
-    <div class='input-group create-form-inner'>
-      
-      <input id='release-id' type='text' name='id' value='#(releaseResponse.release.id)' style='display:none' readonly>
-
-      <div>
-        <div class='label-wrapper'>
-          <label for='name'>Name</label>
-        </div>
-        <input id='name-input' type="text" name="name" value='#(releaseResponse.release.name)' required>
-      </div>
-
-      <div class='select-artists'>
-        <div class='label-wrapper'>
-          <label for='artists'>Select Artists</label>
-          <input type='button' value='+' onclick='addArtistToSelect(this)'>
-        </div>
-
-        #for(artist in releaseResponse.artistPreviews) {
-          <div class='artist-select'>
-            <span class='artist-selection' style='display:none'>#(artist.name)</span>
-          </div>
-        }
-      </div>
-
-      <div>
-        <div class='label-wrapper'>
-          <label for='date'>Release Date</label>
-        </div>
-        <input id='date-select' name='date' type='date' class='form-control' value='#date(releaseResponse.release.date, "yyyy-MM-dd")' required/>
-      </div>
-
-      <div>
-        <div class='label-wrapper'>
-          <label for='description'>Description</label>
-        </div>
-        <textarea id='description-input' type="text" name="description">#(releaseResponse.release.description)</textarea>
-      </div>
-
-      <div>
-        <div class='label-wrapper'>
-          <label for='image'>Image</label>
-        </div>
+    <form class='create-form' method='post' action='/api/release'>
+      <div class='input-group create-form-inner'>
         
-        <div class="additional-field-input-wrapper">
-          <div class="image-preview-wrapper">
-            <img class="image" src="#(releaseResponse.image.url)">
-            <input class="image-id" type="text" name="id" value='#(releaseResponse.image.id)' style="display:none" readonly>
-            
-            <div class='buttons-wrapper'>
-              <input class="image-file-input" type="file">
+        <input id='release-id' type='text' name='id' value='#(releaseResponse.release.id)' style='display:none' readonly>
+
+        <div>
+          <div class='label-wrapper'>
+            <label for='name'>Name</label>
+          </div>
+          <input id='name-input' type="text" name="name" value='#(releaseResponse.release.name)' required>
+        </div>
+
+        <div class='select-artists'>
+          <div class='label-wrapper'>
+            <label for='artists'>Select Artists</label>
+            <input type='button' value='+' onclick='addArtistToSelect(this)'>
+          </div>
+
+          #for(artist in releaseResponse.artistPreviews) {
+            <div class='artist-select'>
+              <span class='artist-selection' style='display:none'>#(artist.name)</span>
+            </div>
+          }
+        </div>
+
+        <div>
+          <div class='label-wrapper'>
+            <label for='date'>Release Date</label>
+          </div>
+          <input id='date-select' name='date' type='date' class='form-control' value='#date(releaseResponse.release.date, "yyyy-MM-dd")' required/>
+        </div>
+
+        <div>
+          <div class='label-wrapper'>
+            <label for='description'>Description</label>
+          </div>
+          <textarea id='description-input' type="text" name="description">#(releaseResponse.release.description)</textarea>
+        </div>
+
+        <div>
+          <div class='label-wrapper'>
+            <label for='image'>Image</label>
+          </div>
+          
+          <div class="additional-field-input-wrapper">
+            <div class="image-preview-wrapper">
+              <img class="image" src="#(releaseResponse.image.url)">
+              <input class="image-id" type="text" name="id" value='#(releaseResponse.image.id)' style="display:none" readonly>
+              
+              <div class='buttons-wrapper'>
+                <input class="image-file-input" type="file">
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div>
-        <div class='label-wrapper'>
-          <label for='spotify'>Spotify URL</label>
+        <div>
+          <div class='label-wrapper'>
+            <label for='spotify'>Spotify URL</label>
+          </div>
+          <input id='spotify-input' type="text" name="spotify" value='#(releaseResponse.release.spotify)' optional>
         </div>
-        <input id='spotify-input' type="text" name="spotify" value='#(releaseResponse.release.spotify)' optional>
-      </div>
 
-      <div>
-        <div class='label-wrapper'>
-          <label for='appleMusic'>Apple Music URL</label>
+        <div>
+          <div class='label-wrapper'>
+            <label for='appleMusic'>Apple Music URL</label>
+          </div>
+          <input id='appleMusic-input' type="text" name="appleMusic" value='#(releaseResponse.release.appleMusic)' optional>
         </div>
-        <input id='appleMusic-input' type="text" name="appleMusic" value='#(releaseResponse.release.appleMusic)' optional>
-      </div>
 
-      <div>
-        <div class='label-wrapper'>
-          <label for='googlePlay'>Google Play URL</label>
+        <div>
+          <div class='label-wrapper'>
+            <label for='googlePlay'>Google Play URL</label>
+          </div>
+          <input id='googlePlay-input' type="text" name="googlePlay" value='#(releaseResponse.release.googlePlay)' optional>
         </div>
-        <input id='googlePlay-input' type="text" name="googlePlay" value='#(releaseResponse.release.googlePlay)' optional>
+
       </div>
 
-    </div>
+      <div id='error' style='display:none'></div>
 
-    <div id='error' style='display:none'></div>
+      <input class='form-create-button' type='button' value='Update' onclick='updateRelease(this)'>
+      <br><br>
+      <input class='delete-button' type='button' value='Delete' onclick='deleteObject("release", "#(releaseResponse.release.id)", "/app/releases")'>
+    </form>
 
-    <input class='form-create-button' type='button' value='Update' onclick='updateRelease(this)'>
-    <br><br>
-    <input class='delete-button' type='button' value='Delete' onclick='deleteObject("release", "#(releaseResponse.release.id)", "/app/releases")'>
-  </form>
-
-  <script>
-    populateArtistSelectors(document.getElementsByClassName("artist-selection"))
-  </script>
-}
-#embed("base")
+    <script>
+      populateArtistSelectors(document.getElementsByClassName("artist-selection"))
+    </script>
+  #endexport
+#endextend

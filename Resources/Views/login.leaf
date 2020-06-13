@@ -1,14 +1,15 @@
-#set("content") {
-<div class='content-wrapper'>
-  <h2>Login</h2>
-  
-  <div id='login-form'>
-    <input id='username-input' name='username' type='text' placeholder='Username' required> <br>
-    <input id='password-input' name='password' type='password' placeholder='Password' required> <br>
-    <input id='login-submit' type='submit' value='Sign In' onclick='login()'>
-  </div>
-  
-  <div id='login-error'></div>
-</div>
-}
-#embed("base")
+#extend("base"):
+  #export("body"):
+    <div class='content-wrapper'>
+      <h2>Login</h2>
+      
+      <div id='login-form'>
+        <input id='username-input' name='username' type='text' placeholder='Username' required> <br>
+        <input id='password-input' name='password' type='password' placeholder='Password' required> <br>
+        <input id='login-submit' type='submit' value='Sign In' onclick='login()'>
+      </div>
+      
+      <div id='login-error'></div>
+    </div>
+  #endexport
+#endextend

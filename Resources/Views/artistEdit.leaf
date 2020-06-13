@@ -1,108 +1,109 @@
-#set("content") {
-  <h1>Editing Artist</h1>
-  <h2>#(artistProfile.artist.name)</h2>
+#extend("base"):
+  #export("body"):
+    <h1>Editing Artist</h1>
+    <h2>#(artistProfile.artist.name)</h2>
 
-  <form class='create-form' method='post' action='/api/artist'>
-    <div class='input-group create-form-inner'>
-      
-      <input id='artist-id' type='text' name='id' value='#(artistProfile.artist.id)' style='display:none' readonly>
-      
-      <div>
-        <div class='label-wrapper'>
-          <label for='name'>Name</label>
-        </div>
-        <input id='name-input' type="text" name="name" value='#(artistProfile.artist.name)' required>
-      </div>
-      
-      <div>
-        <div class='label-wrapper'>
-          <label for='description'>One Line Description</label>
-        </div>
-        <input id='short-description-input' type="text" name="short-description" value='#(artistProfile.artist.shortDescription)' optional>
-      </div>
-      
-      <div>
-        <div class='label-wrapper'>
-          <label for='description'>Description</label>
-        </div>
-        <textarea id='description-input' type="text" name="description">#(artistProfile.artist.description)</textarea>
-      </div>
-      
-      <div>
-        <div class='label-wrapper'>
-          <label for='image'>Images</label>
-          <input type='button' value='+' onclick='addImageToArtist(this)'>
+    <form class='create-form' method='post' action='/api/artist'>
+      <div class='input-group create-form-inner'>
+        
+        <input id='artist-id' type='text' name='id' value='#(artistProfile.artist.id)' style='display:none' readonly>
+        
+        <div>
+          <div class='label-wrapper'>
+            <label for='name'>Name</label>
+          </div>
+          <input id='name-input' type="text" name="name" value='#(artistProfile.artist.name)' required>
         </div>
         
-        <div class='images-row'>
-        #for(image in artistProfile.images) {
-          <div class="additional-field-input-wrapper">
-            <div class="image-preview-wrapper">
-              <img class="image" src="#(image.url)">
-              <input class='image-id' type='text' name='id' value='#(image.id)' style='display:none' readonly>
-              <input class="image-credit-text-input" placeholder="Image Credit Text" value="#(image.creditText)">
-              <input class="image-credit-link-input" placeholder="Image Credit URL" value="#(image.creditLink)">
-              <div>
-                <span class='label'>Index:</span>
-                <input class='image-index-input' type='number' value="#(image.index)">
-              </div>
-              <div class="buttons-wrapper">
-                <input style='margin-left:0px' class="delete-input-button" type="button" value="-" onclick="deleteObjectInSelection(this.parentElement.parentElement)">
+        <div>
+          <div class='label-wrapper'>
+            <label for='description'>One Line Description</label>
+          </div>
+          <input id='short-description-input' type="text" name="short-description" value='#(artistProfile.artist.shortDescription)' optional>
+        </div>
+        
+        <div>
+          <div class='label-wrapper'>
+            <label for='description'>Description</label>
+          </div>
+          <textarea id='description-input' type="text" name="description">#(artistProfile.artist.description)</textarea>
+        </div>
+        
+        <div>
+          <div class='label-wrapper'>
+            <label for='image'>Images</label>
+            <input type='button' value='+' onclick='addImageToArtist(this)'>
+          </div>
+          
+          <div class='images-row'>
+          #for(image in artistProfile.images) {
+            <div class="additional-field-input-wrapper">
+              <div class="image-preview-wrapper">
+                <img class="image" src="#(image.url)">
+                <input class='image-id' type='text' name='id' value='#(image.id)' style='display:none' readonly>
+                <input class="image-credit-text-input" placeholder="Image Credit Text" value="#(image.creditText)">
+                <input class="image-credit-link-input" placeholder="Image Credit URL" value="#(image.creditLink)">
+                <div>
+                  <span class='label'>Index:</span>
+                  <input class='image-index-input' type='number' value="#(image.index)">
+                </div>
+                <div class="buttons-wrapper">
+                  <input style='margin-left:0px' class="delete-input-button" type="button" value="-" onclick="deleteObjectInSelection(this.parentElement.parentElement)">
+                </div>
               </div>
             </div>
+          }
           </div>
-        }
         </div>
-      </div>
-      
-      <div>
-        <div class='label-wrapper'>
-          <label for='spotify'>Spotify URL</label>
+        
+        <div>
+          <div class='label-wrapper'>
+            <label for='spotify'>Spotify URL</label>
+          </div>
+          <input id='spotify-input' type="text" name="spotify" value='#(artistProfile.artist.spotify)' optional>
         </div>
-        <input id='spotify-input' type="text" name="spotify" value='#(artistProfile.artist.spotify)' optional>
-      </div>
-      
-      <div>
-        <div class='label-wrapper'>
-          <label for='appleMusic'>Apple Music URL</label>
+        
+        <div>
+          <div class='label-wrapper'>
+            <label for='appleMusic'>Apple Music URL</label>
+          </div>
+          <input id='appleMusic-input' type="text" name="appleMusic" value='#(artistProfile.artist.appleMusic)' optional>
         </div>
-        <input id='appleMusic-input' type="text" name="appleMusic" value='#(artistProfile.artist.appleMusic)' optional>
-      </div>
 
-      <div>
-        <div class='label-wrapper'>
-          <label for='googlePlay'>Google Play URL</label>
+        <div>
+          <div class='label-wrapper'>
+            <label for='googlePlay'>Google Play URL</label>
+          </div>
+          <input id='googlePlay-input' type="text" name="googlePlay" value='#(artistProfile.artist.googlePlay)' optional>
         </div>
-        <input id='googlePlay-input' type="text" name="googlePlay" value='#(artistProfile.artist.googlePlay)' optional>
+        
+        <div>
+          <div class='label-wrapper'>
+            <label for='instagram'>Instagram URL</label>
+          </div>
+          <input id='instagram-input' type="text" name='instagram' value='#(artistProfile.artist.instagram)' optional>
+        </div>
+        
+        <div>
+          <div class='label-wrapper'>
+            <label for='facebook'>Facebook URL</label>
+          </div>
+          <input id='facebook-input' type="text" name='facebook' value='#(artistProfile.artist.facebook)' optional>
+        </div>
+        
+        <div>
+          <div class='label-wrapper'>
+            <label for='website'>Website URL</label>
+          </div>
+          <input id='website-input' type="text" name='website' value='#(artistProfile.artist.website)' optional>
+        </div>
       </div>
       
-      <div>
-        <div class='label-wrapper'>
-          <label for='instagram'>Instagram URL</label>
-        </div>
-        <input id='instagram-input' type="text" name='instagram' value='#(artistProfile.artist.instagram)' optional>
-      </div>
+      <div id='error' style='display:none'></div>
       
-      <div>
-        <div class='label-wrapper'>
-          <label for='facebook'>Facebook URL</label>
-        </div>
-        <input id='facebook-input' type="text" name='facebook' value='#(artistProfile.artist.facebook)' optional>
-      </div>
-      
-      <div>
-        <div class='label-wrapper'>
-          <label for='website'>Website URL</label>
-        </div>
-        <input id='website-input' type="text" name='website' value='#(artistProfile.artist.website)' optional>
-      </div>
-    </div>
-    
-    <div id='error' style='display:none'></div>
-    
-    <input class='form-create-button' type='button' value='Update' onclick='updateArtist(this)'>
-    <br><br>
-    <input class='delete-button' type='button' value='Delete' onclick='deleteObject("artist", "#(artistProfile.artist.id)", "/app/artists")'>
-  </form>
-}
-#embed("base")
+      <input class='form-create-button' type='button' value='Update' onclick='updateArtist(this)'>
+      <br><br>
+      <input class='delete-button' type='button' value='Delete' onclick='deleteObject("artist", "#(artistProfile.artist.id)", "/app/artists")'>
+    </form>
+  #endexport
+#endextend

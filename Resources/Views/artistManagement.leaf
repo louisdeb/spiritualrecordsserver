@@ -1,108 +1,109 @@
-#set("content") {
-  <h1>Artist Management</h1>
+#extend("base"):
+  #export("body"):
+    <h1>Artist Management</h1>
 
-  <h2 class='create-content-title' onclick='toggleShowCreateForm()'>Create A New Artist</h2>
+    <h2 class='create-content-title' onclick='toggleShowCreateForm()'>Create A New Artist</h2>
 
-  <form class='create-form' method='post' action='/api/artist/' style='display:none'>
-    <div class='input-group create-form-inner'>
-      
-      <div>
-        <div class='label-wrapper'>
-          <label for='name'>Name</label>
+    <form class='create-form' method='post' action='/api/artist/' style='display:none'>
+      <div class='input-group create-form-inner'>
+        
+        <div>
+          <div class='label-wrapper'>
+            <label for='name'>Name</label>
+          </div>
+          <input id='name-input' name='name' type='text' required>
         </div>
-        <input id='name-input' name='name' type='text' required>
-      </div>
-      
-      <div>
-        <div class='label-wrapper'>
-          <label for='description'>One Line Description</label>
+        
+        <div>
+          <div class='label-wrapper'>
+            <label for='description'>One Line Description</label>
+          </div>
+          <input id='short-description-input' type="text" name="short-description" optional>
         </div>
-        <input id='short-description-input' type="text" name="short-description" optional>
-      </div>
-      
-      <div>
-        <div class='label-wrapper'>
-          <label for='description'>Description</label>
+        
+        <div>
+          <div class='label-wrapper'>
+            <label for='description'>Description</label>
+          </div>
+          <textarea id='description-input' type="text" name="description"></textarea>
         </div>
-        <textarea id='description-input' type="text" name="description"></textarea>
-      </div>
-      
-      <div>
-        <div class='label-wrapper'>
-          <label for='image'>Images</label>
-          <input type='button' value='+' onclick='addImageToArtist(this)'/>
+        
+        <div>
+          <div class='label-wrapper'>
+            <label for='image'>Images</label>
+            <input type='button' value='+' onclick='addImageToArtist(this)'/>
+          </div>
+          <div class='images-row'></div>
         </div>
-        <div class='images-row'></div>
-      </div>
-      
-      <div>
-        <div class='label-wrapper'>
-          <label for='spotify'>Spotify URL</label>
+        
+        <div>
+          <div class='label-wrapper'>
+            <label for='spotify'>Spotify URL</label>
+          </div>
+          <input id='spotify-input' type="text" name="spotify" optional>
         </div>
-        <input id='spotify-input' type="text" name="spotify" optional>
-      </div>
-      
-      <div>
-        <div class='label-wrapper'>
-          <label for='appleMusic'>Apple Music URL</label>
+        
+        <div>
+          <div class='label-wrapper'>
+            <label for='appleMusic'>Apple Music URL</label>
+          </div>
+          <input id='appleMusic-input' type="text" name="appleMusic" optional>
         </div>
-        <input id='appleMusic-input' type="text" name="appleMusic" optional>
+
+        <div>
+          <div class='label-wrapper'>
+            <label for='googlePlay'>Google Play URL</label>
+          </div>
+          <input id='googlePlay-input' type="text" name="googlePlay" optional>
+        </div>
+        
+        <div>
+          <div class='label-wrapper'>
+            <label for='instagram'>Instagram URL</label>
+          </div>
+          <input id='instagram-input' type="text" name="instagram" optional>
+        </div>
+        
+        <div>
+          <div class='label-wrapper'>
+            <label for='facebook'>Facebook URL</label>
+          </div>
+          <input id='facebook-input' type="text" name="facebook" optional>
+        </div>
+        
+        <div>
+          <div class='label-wrapper'>
+            <label for='website'>Website URL</label>
+          </div>
+          <input id='website-input' type="text" name="website" optional>
+        </div>
       </div>
 
-      <div>
-        <div class='label-wrapper'>
-          <label for='googlePlay'>Google Play URL</label>
-        </div>
-        <input id='googlePlay-input' type="text" name="googlePlay" optional>
-      </div>
+      <div id='error' style='display:none'></div>
       
-      <div>
-        <div class='label-wrapper'>
-          <label for='instagram'>Instagram URL</label>
-        </div>
-        <input id='instagram-input' type="text" name="instagram" optional>
-      </div>
+      <input class='form-create-button' type='button' value='Create' onclick='submitArtist(this)'>
       
-      <div>
-        <div class='label-wrapper'>
-          <label for='facebook'>Facebook URL</label>
-        </div>
-        <input id='facebook-input' type="text" name="facebook" optional>
-      </div>
+      <p><i>If you are uploading images, you may have to wait for the images to upload before the page refreshes</i></p>
+      <hr>
+    </form>
+
+    <div class='content-wrapper'>
+      <h2>Artists</h2>
       
-      <div>
-        <div class='label-wrapper'>
-          <label for='website'>Website URL</label>
+      #for(artist in artistPreviews) {
+        <div class="content">
+          
+          <div class="artist-image-preview">
+            <img src="#(artist.imageURL)"/>
+          </div>
+          
+          <div class="content-details">
+            <a class="edit" href="/app/artists/#(artist.id)"><h2>#(artist.name)</h2></a>
+            <div class="short-description">#(artist.shortDescription)</div>
+          </div>
         </div>
-        <input id='website-input' type="text" name="website" optional>
-      </div>
+        <hr/>
+      }
     </div>
-
-    <div id='error' style='display:none'></div>
-    
-    <input class='form-create-button' type='button' value='Create' onclick='submitArtist(this)'>
-    
-    <p><i>If you are uploading images, you may have to wait for the images to upload before the page refreshes</i></p>
-    <hr>
-  </form>
-
-  <div class='content-wrapper'>
-    <h2>Artists</h2>
-    
-    #for(artist in artistPreviews) {
-      <div class="content">
-        
-        <div class="artist-image-preview">
-          <img src="#(artist.imageURL)"/>
-        </div>
-        
-        <div class="content-details">
-          <a class="edit" href="/app/artists/#(artist.id)"><h2>#(artist.name)</h2></a>
-          <div class="short-description">#(artist.shortDescription)</div>
-        </div>
-      </div>
-      <hr/>
-    }
-  </div>
-}
-#embed("base")
+  #endexport
+#endextend

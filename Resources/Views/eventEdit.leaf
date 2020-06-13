@@ -1,92 +1,93 @@
-#set("content") {
-  <h1>Editing Event</h1>
-  <h2>#(eventResponse.event.name)</h2>
+#extend("base"):
+  #export("body"):
+    <h1>Editing Event</h1>
+    <h2>#(eventResponse.event.name)</h2>
 
-  <form class='create-form' method='post' action='/api/event'>
-    <div class='input-group create-form-inner'>
-      
-      <input id='event-id' type='text' name='id' value='#(eventResponse.event.id)' style='display:none' readonly>
+    <form class='create-form' method='post' action='/api/event'>
+      <div class='input-group create-form-inner'>
+        
+        <input id='event-id' type='text' name='id' value='#(eventResponse.event.id)' style='display:none' readonly>
 
-      <div class='select-name'>
-        <div class='label-wrapper'>
-          <label for='name'>Name</label>
-        </div>
-        <input id='name-input' name='name' type='text' value='#(eventResponse.event.name)' optional>
-      </div>
-
-      <div class='select-date'>
-        <div class='label-wrapper'>
-          <label for='date'>Select Date</label>
-        </div>
-        <div class='date-select-wrapper'>
-          <input id='date-select' name='date' type='date' class='form-control' onchange="eventDateChanged(this)" value='#date(eventResponse.event.date, "yyyy-MM-dd")' required/>
-          <input id='open-mic-checkbox' name='is-open-mic' type='checkbox' onchange="openMicChecked(this)" style='display:none'>
-          <label id='open-mic-checkbox-label' for='is-open-mic' style='display:none'>Open Mic</label>
-        </div>
-      </div>
-
-      <div class='input-description'>
-        <div class='label-wrapper'>
-          <label for='description'>Description</label>
-        </div>
-        <textarea id='description-input' name='description' type='text'>#(eventResponse.event.description)</textarea>
-      </div>
-
-      <div class='select-artists'>
-        <div class='label-wrapper'>
-          <label for='artists'>Select Signed Artists</label>
-          <input type='button' value='+' onclick='addArtistToSelect(this)'>
-        </div>
-
-        #for(artist in eventResponse.artistPreviews) {
-          <div class='artist-select'>
-            <span class='artist-selection' style='display:none'>#(artist.name)</span>
+        <div class='select-name'>
+          <div class='label-wrapper'>
+            <label for='name'>Name</label>
           </div>
-        }
-      </div>
-
-      <div class='select-unsigned-artists'>
-        <div class='label-wrapper'>
-          <label for='unsigned-artists'>Select Unsigned Artists</label>
-          <input type='button' value='+' onclick='addUnsignedArtist(this)'>
+          <input id='name-input' name='name' type='text' value='#(eventResponse.event.name)' optional>
         </div>
 
-        #for(unsignedArtist in eventResponse.event.unsignedArtists) {
-          #if(unsignedArtist.name != "") {
-            <div class='additional-field-input-wrapper'>
-              <input class='unsigned-artist-input' type='text' value='#(unsignedArtist.name)'>
-              <input class='unsigned-artist-link-input' type='text' value='#(unsignedArtist.link)'>
-              <input type='button' value='-' onclick='deleteObjectInSelection(this)'>
+        <div class='select-date'>
+          <div class='label-wrapper'>
+            <label for='date'>Select Date</label>
+          </div>
+          <div class='date-select-wrapper'>
+            <input id='date-select' name='date' type='date' class='form-control' onchange="eventDateChanged(this)" value='#date(eventResponse.event.date, "yyyy-MM-dd")' required/>
+            <input id='open-mic-checkbox' name='is-open-mic' type='checkbox' onchange="openMicChecked(this)" style='display:none'>
+            <label id='open-mic-checkbox-label' for='is-open-mic' style='display:none'>Open Mic</label>
+          </div>
+        </div>
+
+        <div class='input-description'>
+          <div class='label-wrapper'>
+            <label for='description'>Description</label>
+          </div>
+          <textarea id='description-input' name='description' type='text'>#(eventResponse.event.description)</textarea>
+        </div>
+
+        <div class='select-artists'>
+          <div class='label-wrapper'>
+            <label for='artists'>Select Signed Artists</label>
+            <input type='button' value='+' onclick='addArtistToSelect(this)'>
+          </div>
+
+          #for(artist in eventResponse.artistPreviews) {
+            <div class='artist-select'>
+              <span class='artist-selection' style='display:none'>#(artist.name)</span>
             </div>
           }
-        }
-      </div>
-
-      <div class='input-price'>
-        <div class='label-wrapper'>
-          <label for='price'>Price</label>
         </div>
-        <input id='price-input' type='text' placeholder='Free' value='#(eventResponse.event.price)' optional>
-      </div>
-      
-      <div>
-        <div class='label-wrapper'>
-          <label for='ticketsURL'>Tickets URL</label>
+
+        <div class='select-unsigned-artists'>
+          <div class='label-wrapper'>
+            <label for='unsigned-artists'>Select Unsigned Artists</label>
+            <input type='button' value='+' onclick='addUnsignedArtist(this)'>
+          </div>
+
+          #for(unsignedArtist in eventResponse.event.unsignedArtists) {
+            #if(unsignedArtist.name != "") {
+              <div class='additional-field-input-wrapper'>
+                <input class='unsigned-artist-input' type='text' value='#(unsignedArtist.name)'>
+                <input class='unsigned-artist-link-input' type='text' value='#(unsignedArtist.link)'>
+                <input type='button' value='-' onclick='deleteObjectInSelection(this)'>
+              </div>
+            }
+          }
         </div>
-        <input id='tickets-url-input' type='text' value='#(eventResponse.event.ticketsURL)' optional>
+
+        <div class='input-price'>
+          <div class='label-wrapper'>
+            <label for='price'>Price</label>
+          </div>
+          <input id='price-input' type='text' placeholder='Free' value='#(eventResponse.event.price)' optional>
+        </div>
+        
+        <div>
+          <div class='label-wrapper'>
+            <label for='ticketsURL'>Tickets URL</label>
+          </div>
+          <input id='tickets-url-input' type='text' value='#(eventResponse.event.ticketsURL)' optional>
+        </div>
+        
       </div>
-      
-    </div>
 
-    <div id='error' style='display:none'></div>
+      <div id='error' style='display:none'></div>
 
-    <input class='form-create-button' type='button' value='Update' onclick='updateEvent(this)'>
-    <br><br>
-    <input class='delete-button' type='button' value='Delete' onclick='deleteObject("event", "#(eventResponse.event.id)", "/app/events")'>
-  </form>
+      <input class='form-create-button' type='button' value='Update' onclick='updateEvent(this)'>
+      <br><br>
+      <input class='delete-button' type='button' value='Delete' onclick='deleteObject("event", "#(eventResponse.event.id)", "/app/events")'>
+    </form>
 
-  <script>
-    populateArtistSelectors(document.getElementsByClassName("artist-selection"))
-  </script>
-}
-#embed("base")
+    <script>
+      populateArtistSelectors(document.getElementsByClassName("artist-selection"))
+    </script>
+  #endexport
+#endextend

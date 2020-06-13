@@ -1,8 +1,9 @@
-#set("content") {
-  <h2><a href="/app/artists">Artists</a></h2>
-  <h2><a href="/app/events">Events</a></h2>
-  <h2><a href="/app/releases">Releases</a></h2>
-  <h2><a href="/app/news">News</a></h2>
-  <h2><a href="/app/account">Account</a></h2>
-}
-#embed("base")
+#extend("base"):
+  #export("body"):
+    <h2><a href="/app/artists">Artists</a></h2>
+    <h2><a href="/app/events">Events</a></h2>
+    <h2><a href="/app/releases">Releases</a></h2>
+    <h2><a href="/app/news">News</a></h2>
+    <h2><a href="/app/account">Account</a></h2>
+  #endexport
+#endextend
