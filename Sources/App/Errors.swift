@@ -14,3 +14,11 @@ enum CreateError: Error {
 enum GetError: Error {
   case runtimeError(String)
 }
+
+enum QueryError: Error {
+  case runtimeError(String)
+}
+
+enum AuthError: Error {
+  case runtime(String)
+}

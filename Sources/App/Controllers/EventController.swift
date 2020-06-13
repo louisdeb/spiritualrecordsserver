@@ -6,54 +6,60 @@
 //
 
 import Vapor
-import Authentication
+import Fluent
 
 struct EventController: RouteCollection {
-  func boot(router: Router) throws {
-    let route = router.grouped("api", "event")
+
+  func boot(routes: RoutesBuilder) throws {
+    let route = routes.grouped("api", "event")
     
     route.get(use: get)
     
-    let sessionMiddleware = User.authSessionsMiddleware()
-    let redirectMiddleware = RedirectMiddleware(A: User.self, path: "/login")
-    let auth = route.grouped(sessionMiddleware, redirectMiddleware)
+    let auth = route.grouped([
+      User.sessionAuthenticator(),
+      // redirect middleware
+    ])
     
     auth.post(use: create)
-    auth.post(Event.parameter, "delete", use: delete)
+    auth.post(":eventID", "delete", use: delete)
   }
   
-  func get(_ req: Request) throws -> Future<[EventResponse]> {
-    let events = Event.query(on: req).sort(\Event.date, .ascending).all()
+  func get(req: Request) -> EventLoopFuture<[EventResponse]> {
+    let eventsQuery = Event.query(on: req.db).sort("date", .ascending).all()
     
-    return events.flatMap { _events -> EventLoopFuture<[EventResponse]> in
-      let events = _events.filter { $0.isUpcomingOrThisWeek() }
-      
-      return try events.map { event -> Future<EventResponse> in
-        return try event.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<EventResponse> in
-          return try artists.map { artist -> EventLoopFuture<Artist.Preview> in
-            return try artist.getPreview(req)
+    return eventsQuery.flatMap { events in
+      let events = events.filter { $0.isUpcomingOrThisWeek() }
+      return events.map { event in
+        let artistsQuery = event.$artists.query(on: req.db).all()
+        return artistsQuery.flatMap { artists in
+          return artists.map { artist in
+            return artist.getPreview(db: req.db)
           }
-          .flatten(on: req)
-          .flatMap { artistPreviews -> EventLoopFuture<EventResponse> in
-            return Future.map(on: req, { () -> EventResponse in
-              return EventResponse(event: event, artists: artistPreviews)
-            })
+          .flatten(on: req.eventLoop)
+          .map { artistPreviews in
+            return EventResponse(event: event, artists: artistPreviews)
           }
         }
       }
-      .flatten(on: req)
+      .flatten(on: req.eventLoop)
     }
   }
   
-  func create(_ req: Request) throws -> Future<Event> {
-    let body = req.http.body.description
+  func create(req: Request) -> EventLoopFuture<Event> {
+    let body = req.body.description
     
     guard let data = body.data(using: .utf8) else {
-      throw CreateError.runtimeError("Bad request body")
+      return req.eventLoop.makeFailedFuture(CreateError.runtimeError("Bad request body"))
     }
     
-    guard let json = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? Dictionary<String, Any> else {
-      throw CreateError.runtimeError("Could not parse request body as JSON")
+    let json: Dictionary<String, Any>
+    do {
+      guard let _json = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? Dictionary<String, Any> else {
+        return req.eventLoop.makeFailedFuture(CreateError.runtimeError("Could not parse request body as JSON"))
+      }
+      json = _json
+    } catch {
+      return req.eventLoop.makeFailedFuture(CreateError.runtimeError("Could not parse request body as JSON"))
     }
     
     let formatter = DateFormatter()
@@ -63,17 +69,17 @@ struct EventController: RouteCollection {
     let name = json["name"] as? String
     
     guard let dateJSON = json["date"] as? String else {
-      throw CreateError.runtimeError("Bad date value")
+      return req.eventLoop.makeFailedFuture(CreateError.runtimeError("Bad value for date"))
     }
     
     guard let date = formatter.date(from: dateJSON) else {
-      throw CreateError.runtimeError("Date value could not be converted to DateTime obejct")
+      return req.eventLoop.makeFailedFuture(CreateError.runtimeError("Date value could not be converted to DateTime obejct"))
     }
     
     let description = json["description"] as? String
     
     guard let artistNames = json["artists"] as? [String] else {
-      throw CreateError.runtimeError("Bad value for artists")
+      return req.eventLoop.makeFailedFuture(CreateError.runtimeError("Bad value for artists"))
     }
     
     let price = json["price"] as? String
@@ -81,7 +87,7 @@ struct EventController: RouteCollection {
     
     var unsignedArtists: [UnsignedArtist] = []
     guard let unsignedArtistsJson = json["unsignedArtists"] as? [Dictionary<String, String>] else {
-      throw CreateError.runtimeError("Bad value for unsignedArtists")
+      return req.eventLoop.makeFailedFuture(CreateError.runtimeError("Bad value for unsigned artists"))
     }
     
     for (_, unsignedArtistJson) in unsignedArtistsJson.enumerated() {
@@ -99,61 +105,67 @@ struct EventController: RouteCollection {
                       price: price,
                       ticketsURL: ticketsURL)
     
-    let artists = Artist.query(on: req).all()
+    let artistsQuery = Artist.query(on: req.db).all()
     
     if json["id"] != nil {
       guard let _id = json["id"] as? String else {
-        throw CreateError.runtimeError("Bad id value")
+        return req.eventLoop.makeFailedFuture(CreateError.runtimeError("Bad ID value"))
       }
       
       guard let id = UUID(uuidString: _id) else {
-        throw CreateError.runtimeError("Id was not a valid UUID")
+        return req.eventLoop.makeFailedFuture(CreateError.runtimeError("ID was not a valid UUID"))
       }
       
-      return artists.flatMap { allArtists -> EventLoopFuture<Event> in
-        let artists = allArtists.filter { artistNames.contains($0.name) }
-        return try self.update(req, id: id, updatedEvent: event, artists: artists)
+      return artistsQuery.flatMap { artists in
+        let artists = artists.filter { artistNames.contains($0.name) }
+        return self.update(req: req, id: id, updatedEvent: event, artists: artists)
       }
     }
     
-    return flatMap(artists, event.save(on: req), { (allArtists, event) -> EventLoopFuture<Event> in
-      let artists = allArtists.filter { artistNames.contains($0.name) }
+    let eventSaveRequest = event.save(on: req.db)
+    
+    return artistsQuery.and(eventSaveRequest).flatMap { (artists, _) in
+      let artists = artists.filter { artistNames.contains($0.name) }
       
       return artists.map { artist in
-        return event.artists.attach(artist, on: req)
+        return event.$artists.attach(artist, on: req.db)
       }
-      .flatten(on: req)
+      .flatten(on: req.eventLoop)
       .transform(to: event)
-    })
-  }
-  
-  func update(_ req: Request, id: UUID, updatedEvent: Event, artists: [Artist]) throws -> Future<Event> {
-    let eventFindFuture = Event.find(id, on: req)
-    
-    return eventFindFuture.flatMap { event_ -> EventLoopFuture<Event> in
-      guard let event = event_ else {
-        throw CreateError.runtimeError("Could not find event to update")
-      }
-      
-      event.name = updatedEvent.name
-      event.date = updatedEvent.date
-      event.description = updatedEvent.description
-      event.unsignedArtists = updatedEvent.unsignedArtists
-      event.price = updatedEvent.price
-      event.ticketsURL = updatedEvent.ticketsURL
-      
-      return flatMap(event.artists.detachAll(on: req), event.save(on: req), { (_, event) in
-        return artists.map { artist in
-          return event.artists.attach(artist, on: req)
-          }
-          .flatten(on: req)
-          .transform(to: event)
-      })
     }
   }
   
-  func delete(_ req: Request) throws -> Future<Event> {
-    let event = try req.parameters.next(Event.self)
-    return event.delete(on: req)
+  func update(req: Request, id: UUID, updatedEvent: Event, artists: [Artist]) -> EventLoopFuture<Event> {
+    return Event.find(id, on: req.db)
+      .unwrap(or: Abort(.notFound))
+      .flatMap { event in
+        event.name = updatedEvent.name
+        event.date = updatedEvent.date
+        event.description = updatedEvent.description
+        event.unsignedArtists = updatedEvent.unsignedArtists
+        event.price = updatedEvent.price
+        event.ticketsURL = updatedEvent.ticketsURL
+        
+        let artistsDetachRequest = event.$artists.detach(artists, on: req.db)
+        let eventSaveRequest = event.save(on: req.db)
+        
+        return artistsDetachRequest.and(eventSaveRequest).flatMap { _ in
+          return artists.map { artist in
+            return event.$artists.attach(artist, on: req.db)
+            }
+            .flatten(on: req.eventLoop)
+            .transform(to: event)
+        }
+      }
+  }
+  
+  func delete(req: Request) throws -> EventLoopFuture<Response> {
+    let redirect = req.redirect(to: "/app/events")
+    
+    return Event.find(req.parameters.get("event"), on: req.db)
+      .unwrap(or: Abort(.notFound))
+      .flatMap { event in
+        return event.delete(on: req.db).transform(to: redirect)
+      }
   }
 }

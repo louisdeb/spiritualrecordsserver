@@ -101,7 +101,7 @@
           <div class="short-description">#(artist.shortDescription)</div>
         </div>
       </div>
-      <hr />
+      <hr/>
     }
   </div>
 }

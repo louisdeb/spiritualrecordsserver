@@ -6,20 +6,18 @@
 //
 
 import Vapor
-import Authentication
 
 struct PublicController: RouteCollection {
-  func boot(router: Router) throws {
-    router.get(use: index)
-    router.get("privacy-policy", use: privacyPolicy)
+  func boot(routes: RoutesBuilder) throws {
+    routes.get(use: index)
+    routes.get("privacy-policy", use: privacyPolicy)
   }
   
-  func index(_ req: Request) throws -> Future<View> {
-    return try req.view().render("publicIndex")
+  func index(_ req: Request) throws -> EventLoopFuture<View> {
+    return req.view.render("publicIndex")
   }
   
-  func privacyPolicy(_ req: Request) throws -> Future<View> {
-    return try req.view().render("privacyPolicy")
+  func privacyPolicy(_ req: Request) throws -> EventLoopFuture<View> {
+    return req.view.render("privacyPolicy")
   }
-  
 }

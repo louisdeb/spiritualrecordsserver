@@ -1,72 +1,44 @@
-import FluentPostgreSQL
 import Vapor
-import Authentication
+import Fluent
+import FluentPostgresDriver
 import Leaf
 
 /// Called before your application initializes.
-public func configure(_ config: inout Config, _ env: inout Environment, _ services: inout Services) throws {
-  // Register providers first
-  try services.register(FluentPostgreSQLProvider())
-  try services.register(AuthenticationProvider())
-  try services.register(LeafProvider())
+public func configure(_ app: Application) throws {
   
-  config.prefer(LeafRenderer.self, for: ViewRenderer.self)
-  config.prefer(MemoryKeyedCache.self, for: KeyedCache.self)
+  app.sessions.use(.fluent)
   
-  let awsConfig = try AwsConfiguration().setup(services: &services)
+  app.views.use(.leaf)
+  app.leaf.cache.isEnabled = app.environment.isRelease
 
-  // Register routes to the router
-  let router = EngineRouter.default()
-  try routes(router, awsConfig: awsConfig)
-  services.register(router, as: Router.self)
+//  let awsConfig = try AwsConfiguration().setup(services: &services)
+//  try routes(app, awsConfig: awsConfig)
 
-  // Register middleware
-  var middlewares = MiddlewareConfig() // Create _empty_ middleware config
-  middlewares.use(FileMiddleware.self) // Serves files from `Public/` directory
-  middlewares.use(ErrorMiddleware.self) // Catches errors and converts to HTTP response
-  middlewares.use(SessionsMiddleware.self) // Provides cookies for persistent web authentication
-  services.register(middlewares)
+  app.middleware.use(FileMiddleware(publicDirectory: app.directory.publicDirectory))
+  app.middleware.use(ErrorMiddleware.default(environment: app.environment))
+  app.middleware.use(app.sessions.middleware)
 
-  let psqlConfig: PostgreSQLDatabaseConfig
-  
   if let url: String = Environment.get("DATABASE_URL") {
-    psqlConfig = PostgreSQLDatabaseConfig(url: url)!
+    try app.databases.use(.postgres(url: url), as: .psql)
   } else {
-    psqlConfig = PostgreSQLDatabaseConfig(hostname: "localhost", username: "louis")
+    app.databases.use(.postgres(hostname: "localhost", username: "louis", password: "password"), as: .psql)
   }
 
-  let psql = PostgreSQLDatabase(config: psqlConfig)
+//  services.register(NIOServerConfig.default(workerCount: 4))
+//  services.register(DatabaseConnectionPoolConfig(maxConnections: 4))
 
-  var databases = DatabasesConfig()
-  databases.add(database: psql, as: .psql)
-  databases.enableLogging(on: .psql)
-  services.register(databases)
+  app.migrations.add(SessionRecord.migration)
   
-  services.register(NIOServerConfig.default(workerCount: 4))
-  services.register(DatabaseConnectionPoolConfig(maxConnections: 4))
-
-  var migrations = MigrationConfig()
-  
-  // Models
-  migrations.add(model: User.self, database: .psql)
-  migrations.add(model: Artist.self, database: .psql)
-  migrations.add(model: Event.self, database: .psql)
-  migrations.add(model: Release.self, database: .psql)
-  migrations.add(model: Interview.self, database: .psql)
-  migrations.add(model: Article.self, database: .psql)
-  migrations.add(model: Image.self, database: .psql)
-  migrations.add(model: ArtistEventPivot.self, database: .psql)
-  migrations.add(model: ArtistReleasePivot.self, database: .psql)
-  migrations.add(model: ArtistInterviewPivot.self, database: .psql)
-  migrations.add(model: ArtistImagePivot.self, database: .psql)
-  migrations.add(model: ReleaseImagePivot.self, database: .psql)
-  
-  // Migrations
-//  migrations.add(migration: AddImageToInterview.self, database: .psql)
-//  migrations.add(migration: AddTicketsURLToEvent.self, database: .psql)
-  migrations.add(migration: AddIndexToImage.self, database: .psql)
-//  migrations.add(migration: RemoveImageURLsFromArtist.self, database: .psql)
-//  migrations.add(migration: RemoveImageURLFromRelease.self, database: .psql)
-  
-  services.register(migrations)
+  app.migrations.add(User.Create())
+  app.migrations.add(Artist.Create())
+  app.migrations.add(Event.Create())
+  app.migrations.add(Release.Create())
+  app.migrations.add(Interview.Create())
+  app.migrations.add(Article.Create())
+  app.migrations.add(Image.Create())
+  app.migrations.add(ArtistEvent.Create())
+  app.migrations.add(ArtistRelease.Create())
+  app.migrations.add(ArtistInterview.Create())
+  app.migrations.add(ArtistImage.Create())
+  app.migrations.add(ReleaseImage.Create())
 }

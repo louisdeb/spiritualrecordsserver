@@ -1,31 +1,13 @@
 import Vapor
 
-/// Register your application's routes here.
-public func routes(_ router: Router, awsConfig: AwsConfig) throws {
-  let awsController = AwsController(awsConfig: awsConfig)
-  try router.register(collection: awsController)
-  
-  let userController = UserController()
-  try router.register(collection: userController)
-  
-  let appController = AppController()
-  try router.register(collection: appController)
-  
-  let artistController = ArtistController(awsController: awsController)
-  try router.register(collection: artistController)
-  
-  let eventController = EventController()
-  try router.register(collection: eventController)
-  
-  let releaseController = ReleaseController(awsController: awsController)
-  try router.register(collection: releaseController)
-  
-  let interviewController = InterviewController()
-  try router.register(collection: interviewController)
-  
-  let articleController = ArticleController()
-  try router.register(collection: articleController)
-  
-  let publicController = PublicController()
-  try router.register(collection: publicController)
+public func routes(app: Application) throws { // awsConfig parameter removed
+//  try app.register(collection: AwsController(awsConfig: awsConfig))
+  try app.register(collection: UserController())
+  try app.register(collection: AppController())
+  try app.register(collection: ArtistController())
+  try app.register(collection: EventController())
+  try app.register(collection: ReleaseController())
+  try app.register(collection: InterviewController())
+  try app.register(collection: ArticleController())
+  try app.register(collection: PublicController())
 }

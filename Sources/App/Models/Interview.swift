@@ -5,20 +5,40 @@
 //  Created by Louis de Beaumont on 31/10/2019.
 //
 
-import FluentPostgreSQL
+import Fluent
 import Vapor
 
-final class Interview: Codable {
+final class Interview: Model {
+  static let schema = "interviews"
+  
+  @ID(key: .id)
   var id: UUID?
   
+  @Field(key: "name")
   var name: String
+  
+  @Field(key: "date")
   var date: Date
+  
+  @Field(key: "shortDescription")
   var shortDescription: String
+  
+  @Field(key: "description")
   var description: String
+  
+  @Field(key: "imageURL")
   var imageURL: String
+  
+  @Field(key: "videoURL")
   var videoURL: String
   
-  init(name: String, date: Date, shortDescription: String?, description: String?, imageURL: String?, videoURL: String?) {
+  @Siblings(through: ArtistInterview.self, from: \.$interview, to: \.$artist)
+  var artists: [Artist]
+  
+  init() {}
+  
+  init(name: String, date: Date, shortDescription: String?,
+       description: String?, imageURL: String?, videoURL: String?) {
     self.name = name
     self.date = date
     self.shortDescription = shortDescription ?? ""
@@ -29,20 +49,25 @@ final class Interview: Codable {
 }
 
 extension Interview {
-  var artists: Siblings<Interview, Artist, ArtistInterviewPivot> {
-    return siblings()
-  }
-}
-
-extension Interview: Migration {
-  static func prepare(on connection: PostgreSQLConnection) -> Future<Void> {
-    return Database.create(self, on: connection) { builder in
-      try addProperties(to: builder)
-      builder.unique(on: \.id)
+ struct Create: Migration {
+    let name = Interview.schema
+    
+    func prepare(on database: Database) -> EventLoopFuture<Void> {
+      database.schema(name)
+        .field("id", .uuid, .identifier(auto: true))
+        .field("name", .uuid, .required)
+        .field("date", .uuid, .required)
+        .field("shortDescription", .uuid, .required)
+        .field("description", .uuid, .required)
+        .field("imageURL", .uuid, .required)
+        .field("videoURL", .uuid, .required)
+        .create()
+    }
+    
+    func revert(on database: Database) -> EventLoopFuture<Void> {
+      database.schema(name).delete()
     }
   }
 }
 
-extension Interview: PostgreSQLUUIDModel {}
 extension Interview: Content {}
-extension Interview: Parameter {}

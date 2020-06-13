@@ -6,68 +6,75 @@
 //
 
 import Vapor
-import Authentication
+import Fluent
 
 struct InterviewController: RouteCollection {
-  func boot(router: Router) throws {
-    let route = router.grouped("api", "interview")
+ 
+  func boot(routes: RoutesBuilder) {
+    let route = routes.grouped("api", "interview")
     
     route.get(use: get)
     
-    let sessionMiddleware = User.authSessionsMiddleware()
-    let redirectMiddleware = RedirectMiddleware(A: User.self, path: "/login")
-    let auth = route.grouped(sessionMiddleware, redirectMiddleware)
+    let auth = route.grouped([
+      User.sessionAuthenticator(),
+      // redirect middleware
+    ])
     
     auth.post(use: create)
-    auth.post(Interview.parameter, "delete", use: delete)
+    auth.post(":interviewID", "delete", use: delete)
   }
 
-  func get(_ req: Request) throws -> Future<[InterviewResponse]> {
-    let interviews = Interview.query(on: req).sort(\Interview.date, .descending).all()
+  func get(req: Request) -> EventLoopFuture<[InterviewResponse]> {
+    let interviewsQuery = Interview.query(on: req.db).sort("date", .descending).all()
     
-    return interviews.flatMap { interviews -> EventLoopFuture<[InterviewResponse]> in
-      return try interviews.map { interview -> EventLoopFuture<InterviewResponse> in
-        return try interview.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<InterviewResponse> in
-          return try artists.map { artist -> EventLoopFuture<Artist.Preview> in
-            return try artist.getPreview(req)
+    return interviewsQuery.flatMap { interviews in
+      return interviews.map { interview in
+        let artistsQuery = interview.$artists.query(on: req.db).all()
+        return artistsQuery.flatMap { artists in
+          return artists.map { artist in
+            return artist.getPreview(db: req.db)
           }
-          .flatten(on: req)
-          .flatMap { artistPreviews -> EventLoopFuture<InterviewResponse> in
-            return Future.map(on: req, { () -> InterviewResponse in
-              return InterviewResponse(interview: interview, artists: artistPreviews)
-            })
+          .flatten(on: req.eventLoop)
+          .map { artistPreviews in
+            return InterviewResponse(interview: interview, artists: artistPreviews)
           }
         }
       }
-      .flatten(on: req)
+      .flatten(on: req.eventLoop)
     }
   }
   
-  func create(_ req: Request) throws -> Future<Interview> {
-    let body = req.http.body.description
-
+  func create(req: Request) -> EventLoopFuture<Interview> {
+    let body = req.body.description
+    
     guard let data = body.data(using: .utf8) else {
-      throw CreateError.runtimeError("Bad request body")
+      return req.eventLoop.makeFailedFuture(CreateError.runtimeError("Bad request body"))
     }
-
-    guard let json = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? Dictionary<String, Any> else {
-      throw CreateError.runtimeError("Could not parse request body as JSON")
+    
+    let json: Dictionary<String, Any>
+    do {
+      guard let _json = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? Dictionary<String, Any> else {
+        throw CreateError.runtimeError("Could not parse request body as JSON")
+      }
+      json = _json
+    } catch {
+      return req.eventLoop.makeFailedFuture(error)
     }
     
     let formatter = DateFormatter()
     formatter.dateFormat = "yyyy-MM-dd"
     formatter.timeZone = TimeZone(secondsFromGMT: 0)
-
+    
     guard let name = json["name"] as? String else {
-      throw CreateError.runtimeError("Invalid interview name")
+      return req.eventLoop.makeFailedFuture(CreateError.runtimeError("Invalid interview name"))
     }
     
     guard let dateJSON = json["date"] as? String else {
-      throw CreateError.runtimeError("Bad date value")
+      return req.eventLoop.makeFailedFuture(CreateError.runtimeError("Bad date value"))
     }
-
+    
     guard let date = formatter.date(from: dateJSON) else {
-      throw CreateError.runtimeError("Date value could not be converted to DateTime obejct")
+      return req.eventLoop.makeFailedFuture(CreateError.runtimeError("Date value could not be converted to DateTime obejct"))
     }
     
     let shortDescription = json["short-description"] as? String
@@ -75,74 +82,81 @@ struct InterviewController: RouteCollection {
     let imageURL = json["imageURL"] as? String
     let videoURL = json["videoURL"] as? String
     
-    let interview = Interview(name: name,
-                              date: date,
-                              shortDescription: shortDescription,
-                              description: description,
-                              imageURL: imageURL,
-                              videoURL: videoURL)
+    let interview = Interview(
+      name: name,
+      date: date,
+      shortDescription: shortDescription,
+      description: description,
+      imageURL: imageURL,
+      videoURL: videoURL
+    )
     
-    let artists = Artist.query(on: req).all()
+    let artistsQuery = Artist.query(on: req.db).all()
     
     guard let artistNames = json["artists"] as? [String] else {
-      throw CreateError.runtimeError("[artists] was not a valid array")
+      return req.eventLoop.makeFailedFuture(CreateError.runtimeError("[artists] was not a valid array"))
     }
     
     if json["id"] != nil {
       guard let _id = json["id"] as? String else {
-        throw CreateError.runtimeError("Bad id value")
+        return req.eventLoop.makeFailedFuture(CreateError.runtimeError("Bad id value"))
       }
       
       guard let id = UUID(uuidString: _id) else {
-        throw CreateError.runtimeError("Id was not a valid UUID")
+        return req.eventLoop.makeFailedFuture(CreateError.runtimeError("Id was not a valid UUID"))
       }
       
-      return artists.flatMap { artists -> EventLoopFuture<Interview> in
+      return artistsQuery.flatMap { artists in
         let artists = artists.filter { artistNames.contains($0.name) }
-        return try self.update(req, id: id, updatedInterview: interview, artists: artists)
+        return self.update(req: req, id: id, updatedInterview: interview, artists: artists)
       }
     }
     
-    return flatMap(artists, interview.save(on: req), { (allArtists, interview) -> EventLoopFuture<Interview> in
-      let artists = allArtists.filter { artistNames.contains($0.name) }
+    let interviewSaveRequest = interview.save(on: req.db)
+    
+    return artistsQuery.and(interviewSaveRequest).flatMap { (artists, _) in
+      let artists = artists.filter { artistNames.contains($0.name) }
       
       return artists.map { artist in
-        return interview.artists.attach(artist, on: req)
+        return interview.$artists.attach(artist, on: req.db)
       }
-      .flatten(on: req)
+      .flatten(on: req.eventLoop)
       .transform(to: interview)
-    })
-  }
-
-  func update(_ req: Request, id: UUID, updatedInterview: Interview, artists: [Artist]) throws -> Future<Interview> {
-    let interviewFuture = Interview.find(id, on: req)
-    
-    return interviewFuture.flatMap { interview_ -> EventLoopFuture<Interview> in
-      guard let interview = interview_ else {
-        throw CreateError.runtimeError("Could not find interview to update")
-      }
-      
-      interview.name = updatedInterview.name
-      interview.date = updatedInterview.date
-      interview.shortDescription = updatedInterview.shortDescription
-      interview.description = updatedInterview.description
-      interview.imageURL = updatedInterview.imageURL
-      interview.videoURL = updatedInterview.videoURL
-      
-      return flatMap(interview.artists.detachAll(on: req), interview.save(on: req), { (_, interview) -> EventLoopFuture<Interview> in
-        return artists.map { artist in
-          return interview.artists.attach(artist, on: req)
-        }
-        .flatten(on: req)
-        .transform(to: interview)
-      })
     }
   }
+
+  func update(req: Request, id: UUID, updatedInterview: Interview, artists: [Artist]) -> EventLoopFuture<Interview> {
+    Interview.find(id, on: req.db)
+      .unwrap(or: Abort(.notFound))
+      .flatMap { interview in
+        
+        interview.name = updatedInterview.name
+        interview.date = updatedInterview.date
+        interview.shortDescription = updatedInterview.shortDescription
+        interview.description = updatedInterview.description
+        interview.imageURL = updatedInterview.imageURL
+        interview.videoURL = updatedInterview.videoURL
+        
+        let artistsDetachRequest = interview.$artists.detach(artists, on: req.db)
+        let interviewSaveRequest = interview.save(on: req.db)
+        
+        return artistsDetachRequest.and(interviewSaveRequest).flatMap { (_, _) in
+          return artists.map { artist in
+            return interview.$artists.attach(artist, on: req.db)
+          }
+          .flatten(on: req.eventLoop)
+          .transform(to: interview)
+        }
+      }
+  }
   
-  func delete(_ req: Request) throws -> Future<Interview> {
-    let interview = try req.parameters.next(Interview.self)
-    return interview.delete(on: req)
+  func delete(req: Request) -> EventLoopFuture<Response> {
+    let redirect = req.redirect(to: "/app/interviews")
+    
+    return Interview.find(req.parameters.get("interview"), on: req.db)
+      .unwrap(or: Abort(.notFound))
+      .flatMap { interview in
+        return interview.delete(on: req.db).transform(to: redirect)
+      }
   }
 }
-
-

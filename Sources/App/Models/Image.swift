@@ -5,17 +5,31 @@
 //  Created by Louis de Beaumont on 21/12/2019.
 //
 
-import FluentPostgreSQL
+import Fluent
 import Vapor
-import struct S3.File
 
-final class Image: Codable {
+final class Image: Model {
+  static let schema = "images"
+  
+  @ID(key: .id)
   var id: UUID?
   
+  @Field(key: "url")
   var url: String
+  
+  @Field(key: "creditText")
   var creditText: String
+  
+  @Field(key: "creditLink")
   var creditLink: String
+  
+  @Field(key: "index")
   var index: Int
+  
+  @Siblings(through: ArtistImage.self, from: \.$image, to: \.$artist)
+  var artists: [Artist]
+  
+  init() {}
   
   init(url: String, creditText: String?, creditLink: String?, index: Int) {
     self.url = url
@@ -26,23 +40,26 @@ final class Image: Codable {
 }
 
 extension Image {
-  var artists: Siblings<Image, Artist, ArtistImagePivot> {
-    return siblings()
-  }
-}
-
-extension Image: Migration {
-  static func prepare(on connection: PostgreSQLConnection) -> Future<Void> {
-    return Database.create(self, on: connection) { builder in
-      try addProperties(to: builder)
-      builder.unique(on: \.id)
+  struct Create: Migration {
+    let name = Image.schema
+    
+    func prepare(on database: Database) -> EventLoopFuture<Void> {
+      database.schema(name)
+        .field("id", .uuid, .identifier(auto: true))
+        .field("url", .uuid, .required)
+        .field("creditText", .uuid, .required)
+        .field("creditLink", .uuid, .required)
+        .field("index", .uuid, .required)
+        .create()
+    }
+    
+    func revert(on database: Database) -> EventLoopFuture<Void> {
+      database.schema(name).delete()
     }
   }
 }
 
-extension Image: PostgreSQLUUIDModel {}
 extension Image: Content {}
-extension Image: Parameter {}
 
 struct ImageUploadFuture {
   var uploadFuture: EventLoopFuture<Response>

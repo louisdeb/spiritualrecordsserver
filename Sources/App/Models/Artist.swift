@@ -5,21 +5,52 @@
 //  Created by Louis de Beaumont on 01/09/2019.
 //
 
-import FluentPostgreSQL
+import Fluent
 import Vapor
 
-final class Artist: Codable {
+final class Artist: Model {
+  static let schema = "artists"
+  
+  @ID(key: .id)
   var id: UUID?
   
+  @Field(key: "name")
   var name: String
+  
+  @Field(key: "shortDescription")
   var shortDescription: String
+  
+  @Field(key: "description")
   var description: String
+  
+  @Field(key: "spotify")
   var spotify: String
+  
+  @Field(key: "appleMusic")
   var appleMusic: String
+  
+  @Field(key: "googlePlay")
   var googlePlay: String
+  
+  @Field(key: "instagram")
   var instagram: String
+  
+  @Field(key: "facebook")
   var facebook: String
+  
+  @Field(key: "website")
   var website: String
+  
+  @Siblings(through: ArtistImage.self, from: \.$artist, to: \.$image)
+  var images: [Image]
+  
+  @Siblings(through: ArtistEvent.self, from: \.$artist, to: \.$event)
+  var events: [Event]
+  
+  @Siblings(through: ArtistRelease.self, from: \.$artist, to: \.$release)
+  var releases: [Release]
+  
+  init() {}
   
   init(name: String, shortDescription: String?, description: String?,
        spotify: String?, appleMusic: String?, googlePlay: String?,
@@ -35,11 +66,22 @@ final class Artist: Codable {
     self.website = website ?? ""
   }
   
-  final class Preview: Codable {
+  final class Preview: Model {
+    static let schema = "artist.preview"
+    
+    @ID(key: .id)
     var id: UUID?
+    
+    @Field(key: "name")
     var name: String
+    
+    @Field(key: "shortDescription")
     var shortDescription: String
+    
+    @Field(key: "imageURL")
     var imageURL: String
+    
+    init() {}
     
     init(id: UUID?, name: String, shortDescription: String, imageURL: String) {
       self.id = id
@@ -49,11 +91,22 @@ final class Artist: Codable {
     }
   }
   
-  final class Profile: Codable {
+  final class Profile: Model {
+    static let schema = "artist.profile"
+    
+    @ID(key: .id)
+    var id: UUID?
+    
+    @Field(key: "artist")
     var artist: Artist
+    
+    @Field(key: "images")
     var images: [Image]
     
+    init() {}
+    
     init(artist: Artist, images: [Image]) {
+      self.id = artist.id
       self.artist = artist
       self.images = images
     }
@@ -61,56 +114,50 @@ final class Artist: Codable {
 }
 
 extension Artist {
-  var images: Siblings<Artist, Image, ArtistImagePivot> {
-    return siblings()
-  }
-}
-
-extension Artist {
-  var events: Siblings<Artist, Event, ArtistEventPivot> {
-    return siblings()
-  }
-}
-
-extension Artist {
-  var releases: Siblings<Artist, Release, ArtistReleasePivot> {
-    return siblings()
-  }
-}
-
-extension Artist: Migration {
-  static func prepare(on connection: PostgreSQLConnection) -> Future<Void> {
-    return Database.create(self, on: connection) { builder in
-      try addProperties(to: builder)
-      builder.unique(on: \.name)
+  struct Create: Migration {
+    let name = Artist.schema
+    
+    func prepare(on database: Database) -> EventLoopFuture<Void> {
+      database.schema(name)
+        .field("id", .uuid, .identifier(auto: true))
+        .field("name", .uuid, .required)
+        .field("shortDescription", .uuid, .required)
+        .field("description", .uuid, .required)
+        .field("spotify", .uuid, .required)
+        .field("appleMusic", .uuid, .required)
+        .field("googlePlay", .uuid, .required)
+        .field("instagram", .uuid, .required)
+        .field("facebook", .uuid, .required)
+        .field("website", .uuid, .required)
+        .create()
+    }
+    
+    func revert(on database: Database) -> EventLoopFuture<Void> {
+      database.schema(name).delete()
     }
   }
 }
 
-extension Artist: PostgreSQLUUIDModel {}
 extension Artist: Content {}
-extension Artist: Parameter {}
 
 extension Artist.Preview: Content {}
 extension Artist.Profile: Content {}
 
 extension Artist {
-  func getPreview(_ req: Request) throws -> Future<Artist.Preview> {
-    return try images.query(on: req).sort(\Image.index, .ascending).first().flatMap { image -> EventLoopFuture<Artist.Preview> in
+  func getPreview(db: Database) -> EventLoopFuture<Artist.Preview> {
+    let imageQuery = $images.query(on: db).sort("index", .ascending).first()
+    return imageQuery.map { image in
       let imageURL = image?.url ?? ""
-      return Future.map(on: req, { () -> Artist.Preview in
-        return Artist.Preview(id: self.id, name: self.name, shortDescription: self.shortDescription, imageURL: imageURL)
-      })
+      return Artist.Preview(id: self.id, name: self.name, shortDescription: self.shortDescription, imageURL: imageURL)
     }
   }
 }
 
 extension Artist {
-  func getProfile(_ req: Request) throws -> Future<Artist.Profile> {
-    return try images.query(on: req).sort(\Image.index, .ascending).all().flatMap { images -> EventLoopFuture<Artist.Profile> in
-      return Future.map(on: req, { () -> Artist.Profile in
-        return Artist.Profile(artist: self, images: images)
-      })
+  func getProfile(db: Database) -> EventLoopFuture<Artist.Profile> {
+    let imagesQuery = $images.query(on: db).sort("index", .ascending).all()
+    return imagesQuery.map { images in
+      return Artist.Profile(artist: self, images: images)
     }
   }
 }

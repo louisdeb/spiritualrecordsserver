@@ -2,16 +2,18 @@ function parseReleaseForm(form, callback) {
   var nameInput = document.getElementById("name-input")
   var name = nameInput.value
   if (name.trim() == "") {
-    return {
+    callback({
       'error': 'Release must have a name'
-    }
+    })
+    return
   }
   
   var date = form.date.value
   if (date == "") {
-    return {
+    callback({
       "error": "Release must have a release date"
-    }
+    })
+    return
   }
   
   var descriptionInput = document.getElementById("description-input")
@@ -39,9 +41,10 @@ function parseReleaseForm(form, callback) {
   for (let input of artistInputs)
     artists.push(input.value)
   if (artists.length == 0) {
-    return {
+    callback({
       "error": "Release must have an artist"
-    }
+    })
+    return
   }
 
   json["artists"] = artists
@@ -56,6 +59,7 @@ function parseReleaseForm(form, callback) {
     var data = e.target.result
     imageInputJson["image"] = data
     callback(json)
+    return
   }
   
   var idInput = imageInput.querySelector('.image-id')
@@ -65,10 +69,15 @@ function parseReleaseForm(form, callback) {
     } else {
       imageInputJson["id"] = idInput.value
       callback(json)
+      return
     }
   } else {
-    if (fileInput.files[0] === undefined)
+    if (fileInput.files[0] === undefined) {
+      callback({
+        'error': 'Release must have an image'
+      })
       return
+    }
     reader.readAsDataURL(fileInput.files[0])
   }
   

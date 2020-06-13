@@ -6,35 +6,43 @@
 //
 
 import Vapor
-import Authentication
+import Fluent
 
 struct ArticleController: RouteCollection {
-  func boot(router: Router) throws {
-    let route = router.grouped("api", "article")
+  
+  func boot(routes: RoutesBuilder) {
+    let route = routes.grouped("api", "article")
     
     route.get(use: get)
     
-    let sessionMiddleware = User.authSessionsMiddleware()
-    let redirectMiddleware = RedirectMiddleware(A: User.self, path: "/login")
-    let auth = route.grouped(sessionMiddleware, redirectMiddleware)
+    let auth = route.grouped([
+      User.sessionAuthenticator(),
+      // redirect middleware
+    ])
     
     auth.post(use: create)
-    auth.post(Article.parameter, "delete", use: delete)
+    auth.post(":articleID", "delete", use: delete)
   }
 
-  func get(_ req: Request) throws -> Future<[Article]> {
-    return Article.query(on: req).sort(\Article.date, .descending).all()
+  func get(req: Request) -> EventLoopFuture<[Article]> {
+    return Article.query(on: req.db).sort("date", .descending).all()
   }
   
-  func create(_ req: Request) throws -> Future<Article> {
-    let body = req.http.body.description
+  func create(req: Request) -> EventLoopFuture<Article> {
+    let body = req.body.description
 
     guard let data = body.data(using: .utf8) else {
-      throw CreateError.runtimeError("Bad request body")
+      return req.eventLoop.makeFailedFuture(CreateError.runtimeError("Bad request body"))
     }
 
-    guard let json = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? Dictionary<String, Any> else {
-      throw CreateError.runtimeError("Could not parse request body as JSON")
+    let json: Dictionary<String, Any>
+    do {
+      guard let _json = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? Dictionary<String, Any> else {
+        throw CreateError.runtimeError("Could not parse request body as JSON")
+      }
+      json = _json
+    } catch {
+      return req.eventLoop.makeFailedFuture(error)
     }
     
     let formatter = DateFormatter()
@@ -42,23 +50,23 @@ struct ArticleController: RouteCollection {
     formatter.timeZone = TimeZone(secondsFromGMT: 0)
 
     guard let title = json["title"] as? String else {
-      throw CreateError.runtimeError("Invalid title")
+      return req.eventLoop.makeFailedFuture(CreateError.runtimeError("Invalid title"))
     }
     
     guard let dateJSON = json["date"] as? String else {
-      throw CreateError.runtimeError("Bad date value")
+      return req.eventLoop.makeFailedFuture(CreateError.runtimeError("Bad date value"))
     }
 
     guard let date = formatter.date(from: dateJSON) else {
-      throw CreateError.runtimeError("Date value could not be converted to DateTime obejct")
+      return req.eventLoop.makeFailedFuture(CreateError.runtimeError("Date value could not be converted to DateTime obejct"))
     }
     
     guard let content = json["content"] as? String else {
-      throw CreateError.runtimeError("Invalid content")
+      return req.eventLoop.makeFailedFuture(CreateError.runtimeError("Invalid content"))
     }
     
     guard let author = json["author"] as? String else {
-      throw CreateError.runtimeError("Invalid author")
+      return req.eventLoop.makeFailedFuture(CreateError.runtimeError("Invalid author"))
     }
     
     let authorLink = json["authorLink"] as? String
@@ -71,40 +79,40 @@ struct ArticleController: RouteCollection {
     
     if json["id"] != nil {
       guard let _id = json["id"] as? String else {
-        throw CreateError.runtimeError("Bad id value")
+        return req.eventLoop.makeFailedFuture(CreateError.runtimeError("Bad id value"))
       }
       
       guard let id = UUID(uuidString: _id) else {
-        throw CreateError.runtimeError("Id was not a valid UUID")
+        return req.eventLoop.makeFailedFuture(CreateError.runtimeError("Id was not a valid UUID"))
       }
       
-      return try self.update(req, id: id, updatedArticle: article)
+      return self.update(req: req, id: id, updatedArticle: article)
     }
     
-    return article.save(on: req)
+    return article.save(on: req.db).transform(to: article)
   }
 
-  func update(_ req: Request, id: UUID, updatedArticle: Article) throws -> Future<Article> {
-    let articleFuture = Article.find(id, on: req)
-    
-    return articleFuture.flatMap { article_ -> EventLoopFuture<Article> in
-      guard let article = article_ else {
-        throw CreateError.runtimeError("Could not find article to update")
+  func update(req: Request, id: UUID, updatedArticle: Article) -> EventLoopFuture<Article> {
+    Article.find(id, on: req.db)
+      .unwrap(or: Abort(.notFound))
+      .flatMap { article -> EventLoopFuture<Article> in
+        article.title = updatedArticle.title
+        article.date = updatedArticle.date
+        article.content = updatedArticle.content
+        article.author = updatedArticle.author
+        article.authorLink = updatedArticle.authorLink
+        
+        return article.save(on: req.db).transform(to: article)
       }
-      
-      article.title = updatedArticle.title
-      article.date = updatedArticle.date
-      article.content = updatedArticle.content
-      article.author = updatedArticle.author
-      article.authorLink = updatedArticle.authorLink
-      
-      return article.save(on: req)
-    }
   }
   
-  func delete(_ req: Request) throws -> Future<Article> {
-    let article = try req.parameters.next(Article.self)
-    return article.delete(on: req)
+  func delete(req: Request) throws -> EventLoopFuture<Response> {
+    let redirect = req.redirect(to: "/app/news")
+    
+    return Article.find(req.parameters.get("article"), on: req.db)
+      .unwrap(or: Abort(.notFound))
+      .flatMap { article in
+        return article.delete(on: req.db).transform(to: redirect)
+      }
   }
 }
-

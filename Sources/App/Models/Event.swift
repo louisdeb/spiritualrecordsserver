@@ -5,23 +5,48 @@
 //  Created by Louis de Beaumont on 01/09/2019.
 //
 
-import FluentPostgreSQL
+import Fluent
 import Vapor
 
-final class Event: Codable {
+final class Event: Model {
+  static let schema = "events"
+  
+  @ID(key: .id)
   var id: UUID?
   
+  @Field(key: "name")
   var name: String
+  
+  @Field(key: "date")
   var date: Date
+  
+  @Field(key: "description")
   var description: String
+  
+  @Field(key: "unsignedArtists")
   var unsignedArtists: [UnsignedArtist]
+  
+  @Field(key: "price")
   var price: String
+  
+  @Field(key: "ticketsURL")
   var ticketsURL: String
+  
+  @Field(key: "noEvent")
   var noEvent: Bool
   
-  init(name: String?, date: Date, description: String?, unsignedArtists: [UnsignedArtist], price: String?, ticketsURL: String?, noEvent: Bool = false) {
-//    The following line creates a name for all events.
-//    self.name = (name == nil || name == "") ? Event.generateName(date: date) : name!
+  @Siblings(through: ArtistEvent.self, from: \.$event, to: \.$artist)
+  var artists: [Artist]
+  
+  init() {}
+  
+  init(name: String?, date: Date, description: String?,
+       unsignedArtists: [UnsignedArtist], price: String?,
+       ticketsURL: String?, noEvent: Bool = false) {
+    
+    // The following line creates a name for all events.
+    // self.name = (name == nil || name == "") ? Event.generateName(date: date) : name!
+    
     self.name = name ?? ""
     self.date = date
     self.description = description ?? ""
@@ -39,12 +64,6 @@ final class Event: Codable {
     if (noEvent) {
       self.id = UUID.init()
     }
-  }
-}
-
-extension Event {
-  var artists : Siblings<Event, Artist, ArtistEventPivot> {
-    return siblings()
   }
 }
 
@@ -103,15 +122,27 @@ extension Event {
   }
 }
 
-extension Event: Migration {
-  static func prepare(on connection: PostgreSQLConnection) -> Future<Void> {
-    return Database.create(self, on: connection) { builder in
-      try addProperties(to: builder)
-      builder.unique(on: \.id)
+extension Event {
+  struct Create: Migration {
+    let name = Event.schema
+    
+    func prepare(on database: Database) -> EventLoopFuture<Void> {
+      database.schema(name)
+        .field("id", .uuid, .identifier(auto: true))
+        .field("name", .uuid, .required)
+        .field("date", .uuid, .required)
+        .field("description", .uuid, .required)
+        .field("unsignedArtists", .uuid, .required)
+        .field("price", .uuid, .required)
+        .field("ticketsURL", .uuid, .required)
+        .field("noEvent", .uuid, .required)
+        .create()
+    }
+    
+    func revert(on database: Database) -> EventLoopFuture<Void> {
+      database.schema(name).delete()
     }
   }
 }
 
-extension Event: PostgreSQLUUIDModel {}
 extension Event: Content {}
-extension Event: Parameter {}

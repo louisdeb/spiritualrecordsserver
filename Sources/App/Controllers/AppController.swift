@@ -6,248 +6,286 @@
 //
 
 import Vapor
-import Authentication
+import Fluent
 
 struct AppController: RouteCollection {
-  func boot(router: Router) throws {
-    router.get("login", use: login)
+
+  func boot(routes: RoutesBuilder) throws {
+    routes.get("login", use: login)
     
-    let app = router.grouped("app")
+    let app = routes.grouped("app")
     
-    let sessionMiddleware = User.authSessionsMiddleware()
-    let redirectMiddleware = RedirectMiddleware(A: User.self, path: "/login")
-    let auth = app.grouped(sessionMiddleware, redirectMiddleware)
+    let auth = app.grouped([
+      User.sessionAuthenticator(),
+      // redirect middleware
+    ])
     
     auth.get(use: index)
     
     let artists = auth.grouped("artists")
     artists.get(use: artistManagement)
-    artists.get(Artist.parameter, use: artistView)
-    artists.get(Artist.parameter, "edit", use: artistEdit)
+    artists.get(":artistID", use: artistView)
+    artists.get(":artistID", "edit", use: artistEdit)
     
     let events = auth.grouped("events")
     events.get(use: eventManagement)
     events.get("all", use: eventViewAll)
-    events.get(Event.parameter, "edit", use: eventEdit)
+    events.get(":eventID", "edit", use: eventEdit)
     
     let releases = auth.grouped("releases")
     releases.get(use: releaseManagement)
-    releases.get(Release.parameter, "edit", use: releaseEdit)
+    releases.get(":releaseID", "edit", use: releaseEdit)
     
     let interviews = auth.grouped("interviews")
     interviews.get(use: interviewManagement)
-    interviews.get(Interview.parameter, "edit", use: interviewEdit)
+    interviews.get(":interviewID", "edit", use: interviewEdit)
     
     let news = auth.grouped("news")
     news.get(use: newsManagement)
-    news.get(Article.parameter, "edit", use: newsEdit)
+    news.get(":articleID", "edit", use: newsEdit)
     
     let account = auth.grouped("account")
     account.get(use: accountManagement)
   }
   
-  func index(_ req: Request) throws -> Future<View> {
-    return try req.view().render("index")
+  func index(req: Request) -> EventLoopFuture<View> {
+    return req.view.render("index")
   }
   
-  func login(_ req: Request) throws -> Future<View> {
-    return try req.view().render("login")
+  func login(req: Request) -> EventLoopFuture<View> {
+    return req.view.render("login")
   }
   
-  func artistManagement(_ req: Request) throws -> Future<View> {
-    let artists = Artist.query(on: req).sort(\Artist.name, .ascending).all()
+  func artistManagement(req: Request) -> EventLoopFuture<View> {
+    let artistsQuery: EventLoopFuture<[Artist]> = Artist.query(on: req.db).sort("name", .ascending).all()
     
-    return artists.flatMap { artists -> EventLoopFuture<View> in
-      let artistPreviews = try artists.map { artist -> Future<Artist.Preview> in
-        return try artist.getPreview(req)
+    return artistsQuery.flatMap { artists in
+      return artists.map { artist in
+        return artist.getPreview(db: req.db)
       }
-      .flatten(on: req)
-      
-      let data = ["artistPreviews": artistPreviews]
-      return try req.view().render("artistManagement", data)
+      .flatten(on: req.eventLoop)
+      .flatMap { artistPreviews in
+        return req.view.render("artistManagement", [
+          "artistPreviews": artistPreviews
+        ])
+      }
     }
   }
   
-  func artistView(_ req: Request) throws -> Future<View> {
-    let artist = try req.parameters.next(Artist.self)
-    return artist.flatMap { artist -> EventLoopFuture<View> in
-      let artistProfile = try artist.getProfile(req)
-      let data = ["artistProfile": artistProfile]
-      return try req.view().render("artistView", data)
-    }
-  }
-  
-  func artistEdit(_ req: Request) throws -> Future<View> {
-    let artist = try req.parameters.next(Artist.self)
-    return artist.flatMap { artist -> EventLoopFuture<View> in
-      let artistProfile = try artist.getProfile(req)
-      let data = ["artistProfile": artistProfile]
-      return try req.view().render("artistEdit", data)
-    }
-  }
-  
-  func getEventsView(_ req: Request, viewAll: Bool) throws -> Future<View> {
-    let events = Event.query(on: req).sort(\Event.date, .ascending).all()
-    
-    return events.flatMap { _events -> EventLoopFuture<View> in
-      let events = viewAll ? _events : _events.filter { $0.isUpcomingOrThisWeek() }
-      
-      let eventResponses = try events.map { event -> Future<EventResponse> in
-        return try event.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<EventResponse> in
-          return try artists.map { artist -> EventLoopFuture<Artist.Preview> in
-            return try artist.getPreview(req)
+  func artistView(req: Request) -> EventLoopFuture<View> {
+    Artist.find(req.parameters.get("artist"), on: req.db)
+      .unwrap(or: Abort(.notFound))
+      .flatMap { artist in
+        artist.getProfile(db: req.db)
+          .flatMap { artistProfile in
+            return req.view.render("artistView", [
+              "artistProfile": artistProfile
+            ])
           }
-          .flatten(on: req)
-          .flatMap { artistPreviews -> EventLoopFuture<EventResponse> in
-            return Future.map(on: req, { () -> EventResponse in
-              return EventResponse(event: event, artists: artistPreviews)
-            })
+      }
+  }
+  
+  func artistEdit(req: Request) -> EventLoopFuture<View> {
+    Artist.find(req.parameters.get("artist"), on: req.db)
+      .unwrap(or: Abort(.notFound))
+      .flatMap { artist in
+        artist.getProfile(db: req.db)
+          .flatMap { artistProfile in
+            return req.view.render("artistEdit", [
+              "artistProfile": artistProfile
+            ])
           }
-        }
       }
-      .flatten(on: req)
-      
-      return eventResponses.flatMap { eventResponses -> EventLoopFuture<View> in
-        let data = ["eventResponses": eventResponses]
-        return viewAll ? try req.view().render("eventViewAll", data) : try req.view().render("eventManagement", data)
-      }
-    }
   }
   
-  func eventManagement(_ req: Request) throws -> Future<View> {
-    return try getEventsView(req, viewAll: false)
-  }
-  
-  func eventViewAll(_ req: Request) throws -> Future<View> {
-    return try getEventsView(req, viewAll: true)
-  }
-  
-  func eventEdit(_ req: Request) throws -> Future<View> {
-    let event = try req.parameters.next(Event.self)
-    return event.flatMap { event -> EventLoopFuture<View> in
-      return try event.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<View> in
-        return try artists.map { artist -> EventLoopFuture<Artist.Preview> in
-          return try artist.getPreview(req)
-        }
-        .flatten(on: req)
-        .flatMap { artistPreviews -> EventLoopFuture<View> in
-          let eventResponse = EventResponse(event: event, artists: artistPreviews)
-          let data = ["eventResponse": eventResponse]
-          return try req.view().render("eventEdit", data)
-        }
-      }
-    }
-  }
-  
-  func releaseManagement(_ req: Request) throws -> Future<View> {
-    let releases = Release.query(on: req).sort(\Release.date, .descending).all()
-    
-    return releases.flatMap { releases -> EventLoopFuture<View> in
-      let releaseResponses = try releases.map { release -> EventLoopFuture<ReleaseResponse> in
-        return try release.images.query(on: req).first().flatMap { image_ -> EventLoopFuture<ReleaseResponse> in
-          let image = image_ ?? Image(url: "", creditText: "", creditLink: "", index: 0)
-          
-          return try release.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<ReleaseResponse> in
-            return try artists.map { artist -> EventLoopFuture<Artist.Preview> in
-              return try artist.getPreview(req)
-            }
-            .flatten(on: req)
-            .flatMap { artistPreviews -> EventLoopFuture<ReleaseResponse> in
-              return Future.map(on: req, { () -> ReleaseResponse in
-                return ReleaseResponse(release: release, artists: artistPreviews, image: image)
-              })
-            }
-          }
-        }
-      }
-      .flatten(on: req)
-      
-      return releaseResponses.flatMap { releaseResponses -> EventLoopFuture<View> in
-        let data = ["releaseResponses": releaseResponses]
-        return try req.view().render("releaseManagement", data)
-      }
-    }
-  }
-  
-  func releaseEdit(_ req: Request) throws -> Future<View> {
-    let release = try req.parameters.next(Release.self)
-    
-    return release.flatMap { release -> EventLoopFuture<View> in
-      return try release.images.query(on: req).first().flatMap { image_ -> EventLoopFuture<View> in
-        let image = image_ ?? Image(url: "", creditText: "", creditLink: "", index: 0)
+  func getEventsView(req: Request, viewAll: Bool) -> EventLoopFuture<View> {
+    Event.query(on: req.db)
+      .sort("date", .ascending)
+      .all()
+      .flatMap { allEvents in
+        let events = viewAll ? allEvents : allEvents.filter { $0.isUpcomingOrThisWeek() }
+        let eventResponses: EventLoopFuture<[EventResponse]>
         
-        return try release.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<View> in
-          return try artists.map { artist -> EventLoopFuture<Artist.Preview> in
-            return try artist.getPreview(req)
+        eventResponses = events.map { event in
+          let artistsQuery = event.$artists.query(on: req.db).all()
+          return artistsQuery.flatMap { artists in
+            return artists.map { artist in
+              return artist.getPreview(db: req.db)
+            }
+            .flatten(on: req.eventLoop)
+            .map { artistPreviews in
+              return EventResponse(event: event, artists: artistPreviews)
+            }
           }
-          .flatten(on: req)
+        }
+        .flatten(on: req.eventLoop)
+        
+        return eventResponses.flatMap { eventResponses in
+          let data = ["eventResponses": eventResponses]
+          return viewAll
+            ? req.view.render("eventViewAll", data)
+            : req.view.render("eventManagement", data)
+        }
+      }
+  }
+  
+  func eventManagement(req: Request) -> EventLoopFuture<View> {
+    return getEventsView(req: req, viewAll: false)
+  }
+  
+  func eventViewAll(req: Request) -> EventLoopFuture<View> {
+    return getEventsView(req: req, viewAll: true)
+  }
+  
+  func eventEdit(req: Request) -> EventLoopFuture<View> {
+    Event.find(req.parameters.get("event"), on: req.db)
+      .unwrap(or: Abort(.notFound))
+      .flatMap { event -> EventLoopFuture<View> in
+        let artistsQuery = event.$artists.query(on: req.db).all()
+        
+        return artistsQuery.flatMap { artists -> EventLoopFuture<View> in
+          return artists.map { artist -> EventLoopFuture<Artist.Preview> in
+            return artist.getPreview(db: req.db)
+          }
+          .flatten(on: req.eventLoop)
           .flatMap { artistPreviews -> EventLoopFuture<View> in
-            let releaseResponse = ReleaseResponse(release: release, artists: artistPreviews, image: image)
-            let data = ["releaseResponse": releaseResponse]
-            return try req.view().render("releaseEdit", data)
+            let eventResponse = EventResponse(event: event, artists: artistPreviews)
+            let data = ["eventResponse": eventResponse]
+            return req.view.render("eventEdit", data)
           }
         }
       }
-    }
   }
   
-  func interviewManagement(_ req: Request) throws -> Future<View> {
-    let interviews = Interview.query(on: req).sort(\Interview.date, .descending).all()
+  func releaseManagement(req: Request) -> EventLoopFuture<View> {
+    Release.query(on: req.db)
+      .sort("date", .descending)
+      .all()
+      .flatMap { releases in
+        let releaseResponses: EventLoopFuture<[ReleaseResponse]>
+        
+        releaseResponses = releases.map { release in
+          let imageQuery = release.$images.query(on: req.db).first()
+          let artistsQuery = release.$artists.query(on: req.db).all()
+          
+          return imageQuery.and(artistsQuery).flatMap { (image, artists) in
+            let image = image ?? Image(url: "", creditText: "", creditLink: "", index: 0)
+            
+            return artists.map { artist in
+              return artist.getPreview(db: req.db)
+            }
+            .flatten(on: req.eventLoop)
+            .flatMap { artistPreviews in
+              return req.eventLoop.future(ReleaseResponse(release: release, artists: artistPreviews, image: image))
+            }
+          }
+        }
+        .flatten(on: req.eventLoop)
+        
+        return releaseResponses.flatMap { releaseResponses in
+          return req.view.render("releaseManagement", [
+            "releaseResponses": releaseResponses
+          ])
+        }
+      }
+  }
+  
+  func releaseEdit(req: Request) -> EventLoopFuture<View> {
+    Release.find(req.parameters.get("release"), on: req.db)
+      .unwrap(or: Abort(.notFound))
+      .flatMap { release in
+        let imageQuery = release.$images.query(on: req.db).first()
+        
+        return imageQuery.flatMap { image in
+          let image = image ?? Image(url: "", creditText: "", creditLink: "", index: 0)
+          let artistsQuery = release.$artists.query(on: req.db).all()
+          
+          return artistsQuery.flatMap { artists in
+            return artists.map { artist in
+              return artist.getPreview(db: req.db)
+            }
+            .flatten(on: req.eventLoop)
+            .flatMap { artistPreviews in
+              let releaseResponse = ReleaseResponse(release: release, artists: artistPreviews, image: image)
+              let data = ["releaseResponse": releaseResponse]
+              return req.view.render("releaseEdit", data)
+            }
+          }
+        }
+      }
+  }
+  
+  func interviewManagement(req: Request) -> EventLoopFuture<View> {
+    let interviewsQuery = Interview.query(on: req.db).sort("date", .descending).all()
     
-    return interviews.flatMap { interviews -> EventLoopFuture<View> in
-      let interviewResponses = try interviews.map { interview -> EventLoopFuture<InterviewResponse> in
-        return try interview.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<InterviewResponse> in
-          return try artists.map { artist -> EventLoopFuture<Artist.Preview> in
-            return try artist.getPreview(req)
+    return interviewsQuery.flatMap { interviews in
+      let interviewResponses: EventLoopFuture<[InterviewResponse]>
+      interviewResponses = interviews.map { interview in
+        let artistsQuery = interview.$artists.query(on: req.db).all()
+        
+        return artistsQuery.flatMap { artists in
+          return artists.map { artist in
+            return artist.getPreview(db: req.db)
           }
-          .flatten(on: req)
-          .flatMap { artistPreviews -> EventLoopFuture<InterviewResponse> in
-            return Future.map(on: req, { () -> InterviewResponse in
-              return InterviewResponse(interview: interview, artists: artistPreviews)
-            })
+          .flatten(on: req.eventLoop)
+          .map { artistPreviews in
+            return InterviewResponse(interview: interview, artists: artistPreviews)
           }
         }
       }
-      .flatten(on: req)
-      
-      return interviewResponses.flatMap { interviewResponses -> EventLoopFuture<View> in
-        let data = ["interviewResponses": interviewResponses]
-        return try req.view().render("interviewManagement", data)
+      .flatten(on: req.eventLoop)
+        
+      return interviewResponses.flatMap { interviewResponses in
+        return req.view.render("interviewManagement", [
+          "interviewResponses": interviewResponses
+        ])
       }
     }
   }
   
-  func interviewEdit(_ req: Request) throws -> Future<View> {
-    let interview = try req.parameters.next(Interview.self)
-    
-    return interview.flatMap { interview -> EventLoopFuture<View> in
-      return try interview.artists.query(on: req).all().flatMap { artists -> EventLoopFuture<View> in
-        return try artists.map { artist -> EventLoopFuture<Artist.Preview> in
-          return try artist.getPreview(req)
-        }
-        .flatten(on: req)
-        .flatMap { artistPreviews -> EventLoopFuture<View> in
-          let interviewResponse = InterviewResponse(interview: interview, artists: artistPreviews)
-          let data = ["interviewResponse": interviewResponse]
-          return try req.view().render("interviewEdit", data)
+  func interviewEdit(req: Request) -> EventLoopFuture<View> {
+    Interview.find(req.parameters.get("interview"), on: req.db)
+      .unwrap(or: Abort(.notFound))
+      .flatMap { interview in
+        let artistsQuery = interview.$artists.query(on: req.db).all()
+        
+        return artistsQuery.flatMap { artists in
+          return artists.map { artist in
+            return artist.getPreview(db: req.db)
+          }
+          .flatten(on: req.eventLoop)
+          .flatMap { artistPreviews in
+            let interviewResponse = InterviewResponse(interview: interview, artists: artistPreviews)
+            let data = ["interviewResponse": interviewResponse]
+            return req.view.render("interviewEdit", data)
+          }
         }
       }
-    }
   }
   
-  func newsManagement(_ req: Request) throws -> Future<View> {
-    let news = Article.query(on: req).sort(\Article.date, .descending).all()
-    let data = ["news": news]
-    return try req.view().render("newsManagement", data)
+  func newsManagement(req: Request) -> EventLoopFuture<View> {
+    Article.query(on: req.db).sort("date", .descending)
+      .all()
+      .flatMap { articles in
+        return req.view.render("newsManagement", [
+          "articles": articles
+        ])
+      }
   }
   
-  func newsEdit(_ req: Request) throws -> Future<View> {
-    let article = try req.parameters.next(Article.self)
-    let data = ["article": article]
-    return try req.view().render("newsEdit", data)
+  func newsEdit(req: Request) -> EventLoopFuture<View> {
+    Article.find(req.parameters.get("article"), on: req.db)
+      .flatMap { article in
+        guard let article = article else {
+          return req.eventLoop.future(error: QueryError.runtimeError("Could not find article"))
+        }
+        return req.view.render("newsEdit", [
+          "article": article
+        ])
+      }
   }
   
-  func accountManagement(_ req: Request) throws -> Future<View> {
-    return try req.view().render("accountManagement")
+  func accountManagement(req: Request) -> EventLoopFuture<View> {
+    return req.view.render("accountManagement")
   }
 }

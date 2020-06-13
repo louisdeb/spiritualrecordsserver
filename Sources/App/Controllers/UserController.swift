@@ -7,16 +7,18 @@
 
 import Vapor
 import Crypto
-import Authentication
+import Fluent
 
 class UserController: RouteCollection {
-  func boot(router: Router) throws {
-    let usersRoute = router.grouped("api", "user")
+
+  func boot(routes: RoutesBuilder) throws {
+    let usersRoute = routes.grouped("api", "user")
     
-    let basicAuthMiddleware = User.basicAuthMiddleware(using: BCryptDigest())
-    let sessionMiddleware = User.authSessionsMiddleware()
-    let guardMiddleware = User.guardAuthMiddleware()
-    let auth = usersRoute.grouped(basicAuthMiddleware, sessionMiddleware, guardMiddleware)
+    let auth = usersRoute.grouped([
+      UserBasicAuthenticator(),
+      User.sessionAuthenticator(),
+      User.guardMiddleware(),
+    ])
     
     auth.post(use: login)
     auth.post("change-password", use: changePassword)
@@ -24,80 +26,104 @@ class UserController: RouteCollection {
   }
 
   func login(_ req: Request) throws -> String {
-    let user = try req.requireAuthenticated(User.self)
-    try req.authenticateSession(user)
+    guard req.auth.has(User.self) else { return "Login failed" }
     return "Logged in"
   }
   
-  func changePassword(_ req: Request) throws -> Future<User> {
-    let user = try req.requireAuthenticated(User.self)
+  func changePassword(req: Request) -> EventLoopFuture<Response> {
+    let redirect = req.redirect(to: "/app")
     
-    let body = req.http.body.description
-    
-    guard let data = body.data(using: .utf8) else {
-      throw CreateError.runtimeError("Bad request body")
+    guard req.auth.has(User.self) else {
+      return req.eventLoop.future().transform(to: redirect)
     }
     
-    guard let json = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? Dictionary<String, Any> else {
-      throw CreateError.runtimeError("Could not parse request body as JSON")
+    let user = req.auth.get(User.self)!
+    
+    let body = req.body.description
+    
+    guard let data = body.data(using: .utf8) else {
+      return req.eventLoop.makeFailedFuture(CreateError.runtimeError("Bad request body"))
+    }
+    
+    let json: Dictionary<String, Any>
+    do {
+      guard let _json = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? Dictionary<String, Any> else {
+        throw CreateError.runtimeError("Could not parse request body as JSON")
+      }
+      json = _json
+    } catch {
+      return req.eventLoop.makeFailedFuture(error)
     }
     
     guard let newPassword = json["new-password"] as? String else {
-      throw CreateError.runtimeError("New password is not a valid string")
+      return req.eventLoop.makeFailedFuture(CreateError.runtimeError("New password is not a valid string"))
     }
     
     guard newPassword.count >= 8 else {
-      throw CreateError.runtimeError("Password must be at least 8 characters long")
+      return req.eventLoop.makeFailedFuture(CreateError.runtimeError("Password must be at least 8 characters long"))
     }
     
-    let newPasswordHash = try BCrypt.hash(newPassword)
-
-    user.password = newPasswordHash
+    let newPasswordHash: String
+    do {
+      newPasswordHash = try Bcrypt.hash(newPassword)
+    } catch {
+      return req.eventLoop.makeFailedFuture(CreateError.runtimeError("Failed to hash plaintext"))
+    }
     
-    return user.save(on: req)
+    user.password = newPasswordHash
+    return user.save(on: req.db).transform(to: redirect)
   }
   
-  func createAccount(_ req: Request) throws -> Future<User> {
-    let _ = try req.requireAuthenticated(User.self)
+  func createAccount(_ req: Request) throws -> EventLoopFuture<User> {
+    guard req.auth.has(User.self) else { return req.eventLoop.future(User()) }
     
-    let body = req.http.body.description
+    let body = req.body.description
     
     guard let data = body.data(using: .utf8) else {
-      throw CreateError.runtimeError("Bad request body")
+      return req.eventLoop.makeFailedFuture(CreateError.runtimeError("Bad request body"))
     }
     
-    guard let json = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? Dictionary<String, Any> else {
-      throw CreateError.runtimeError("Could not parse request body as JSON")
+    let json: Dictionary<String, Any>
+    do {
+      guard let _json = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? Dictionary<String, Any> else {
+        throw CreateError.runtimeError("Could not parse request body as JSON")
+      }
+      json = _json
+    } catch {
+      return req.eventLoop.makeFailedFuture(error)
     }
     
     guard let username = json["username"] as? String else {
-      throw CreateError.runtimeError("Username not a valid string")
+      return req.eventLoop.makeFailedFuture(CreateError.runtimeError("Username not a valid string"))
     }
     
-    let usernameAvailable = User.query(on: req).all().flatMap { users -> EventLoopFuture<Bool> in
+    let usernameAvailable = User.query(on: req.db).all().map { users -> Bool in
       let sameNamedUsers = users.filter { $0.username == username }
-      return Future.map(on: req, { () -> Bool in
-        return sameNamedUsers.isEmpty
-      })
+      return sameNamedUsers.isEmpty
     }
     
-    return usernameAvailable.flatMap { usernameAvailable -> EventLoopFuture<User> in
+    return usernameAvailable.flatMap { usernameAvailable in
       if (!usernameAvailable) {
-        throw CreateError.runtimeError("Username in use")
+        return req.eventLoop.makeFailedFuture(CreateError.runtimeError("Username taken"))
       }
       
       guard let password = json["password"] as? String else {
-        throw CreateError.runtimeError("Password not a valid string")
+        return req.eventLoop.makeFailedFuture(CreateError.runtimeError("Password not a valid string"))
       }
       
       guard password.count >= 8 else {
-        throw CreateError.runtimeError("Password must be at least 8 characters long")
+        return req.eventLoop.makeFailedFuture(CreateError.runtimeError("Password must be at least 8 characters long"))
       }
       
-      let passwordHash = try BCrypt.hash(password)
+      let passwordHash: String
+      do {
+        passwordHash = try Bcrypt.hash(password)
+      } catch {
+        return req.eventLoop.makeFailedFuture(error)
+      }
       
       let user = User(username: username, password: passwordHash)
-      return user.save(on: req)
+      return user.save(on: req.db).transform(to: user)
     }
   }
 }

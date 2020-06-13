@@ -6,9 +6,8 @@
 //
 
 import Vapor
-import Authentication
 import S3
-
+/*
 final class AwsController: RouteCollection {
   let awsConfig: AwsConfig
   
@@ -16,14 +15,15 @@ final class AwsController: RouteCollection {
     self.awsConfig = awsConfig
   }
   
-  func boot(router: Router) throws {
-    let route = router.grouped("api", "aws")
+  func boot(routes: RoutesBuilder) throws {
+    let route = routes.grouped("api", "aws")
     
     route.post(ImageResponse.self, at: "s3-image-created", use: imageCreatedCallback)
     
-    let sessionMiddleware = User.authSessionsMiddleware()
-    let redirectMiddleware = RedirectMiddleware(A: User.self, path: "/login")
-    let auth = route.grouped(sessionMiddleware, redirectMiddleware)
+    let auth = route.grouped([
+      User.sessionAuthenticator(),
+      // redirect middleware
+    ])
 
     auth.get(use: preparePresignedUrlForImage)
   }
@@ -66,3 +66,4 @@ struct PresignedURL: Content {
   var url: String
   var get: String
 }
+*/
