@@ -9,7 +9,7 @@ import Fluent
 import Vapor
 
 final class Image: Model {
-  static let schema = "images"
+  static let schema = "Image"
   
   @ID(key: .id)
   var id: UUID?

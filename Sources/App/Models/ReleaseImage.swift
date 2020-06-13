@@ -9,7 +9,7 @@ import Foundation
 import Fluent
 
 final class ReleaseImage: Model {
-  static let schema = "releaseimage"
+  static let schema = "Image_Release"
   
   @ID(key: .id)
   var id: UUID?

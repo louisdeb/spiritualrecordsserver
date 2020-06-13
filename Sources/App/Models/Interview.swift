@@ -9,7 +9,7 @@ import Fluent
 import Vapor
 
 final class Interview: Model {
-  static let schema = "interviews"
+  static let schema = "Interview"
   
   @ID(key: .id)
   var id: UUID?

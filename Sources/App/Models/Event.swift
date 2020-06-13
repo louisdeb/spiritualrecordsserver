@@ -9,7 +9,7 @@ import Fluent
 import Vapor
 
 final class Event: Model {
-  static let schema = "events"
+  static let schema = "Event"
   
   @ID(key: .id)
   var id: UUID?

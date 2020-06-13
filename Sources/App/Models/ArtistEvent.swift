@@ -9,7 +9,7 @@ import Foundation
 import Fluent
 
 final class ArtistEvent: Model {
-  static let schema = "artistevent"
+  static let schema = "Artist_Event"
   
   @ID(key: .id)
   var id: UUID?
