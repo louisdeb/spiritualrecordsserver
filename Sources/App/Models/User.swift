@@ -50,21 +50,40 @@ extension User: Content {}
 
 extension User: Authenticatable {}
 
-struct UserBasicAuthenticator: BasicAuthenticator {
+struct UserAuthenticator: BasicAuthenticator {
   typealias User = App.User
-  
+
   func authenticate(basic: BasicAuthorization, for request: Request) -> EventLoopFuture<Void> {
-    User.query(on: request.db)
+    return User.query(on: request.db)
       .filter(\.$username == basic.username)
       .first()
-      .map {
+      .map { user -> EventLoopFuture<Void> in
         do {
-          if let user = $0, try Bcrypt.verify(basic.password, created: user.password) {
+          if let user = user, try Bcrypt.verify(basic.password, created: user.password) {
             request.auth.login(user)
           }
-        } catch {}
+        }
+        catch {}
+        return request.eventLoop.makeSucceededFuture(())
       }
+      .transform(to: ())
   }
 }
 
-extension User: ModelSessionAuthenticatable {}
+extension User: SessionAuthenticatable {
+  typealias SessionID = UUID
+  var sessionID: SessionID { self.id! }
+}
+
+struct UserSessionAuthenticator: SessionAuthenticator {
+  typealias User = App.User
+  
+  func authenticate(sessionID: User.SessionID, for request: Request) -> EventLoopFuture<Void> {
+    User.find(sessionID, on: request.db)
+      .map { user in
+        if let user = user {
+          request.auth.login(user)
+        }
+      }
+  }
+}

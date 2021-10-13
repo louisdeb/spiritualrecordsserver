@@ -10,7 +10,7 @@ let package = Package(
         .library(name: "spiritualrecordsserver", targets: ["App"]),
     ],
     dependencies: [
-      .package(url: "https://github.com/vapor/vapor.git", from: "4.3.0"),
+      .package(url: "https://github.com/vapor/vapor.git", from: "4.10.0"),
       .package(url: "https://github.com/vapor/fluent.git", from: "4.0.0-rc.3.1"),
       .package(url: "https://github.com/vapor/fluent-postgres-driver.git", from: "2.0.0-rc.3"),
       .package(url: "https://github.com/vapor/leaf.git", from: "4.0.0-rc.1.2"),

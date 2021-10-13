@@ -24,7 +24,7 @@ struct ReleaseController: RouteCollection {
     route.get("latest", use: getLatest)
     
     let auth = route.grouped([
-      User.sessionAuthenticator(),
+//      User.sessionAuthenticator(),
       RedirectMiddleware(),
     ])
     

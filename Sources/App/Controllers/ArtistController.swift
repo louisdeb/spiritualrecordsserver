@@ -25,7 +25,7 @@ struct ArtistController: RouteCollection {
     route.get(":artistID", use: getResponse)
     
     let auth = route.grouped([
-      User.sessionAuthenticator(),
+//      User.sessionAuthenticator(),
       RedirectMiddleware(),
     ])
     

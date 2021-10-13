@@ -10,24 +10,28 @@ import Crypto
 import Fluent
 
 class UserController: RouteCollection {
-
+  
   func boot(routes: RoutesBuilder) throws {
     let usersRoute = routes.grouped("api", "user")
     
     let auth = usersRoute.grouped([
-      UserBasicAuthenticator(),
-      User.sessionAuthenticator(),
+      UserAuthenticator(),
+      UserSessionAuthenticator(),
       User.guardMiddleware(),
+      RedirectMiddleware(),
     ])
     
     auth.post(use: login)
     auth.post("change-password", use: changePassword)
     auth.post("create-account", use: createAccount)
   }
-
-  func login(_ req: Request) throws -> String {
-    guard req.auth.has(User.self) else { return "Login failed" }
-    return "Logged in"
+  
+  func login(_ req: Request) -> EventLoopFuture<Response> {
+    guard req.auth.has(User.self) else {
+      return req.eventLoop.makeFailedFuture(AuthError.runtime("Failed to log in"))
+    }
+    let redirect = req.redirect(to: "/app")
+    return req.eventLoop.makeSucceededFuture(redirect)
   }
   
   func changePassword(req: Request) -> EventLoopFuture<Response> {

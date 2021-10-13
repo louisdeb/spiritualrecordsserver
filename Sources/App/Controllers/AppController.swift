@@ -16,7 +16,9 @@ struct AppController: RouteCollection {
     let app = routes.grouped("app")
     
     let auth = app.grouped([
-//      User.sessionAuthenticator(),
+      UserAuthenticator(),
+      UserSessionAuthenticator(),
+      User.guardMiddleware(),
       RedirectMiddleware(),
     ])
     

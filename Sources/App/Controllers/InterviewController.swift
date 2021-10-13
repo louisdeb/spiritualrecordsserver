@@ -16,7 +16,7 @@ struct InterviewController: RouteCollection {
     route.get(use: get)
     
     let auth = route.grouped([
-      User.sessionAuthenticator(),
+//      User.sessionAuthenticator(),
       RedirectMiddleware(),
     ])
     

@@ -7,6 +7,7 @@ import Leaf
 public func configure(_ app: Application) throws {
   
   app.sessions.use(.fluent)
+  app.migrations.add(SessionRecord.migration)
   
 //  let awsConfig = try AwsConfiguration().setup(services: &services)
 //  try routes(app, awsConfig: awsConfig)
